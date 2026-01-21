@@ -14,7 +14,9 @@ COMPLETE_FLAG="tasks_complete"
 # Configuration
 XCODE_PROJECT="TennerGrid.xcodeproj"  # Change to your project name
 XCODE_WORKSPACE=""  # Set to "TennerGrid.xcworkspace" if using CocoaPods/SPM
-TEST_DESTINATION="platform=iOS Simulator,name=iPhone 15,OS=latest"
+# TEST_DESTINATION="platform=iOS Simulator,name=iPhone 15,OS=latest"
+TEST_DESTINATION="platform=iOS Simulator,id=2B6CC595-D05B-456B-8DE0-F70C454F354C"
+
 
 # Color output
 RED='\033[0;31m'

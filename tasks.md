@@ -12,15 +12,15 @@
 
 ### 0.1 Initial Setup
 
-- [ ] Create new Xcode project with SwiftUI template, bundle ID `com.tennergrid.app`, iOS 16+ deployment target
-- [ ] Set up Git repository with `.gitignore` for Xcode/Swift projects
-- [ ] Create basic folder structure: Models/, ViewModels/, Views/, Services/, Utilities/, Resources/
-- [ ] Configure Xcode scheme and ensure project builds successfully
+- [x] Create new Xcode project with SwiftUI template, bundle ID `com.tennergrid.app`, iOS 16+ deployment target
+- [x] Set up Git repository with `.gitignore` for Xcode/Swift projects
+- [x] Create basic folder structure: Models/, ViewModels/, Views/, Services/, Utilities/, Resources/
+- [x] Configure Xcode scheme and ensure project builds successfully
 - [ ] Add SwiftLint configuration file (.swiftlint.yml) with iOS/Swift best practices
 
 ### 0.2 Core Data Models
 
-- [ ] Create `Difficulty` enum with cases (easy, medium, hard, expert, master, extreme) and associated properties
+- [ ] Create `Difficulty` enum with cases (easy, medium, hard, expert, calculator) and associated properties
 - [ ] Create `CellPosition` struct with row and column properties
 - [ ] Create `TennerGridPuzzle` model struct with id, dimensions, difficulty, targetSums, initialGrid, solution
 - [ ] Create `Cell` model struct with position, value, isInitial, pencilMarks, and state flags
