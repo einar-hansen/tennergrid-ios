@@ -23,7 +23,7 @@
 - [x] Create `Difficulty` enum with cases (easy, medium, hard, expert, calculator) and associated properties
 - [x] Create `CellPosition` struct with row and column properties
 - [x] Create `TennerGridPuzzle` model struct with id, dimensions, difficulty, targetSums, initialGrid, solution
-- [ ] Create `Cell` model struct with position, value, isInitial, pencilMarks, and state flags
+- [x] Create `Cell` model struct with position, value, isInitial, pencilMarks, and state flags
 - [ ] Write unit tests for all data models in Phase 0.2
 
 ### 0.3 Game State Models
