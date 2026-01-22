@@ -128,7 +128,7 @@
 
 ### 3.3 Number Pad
 
-- [ ] Create `NumberPadView` with buttons for digits 0-9
+- [x] Create `NumberPadView` with buttons for digits 0-9
 - [ ] Show conflict count or disabled state for invalid numbers
 - [ ] Highlight currently selected number
 - [ ] Add tap handling connected to GameViewModel
