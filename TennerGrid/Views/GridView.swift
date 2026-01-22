@@ -129,9 +129,9 @@ struct GridView: View {
     /// - Returns: The appropriate color
     private func sumColor(isComplete: Bool, isValid: Bool) -> Color {
         if isComplete {
-            return isValid ? .green : .red
+            isValid ? .green : .red
         } else {
-            return .secondary
+            .secondary
         }
     }
 
@@ -141,12 +141,12 @@ struct GridView: View {
     ///   - isValid: Whether the current sum matches the target
     /// - Returns: The appropriate background color
     private func sumBackgroundColor(isComplete: Bool, isValid: Bool) -> Color {
-        if isComplete && isValid {
-            return Color.green.opacity(0.1)
-        } else if isComplete && !isValid {
-            return Color.red.opacity(0.1)
+        if isComplete, isValid {
+            Color.green.opacity(0.1)
+        } else if isComplete, !isValid {
+            Color.red.opacity(0.1)
         } else {
-            return Color.gray.opacity(0.05)
+            Color.gray.opacity(0.05)
         }
     }
 }
@@ -155,25 +155,25 @@ struct GridView: View {
 
 #Preview("5x5 Grid") {
     let generator = PuzzleGenerator()
-    let puzzle = generator.generate(columns: 5, rows: 5, difficulty: .easy)
+    let puzzle = generator.generatePuzzle(columns: 5, rows: 5, difficulty: .easy)!
     GridView(viewModel: GameViewModel(puzzle: puzzle))
 }
 
 #Preview("7x5 Grid") {
     let generator = PuzzleGenerator()
-    let puzzle = generator.generate(columns: 7, rows: 5, difficulty: .easy)
+    let puzzle = generator.generatePuzzle(columns: 7, rows: 5, difficulty: .easy)!
     GridView(viewModel: GameViewModel(puzzle: puzzle))
 }
 
 #Preview("10x5 Grid") {
     let generator = PuzzleGenerator()
-    let puzzle = generator.generate(columns: 10, rows: 5, difficulty: .easy)
+    let puzzle = generator.generatePuzzle(columns: 10, rows: 5, difficulty: .easy)!
     GridView(viewModel: GameViewModel(puzzle: puzzle))
 }
 
 #Preview("Dark Mode") {
     let generator = PuzzleGenerator()
-    let puzzle = generator.generate(columns: 7, rows: 5, difficulty: .easy)
+    let puzzle = generator.generatePuzzle(columns: 7, rows: 5, difficulty: .easy)!
     GridView(viewModel: GameViewModel(puzzle: puzzle))
         .preferredColorScheme(.dark)
 }

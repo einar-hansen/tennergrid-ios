@@ -734,7 +734,27 @@ final class GameViewModel: ObservableObject {
     /// - Parameter position: The cell position
     /// - Returns: The cell at that position
     func cell(at position: CellPosition) -> Cell {
-        gameState.currentGrid[position.row][position.column]
+        let value = gameState.currentGrid[position.row][position.column]
+        let isInitial = gameState.puzzle.isPrefilled(at: position)
+        let pencilMarks = gameState.marks(at: position)
+        let isSelected = gameState.selectedCell == position
+
+        // Check if this cell has an error (validation logic would go here)
+        let hasError = false
+
+        // Check if this cell should be highlighted
+        // (e.g., same value as selected cell or adjacent to selected cell)
+        let isHighlighted = false
+
+        return Cell(
+            position: position,
+            value: value,
+            isInitial: isInitial,
+            pencilMarks: pencilMarks,
+            isSelected: isSelected,
+            hasError: hasError,
+            isHighlighted: isHighlighted
+        )
     }
 
     /// Calculate the current sum for a column
@@ -743,7 +763,7 @@ final class GameViewModel: ObservableObject {
     func columnSum(for column: Int) -> Int {
         var sum = 0
         for row in 0 ..< gameState.puzzle.rows {
-            if let value = gameState.currentGrid[row][column].value {
+            if let value = gameState.currentGrid[row][column] {
                 sum += value
             }
         }
@@ -755,7 +775,7 @@ final class GameViewModel: ObservableObject {
     /// - Returns: True if all cells in the column have values
     func isColumnComplete(_ column: Int) -> Bool {
         for row in 0 ..< gameState.puzzle.rows {
-            if gameState.currentGrid[row][column].value == nil {
+            if gameState.currentGrid[row][column] == nil {
                 return false
             }
         }
