@@ -48,7 +48,9 @@ struct NumberPadView: View {
     /// - Parameter number: The number (0-9) to display
     /// - Returns: A button view
     private func numberButton(for number: Int) -> some View {
-        Button {
+        let isSelected = isSelectedNumber(number)
+
+        return Button {
             viewModel.enterNumber(number)
         } label: {
             ZStack {
@@ -58,17 +60,23 @@ struct NumberPadView: View {
 
                 // Border
                 RoundedRectangle(cornerRadius: buttonCornerRadius)
-                    .strokeBorder(buttonBorderColor(for: number), lineWidth: 1)
+                    .strokeBorder(buttonBorderColor(for: number), lineWidth: isSelected ? 2 : 1)
 
                 // Number
                 Text(String(number))
-                    .font(.system(size: 24, weight: .medium, design: .rounded))
+                    .font(.system(size: 24, weight: isSelected ? .bold : .medium, design: .rounded))
                     .foregroundColor(buttonTextColor(for: number))
 
                 // Conflict count badge
                 conflictBadge(for: number)
             }
             .frame(width: buttonSize, height: buttonSize)
+            .shadow(
+                color: isSelected ? Color.blue.opacity(0.4) : Color.clear,
+                radius: isSelected ? 4 : 0,
+                x: 0,
+                y: isSelected ? 2 : 0
+            )
             .opacity(isNumberDisabled(for: number) ? 0.5 : 1.0)
         }
         .buttonStyle(.plain)
@@ -121,6 +129,18 @@ struct NumberPadView: View {
 
     // MARK: - Styling Helpers
 
+    /// Checks if a number is the currently selected cell's value
+    /// - Parameter number: The number to check
+    /// - Returns: True if this number matches the selected cell's value
+    private func isSelectedNumber(_ number: Int) -> Bool {
+        guard let selected = viewModel.selectedPosition,
+              let selectedValue = viewModel.value(at: selected)
+        else {
+            return false
+        }
+        return selectedValue == number
+    }
+
     /// Background color for a number button
     /// - Parameter number: The number
     /// - Returns: The background color
@@ -130,10 +150,9 @@ struct NumberPadView: View {
         }
 
         // Highlight if this is the currently selected cell's value
-        if let selectedValue = viewModel.value(at: selected),
-           selectedValue == number
-        {
-            return Color.blue.opacity(0.3)
+        // Use a filled blue background to make it stand out prominently
+        if isSelectedNumber(number) {
+            return Color.blue
         }
 
         // Check if this number would be invalid
@@ -155,10 +174,9 @@ struct NumberPadView: View {
         }
 
         // Highlight if this is the currently selected cell's value
-        if let selectedValue = viewModel.value(at: selected),
-           selectedValue == number
-        {
-            return Color.blue
+        // Use a darker blue border for the selected number
+        if isSelectedNumber(number) {
+            return Color.blue.opacity(0.8)
         }
 
         // Check if this number would be invalid
@@ -180,10 +198,9 @@ struct NumberPadView: View {
         }
 
         // Highlight if this is the currently selected cell's value
-        if let selectedValue = viewModel.value(at: selected),
-           selectedValue == number
-        {
-            return .blue
+        // Use white text on the filled blue background for better contrast
+        if isSelectedNumber(number) {
+            return .white
         }
 
         // Check if this number would be invalid (dim the text)
@@ -260,6 +277,24 @@ struct NumberPadView: View {
 
     return NumberPadView(viewModel: viewModel)
         .padding()
+}
+
+#Preview("Number Pad - Selected Number Highlighted") {
+    let generator = PuzzleGenerator()
+    let puzzle = generator.generatePuzzle(columns: 5, rows: 5, difficulty: .easy)!
+    let viewModel = GameViewModel(puzzle: puzzle)
+
+    // Select a cell and enter a value to show the highlight
+    _ = viewModel.selectCell(at: CellPosition(row: 0, column: 0))
+    _ = viewModel.enterNumber(5)
+
+    return VStack(spacing: 20) {
+        Text("Button '5' should be highlighted blue")
+            .font(.caption)
+            .foregroundColor(.secondary)
+        NumberPadView(viewModel: viewModel)
+    }
+    .padding()
 }
 
 #Preview("Number Pad - Dark Mode") {

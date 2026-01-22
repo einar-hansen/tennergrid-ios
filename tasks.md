@@ -130,7 +130,7 @@
 
 - [x] Create `NumberPadView` with buttons for digits 0-9
 - [x] Show conflict count or disabled state for invalid numbers
-- [ ] Highlight currently selected number
+- [x] Highlight currently selected number
 - [ ] Add tap handling connected to GameViewModel
 - [ ] Test number pad on iPhone and iPad
 
