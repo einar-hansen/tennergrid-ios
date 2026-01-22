@@ -76,11 +76,11 @@
 
 ### 2.1 Game View Model
 
-- [ ] Create `GameViewModel` as ObservableObject with published game state
-- [ ] Implement cell selection logic with published selectedPosition
-- [ ] Implement number entry with validation and error handling
-- [ ] Implement notes/pencil marks toggle and management
-- [ ] Write unit tests for GameViewModel state changes
+- [x] Create `GameViewModel` as ObservableObject with published game state
+- [x] Implement cell selection logic with published selectedPosition
+- [x] Implement number entry with validation and error handling
+- [x] Implement notes/pencil marks toggle and management
+- [x] Write unit tests for GameViewModel state changes
 
 ### 2.2 Undo/Redo System
 
