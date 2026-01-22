@@ -1091,4 +1091,552 @@ final class PuzzleGeneratorTests: XCTestCase {
             }
         }
     }
+
+    // MARK: - generatePuzzle Tests (Complete Puzzle Generation)
+
+    func testGeneratePuzzle_MinimumSize_Easy() {
+        // Given: Minimum dimensions and easy difficulty
+        let rows = 5
+        let columns = 5
+        let difficulty = Difficulty.easy
+
+        // When: Generating a complete puzzle
+        let puzzle = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty)
+
+        // Then: Should successfully generate a valid puzzle
+        XCTAssertNotNil(puzzle, "Should generate a puzzle for minimum size")
+
+        if let generatedPuzzle = puzzle {
+            // Verify basic properties
+            XCTAssertEqual(generatedPuzzle.rows, rows, "Puzzle should have correct number of rows")
+            XCTAssertEqual(generatedPuzzle.columns, columns, "Puzzle should have correct number of columns")
+            XCTAssertEqual(generatedPuzzle.difficulty, difficulty, "Puzzle should have correct difficulty")
+
+            // Verify puzzle is valid
+            XCTAssertTrue(generatedPuzzle.isValid(), "Generated puzzle should be valid")
+
+            // Verify solution is complete and valid
+            verifyCompleteSolution(puzzle: generatedPuzzle)
+
+            // Verify initial grid has some empty cells
+            verifyPuzzleHasEmptyCells(puzzle: generatedPuzzle)
+
+            // Verify puzzle is solvable
+            verifyPuzzleIsSolvable(puzzle: generatedPuzzle)
+        }
+    }
+
+    func testGeneratePuzzle_MaximumSize_Hard() {
+        // Given: Maximum dimensions and hard difficulty
+        let rows = 10
+        let columns = 10
+        let difficulty = Difficulty.hard
+
+        // When: Generating a complete puzzle
+        let puzzle = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty)
+
+        // Then: Should successfully generate a valid puzzle
+        XCTAssertNotNil(puzzle, "Should generate a puzzle for maximum size")
+
+        if let generatedPuzzle = puzzle {
+            XCTAssertEqual(generatedPuzzle.rows, rows, "Puzzle should have correct number of rows")
+            XCTAssertEqual(generatedPuzzle.columns, columns, "Puzzle should have correct number of columns")
+            XCTAssertEqual(generatedPuzzle.difficulty, difficulty, "Puzzle should have correct difficulty")
+
+            XCTAssertTrue(generatedPuzzle.isValid(), "Generated puzzle should be valid")
+            verifyCompleteSolution(puzzle: generatedPuzzle)
+            verifyPuzzleHasEmptyCells(puzzle: generatedPuzzle)
+            verifyPuzzleIsSolvable(puzzle: generatedPuzzle)
+        }
+    }
+
+    func testGeneratePuzzle_TypicalSize_Medium() {
+        // Given: Typical dimensions and medium difficulty
+        let rows = 7
+        let columns = 8
+        let difficulty = Difficulty.medium
+
+        // When: Generating a complete puzzle
+        let puzzle = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty)
+
+        // Then: Should successfully generate a valid puzzle
+        XCTAssertNotNil(puzzle, "Should generate a puzzle for typical size")
+
+        if let generatedPuzzle = puzzle {
+            XCTAssertEqual(generatedPuzzle.rows, rows, "Puzzle should have correct number of rows")
+            XCTAssertEqual(generatedPuzzle.columns, columns, "Puzzle should have correct number of columns")
+            XCTAssertEqual(generatedPuzzle.difficulty, difficulty, "Puzzle should have correct difficulty")
+
+            XCTAssertTrue(generatedPuzzle.isValid(), "Generated puzzle should be valid")
+            verifyCompleteSolution(puzzle: generatedPuzzle)
+            verifyPuzzleHasEmptyCells(puzzle: generatedPuzzle)
+            verifyPuzzleIsSolvable(puzzle: generatedPuzzle)
+        }
+    }
+
+    func testGeneratePuzzle_AllDifficulties() {
+        // Given: Standard dimensions and all difficulty levels
+        let rows = 6
+        let columns = 6
+        let difficulties: [Difficulty] = [.easy, .medium, .hard, .expert]
+
+        for difficulty in difficulties {
+            // When: Generating a puzzle for each difficulty
+            let puzzle = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty)
+
+            // Then: Should successfully generate valid puzzles for all difficulties
+            XCTAssertNotNil(puzzle, "Should generate a puzzle for \(difficulty) difficulty")
+
+            if let generatedPuzzle = puzzle {
+                XCTAssertEqual(generatedPuzzle.difficulty, difficulty, "Puzzle should have correct difficulty")
+                XCTAssertTrue(generatedPuzzle.isValid(), "Generated \(difficulty) puzzle should be valid")
+                verifyCompleteSolution(puzzle: generatedPuzzle)
+                verifyPuzzleIsSolvable(puzzle: generatedPuzzle)
+
+                // Verify difficulty affects pre-filled percentage
+                let filledCount = countFilledCells(grid: generatedPuzzle.initialGrid)
+                let totalCells = rows * columns
+                let filledPercentage = Double(filledCount) / Double(totalCells)
+                let expectedPercentage = difficulty.prefilledPercentage
+
+                // Allow some variance (±10%)
+                XCTAssertTrue(
+                    abs(filledPercentage - expectedPercentage) < 0.15,
+                    "Difficulty \(difficulty) should have ~\(expectedPercentage * 100)% pre-filled, got \(filledPercentage * 100)%"
+                )
+            }
+        }
+    }
+
+    func testGeneratePuzzle_InvalidDimensions_RowsTooSmall() {
+        // Given: Invalid dimensions (rows < 5)
+        let rows = 3
+        let columns = 6
+
+        // When: Attempting to generate a puzzle
+        let puzzle = generator.generatePuzzle(columns: columns, rows: rows, difficulty: .easy)
+
+        // Then: Should return nil for invalid dimensions
+        XCTAssertNil(puzzle, "Should return nil for rows < 5")
+    }
+
+    func testGeneratePuzzle_InvalidDimensions_ColumnsTooSmall() {
+        // Given: Invalid dimensions (columns < 5)
+        let rows = 6
+        let columns = 4
+
+        // When: Attempting to generate a puzzle
+        let puzzle = generator.generatePuzzle(columns: columns, rows: rows, difficulty: .easy)
+
+        // Then: Should return nil for invalid dimensions
+        XCTAssertNil(puzzle, "Should return nil for columns < 5")
+    }
+
+    func testGeneratePuzzle_InvalidDimensions_RowsTooLarge() {
+        // Given: Invalid dimensions (rows > 10)
+        let rows = 12
+        let columns = 6
+
+        // When: Attempting to generate a puzzle
+        let puzzle = generator.generatePuzzle(columns: columns, rows: rows, difficulty: .easy)
+
+        // Then: Should return nil for invalid dimensions
+        XCTAssertNil(puzzle, "Should return nil for rows > 10")
+    }
+
+    func testGeneratePuzzle_InvalidDimensions_ColumnsTooLarge() {
+        // Given: Invalid dimensions (columns > 10)
+        let rows = 6
+        let columns = 15
+
+        // When: Attempting to generate a puzzle
+        let puzzle = generator.generatePuzzle(columns: columns, rows: rows, difficulty: .easy)
+
+        // Then: Should return nil for invalid dimensions
+        XCTAssertNil(puzzle, "Should return nil for columns > 10")
+    }
+
+    func testGeneratePuzzle_WithSeed_Deterministic() {
+        // Given: Same parameters and seed
+        let rows = 6
+        let columns = 6
+        let difficulty = Difficulty.medium
+        let seed: UInt64 = 42
+
+        // When: Generating multiple puzzles with same seed
+        let puzzle1 = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty, seed: seed)
+        let puzzle2 = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty, seed: seed)
+
+        // Then: Should generate identical puzzles
+        XCTAssertNotNil(puzzle1, "First puzzle should be generated")
+        XCTAssertNotNil(puzzle2, "Second puzzle should be generated")
+
+        if let p1 = puzzle1, let p2 = puzzle2 {
+            // Verify initial grids are identical
+            XCTAssertEqual(p1.initialGrid.count, p2.initialGrid.count, "Should have same number of rows")
+            for row in 0 ..< p1.initialGrid.count {
+                XCTAssertEqual(
+                    p1.initialGrid[row].count,
+                    p2.initialGrid[row].count,
+                    "Row \(row) should have same length"
+                )
+                for col in 0 ..< p1.initialGrid[row].count {
+                    XCTAssertEqual(
+                        p1.initialGrid[row][col],
+                        p2.initialGrid[row][col],
+                        "Initial grid cell at (\(row),\(col)) should be identical"
+                    )
+                }
+            }
+
+            // Verify solutions are identical
+            XCTAssertEqual(p1.solution, p2.solution, "Solutions should be identical")
+
+            // Verify target sums are identical
+            XCTAssertEqual(p1.targetSums, p2.targetSums, "Target sums should be identical")
+        }
+    }
+
+    func testGeneratePuzzle_DifferentSeeds_DifferentPuzzles() {
+        // Given: Same parameters but different seeds
+        let rows = 6
+        let columns = 6
+        let difficulty = Difficulty.medium
+        let seed1: UInt64 = 12345
+        let seed2: UInt64 = 67890
+
+        // When: Generating puzzles with different seeds
+        let puzzle1 = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty, seed: seed1)
+        let puzzle2 = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty, seed: seed2)
+
+        // Then: Should generate different puzzles (highly likely)
+        XCTAssertNotNil(puzzle1, "First puzzle should be generated")
+        XCTAssertNotNil(puzzle2, "Second puzzle should be generated")
+
+        if let p1 = puzzle1, let p2 = puzzle2 {
+            // Solutions should be different
+            XCTAssertNotEqual(p1.solution, p2.solution, "Different seeds should produce different solutions")
+        }
+    }
+
+    func testGeneratePuzzle_ColumnSumsMatchSolution() {
+        // Given: Standard puzzle generation
+        let rows = 6
+        let columns = 7
+        let difficulty = Difficulty.medium
+
+        // When: Generating a puzzle
+        let puzzle = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty)
+
+        // Then: Column sums should match the solution
+        XCTAssertNotNil(puzzle, "Should generate a puzzle")
+
+        if let generatedPuzzle = puzzle {
+            // Calculate column sums from solution
+            let calculatedSums = calculateColumnSums(grid: generatedPuzzle.solution)
+
+            // Verify they match the puzzle's target sums
+            XCTAssertEqual(
+                calculatedSums.count,
+                generatedPuzzle.targetSums.count,
+                "Should have same number of column sums"
+            )
+
+            for col in 0 ..< calculatedSums.count {
+                XCTAssertEqual(
+                    calculatedSums[col],
+                    generatedPuzzle.targetSums[col],
+                    "Column \(col) sum from solution should match target sum"
+                )
+            }
+        }
+    }
+
+    func testGeneratePuzzle_SolutionFollowsAllRules() {
+        // Given: Standard puzzle generation
+        let rows = 7
+        let columns = 7
+        let difficulty = Difficulty.medium
+
+        // When: Generating a puzzle
+        let puzzle = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty)
+
+        // Then: Solution should follow all Tenner Grid rules
+        XCTAssertNotNil(puzzle, "Should generate a puzzle")
+
+        if let generatedPuzzle = puzzle {
+            let solution = generatedPuzzle.solution
+
+            // Verify no adjacent duplicates in solution
+            verifyNoAdjacentDuplicates(grid: solution, rows: rows, columns: columns)
+
+            // Verify no row duplicates in solution
+            verifyNoRowDuplicates(grid: solution)
+
+            // Verify all values are 0-9
+            for row in solution {
+                for value in row {
+                    XCTAssertTrue(value >= 0 && value <= 9, "All solution values should be 0-9")
+                }
+            }
+        }
+    }
+
+    func testGeneratePuzzle_InitialGridMatchesSolution() {
+        // Given: Standard puzzle generation
+        let rows = 6
+        let columns = 6
+        let difficulty = Difficulty.easy
+
+        // When: Generating a puzzle
+        let puzzle = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty)
+
+        // Then: All filled cells in initial grid should match solution
+        XCTAssertNotNil(puzzle, "Should generate a puzzle")
+
+        if let generatedPuzzle = puzzle {
+            verifyConsistencyWithSolution(
+                puzzleGrid: generatedPuzzle.initialGrid,
+                solution: generatedPuzzle.solution
+            )
+        }
+    }
+
+    func testGeneratePuzzle_HasUniqueSolution() {
+        // Given: Standard puzzle generation
+        let rows = 6
+        let columns = 6
+        let difficulty = Difficulty.medium
+
+        // When: Generating a puzzle
+        let puzzle = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty)
+
+        // Then: Puzzle should have a unique solution
+        XCTAssertNotNil(puzzle, "Should generate a puzzle")
+
+        if let generatedPuzzle = puzzle {
+            let solver = PuzzleSolver()
+            XCTAssertTrue(
+                solver.hasUniqueSolution(puzzle: generatedPuzzle),
+                "Generated puzzle should have a unique solution"
+            )
+        }
+    }
+
+    func testGeneratePuzzle_IsSolvable() {
+        // Given: Standard puzzle generation
+        let rows = 5
+        let columns = 5
+        let difficulty = Difficulty.medium
+
+        // When: Generating a puzzle
+        let puzzle = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty)
+
+        // Then: Puzzle should be solvable
+        XCTAssertNotNil(puzzle, "Should generate a puzzle")
+
+        if let generatedPuzzle = puzzle {
+            let solver = PuzzleSolver()
+            if let solvedGrid = solver.solve(puzzle: generatedPuzzle) {
+                // Verify solved grid matches the original solution
+                XCTAssertEqual(
+                    solvedGrid,
+                    generatedPuzzle.solution,
+                    "Solved grid should match the original solution"
+                )
+            } else {
+                XCTFail("Generated puzzle should be solvable")
+            }
+        }
+    }
+
+    func testGeneratePuzzle_MultipleGenerations_AllValid() {
+        // Given: Standard parameters
+        let rows = 5
+        let columns = 5
+        let difficulty = Difficulty.easy
+        let attempts = 10
+
+        // When: Generating multiple puzzles
+        var successCount = 0
+        var validCount = 0
+        var solvableCount = 0
+
+        for _ in 0 ..< attempts {
+            if let puzzle = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty) {
+                successCount += 1
+
+                // Verify puzzle is valid
+                if puzzle.isValid() {
+                    validCount += 1
+                }
+
+                // Verify puzzle is solvable
+                let solver = PuzzleSolver()
+                if solver.solve(puzzle: puzzle) != nil {
+                    solvableCount += 1
+                }
+
+                // Verify solution follows rules
+                verifyNoAdjacentDuplicates(grid: puzzle.solution, rows: rows, columns: columns)
+                verifyNoRowDuplicates(grid: puzzle.solution)
+            }
+        }
+
+        // Then: Should successfully generate and validate all puzzles
+        XCTAssertEqual(successCount, attempts, "Should generate all puzzles successfully")
+        XCTAssertEqual(validCount, attempts, "All generated puzzles should be valid")
+        XCTAssertEqual(solvableCount, attempts, "All generated puzzles should be solvable")
+    }
+
+    func testGeneratePuzzle_CreatedAtDate() {
+        // Given: Standard puzzle generation
+        let rows = 6
+        let columns = 6
+        let difficulty = Difficulty.medium
+
+        // When: Generating a puzzle
+        let beforeGeneration = Date()
+        let puzzle = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty)
+        let afterGeneration = Date()
+
+        // Then: Puzzle should have a createdAt date within the generation timeframe
+        XCTAssertNotNil(puzzle, "Should generate a puzzle")
+
+        if let generatedPuzzle = puzzle {
+            XCTAssertNotNil(generatedPuzzle.createdAt, "Puzzle should have a createdAt date")
+
+            if let createdAt = generatedPuzzle.createdAt {
+                XCTAssertTrue(
+                    createdAt >= beforeGeneration && createdAt <= afterGeneration,
+                    "createdAt should be within generation timeframe"
+                )
+            }
+        }
+    }
+
+    func testGeneratePuzzle_Performance_SmallGrid() {
+        // Given: Small grid dimensions
+        let rows = 5
+        let columns = 5
+        let difficulty = Difficulty.easy
+
+        // When: Measuring puzzle generation time
+        measure {
+            _ = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty)
+        }
+
+        // Then: Performance is measured
+    }
+
+    func testGeneratePuzzle_Performance_LargeGrid() {
+        // Given: Large grid dimensions
+        let rows = 10
+        let columns = 10
+        let difficulty = Difficulty.medium
+
+        // When: Measuring puzzle generation time
+        measure {
+            _ = generator.generatePuzzle(columns: columns, rows: rows, difficulty: difficulty)
+        }
+
+        // Then: Performance is measured
+    }
+
+    func testGeneratePuzzle_DailyPuzzle_Deterministic() {
+        // Given: Same seed representing a specific date
+        let rows = 6
+        let columns = 6
+        let difficulty = Difficulty.medium
+
+        // Simulate daily puzzle by using date as seed
+        let calendar = Calendar.current
+        let components = calendar.dateComponents([.year, .month, .day], from: Date())
+        let seed = UInt64(components.year! * 10000 + components.month! * 100 + components.day!)
+
+        // When: Generating multiple "daily" puzzles with same seed
+        let dailyPuzzle1 = generator.generatePuzzle(
+            columns: columns,
+            rows: rows,
+            difficulty: difficulty,
+            seed: seed
+        )
+        let dailyPuzzle2 = generator.generatePuzzle(
+            columns: columns,
+            rows: rows,
+            difficulty: difficulty,
+            seed: seed
+        )
+
+        // Then: Should generate identical puzzles for the same "day"
+        XCTAssertNotNil(dailyPuzzle1, "First daily puzzle should be generated")
+        XCTAssertNotNil(dailyPuzzle2, "Second daily puzzle should be generated")
+
+        if let p1 = dailyPuzzle1, let p2 = dailyPuzzle2 {
+            XCTAssertEqual(p1.solution, p2.solution, "Daily puzzles with same seed should be identical")
+            XCTAssertEqual(p1.targetSums, p2.targetSums, "Target sums should be identical")
+        }
+    }
+
+    // MARK: - Additional Validation Helper Methods
+
+    /// Verifies that a puzzle's solution is complete and contains all required data
+    private func verifyCompleteSolution(puzzle: TennerGridPuzzle) {
+        // Verify solution dimensions match puzzle dimensions
+        XCTAssertEqual(
+            puzzle.solution.count,
+            puzzle.rows,
+            "Solution should have correct number of rows"
+        )
+
+        for (index, row) in puzzle.solution.enumerated() {
+            XCTAssertEqual(
+                row.count,
+                puzzle.columns,
+                "Solution row \(index) should have correct number of columns"
+            )
+
+            // Verify all values are in valid range (0-9)
+            for (colIndex, value) in row.enumerated() {
+                XCTAssertTrue(
+                    value >= 0 && value <= 9,
+                    "Solution value at (\(index),\(colIndex)) should be between 0 and 9, got \(value)"
+                )
+            }
+        }
+    }
+
+    /// Verifies that a puzzle has at least some empty cells (is not fully filled)
+    private func verifyPuzzleHasEmptyCells(puzzle: TennerGridPuzzle) {
+        let filledCount = countFilledCells(grid: puzzle.initialGrid)
+        let totalCells = puzzle.rows * puzzle.columns
+
+        XCTAssertLessThan(
+            filledCount,
+            totalCells,
+            "Puzzle should have at least some empty cells"
+        )
+
+        XCTAssertGreaterThan(
+            filledCount,
+            0,
+            "Puzzle should have at least some pre-filled cells"
+        )
+    }
+
+    /// Verifies that a puzzle can be solved by the solver
+    private func verifyPuzzleIsSolvable(puzzle: TennerGridPuzzle) {
+        let solver = PuzzleSolver()
+        guard let solvedGrid = solver.solve(puzzle: puzzle) else {
+            XCTFail("Puzzle should be solvable")
+            return
+        }
+
+        // Verify solved grid matches the original solution
+        XCTAssertEqual(
+            solvedGrid,
+            puzzle.solution,
+            "Solved grid should match the original solution"
+        )
+    }
 }
