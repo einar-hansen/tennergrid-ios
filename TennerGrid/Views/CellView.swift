@@ -87,39 +87,53 @@ struct CellView: View {
 
     // MARK: - Styling
 
-    /// Background color based on cell state
+    /// Background color based on cell state (priority order: error > selected > same-number > highlighted > initial > empty)
     private var backgroundColor: Color {
         if cell.hasError {
+            // Error state: red tint to indicate invalid placement
             Color.red.opacity(0.2)
         } else if cell.isSelected {
+            // Selected state: prominent blue background
             Color.blue.opacity(0.15)
+        } else if cell.isSameNumber {
+            // Same-number state: yellow/amber tint for cells with matching value
+            Color.yellow.opacity(0.12)
         } else if cell.isHighlighted {
+            // Highlighted state: subtle blue tint for related cells (e.g., same row/column)
             Color.blue.opacity(0.08)
         } else if cell.isInitial {
+            // Initial/pre-filled state: light gray to distinguish from user entries
             Color.gray.opacity(0.1)
         } else {
+            // Empty/default state: clear background
             Color.clear
         }
     }
 
-    /// Border color based on cell state
+    /// Border color based on cell state (priority order: error > selected > default)
     private var borderColor: Color {
         if cell.hasError {
+            // Error state: red border
             .red
         } else if cell.isSelected {
+            // Selected state: blue border
             .blue
         } else {
+            // Default state: subtle gray border
             Color.gray.opacity(0.3)
         }
     }
 
-    /// Text color based on cell state
+    /// Text color based on cell state (priority order: error > initial > user-entered)
     private var textColor: Color {
         if cell.hasError {
+            // Error state: red text
             .red
         } else if cell.isInitial {
+            // Initial/pre-filled: primary color (adapts to light/dark mode)
             .primary
         } else {
+            // User-entered: blue to distinguish from pre-filled
             .blue
         }
     }
@@ -200,6 +214,18 @@ struct CellView_Previews: PreviewProvider {
             )
             .previewDisplayName("Highlighted")
 
+            // Same-number cell
+            CellView(
+                cell: Cell(
+                    position: CellPosition(row: 0, column: 0),
+                    value: 7,
+                    isInitial: false,
+                    isSameNumber: true
+                ),
+                onTap: {}
+            )
+            .previewDisplayName("Same Number")
+
             // Pencil marks
             CellView(
                 cell: Cell(
@@ -211,6 +237,19 @@ struct CellView_Previews: PreviewProvider {
                 onTap: {}
             )
             .previewDisplayName("Pencil Marks")
+
+            // Combined states: Selected with error
+            CellView(
+                cell: Cell(
+                    position: CellPosition(row: 0, column: 0),
+                    value: 6,
+                    isInitial: false,
+                    isSelected: true,
+                    hasError: true
+                ),
+                onTap: {}
+            )
+            .previewDisplayName("Selected + Error")
 
             // Dark mode
             CellView(

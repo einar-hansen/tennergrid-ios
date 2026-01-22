@@ -28,8 +28,11 @@ struct Cell: Equatable, Hashable, Codable {
     /// Whether this cell has an error (conflicts with game rules)
     var hasError: Bool
 
-    /// Whether this cell should be highlighted (e.g., same value as selected cell)
+    /// Whether this cell should be highlighted (e.g., related to selected cell)
     var isHighlighted: Bool
+
+    /// Whether this cell has the same number as the selected cell
+    var isSameNumber: Bool
 
     /// Creates a new cell
     /// - Parameters:
@@ -40,6 +43,7 @@ struct Cell: Equatable, Hashable, Codable {
     ///   - isSelected: Whether the cell is selected (defaults to false)
     ///   - hasError: Whether the cell has an error (defaults to false)
     ///   - isHighlighted: Whether the cell is highlighted (defaults to false)
+    ///   - isSameNumber: Whether the cell has the same number as selected (defaults to false)
     init(
         position: CellPosition,
         value: Int? = nil,
@@ -47,7 +51,8 @@ struct Cell: Equatable, Hashable, Codable {
         pencilMarks: Set<Int> = [],
         isSelected: Bool = false,
         hasError: Bool = false,
-        isHighlighted: Bool = false
+        isHighlighted: Bool = false,
+        isSameNumber: Bool = false
     ) {
         self.position = position
         self.value = value
@@ -56,6 +61,7 @@ struct Cell: Equatable, Hashable, Codable {
         self.isSelected = isSelected
         self.hasError = hasError
         self.isHighlighted = isHighlighted
+        self.isSameNumber = isSameNumber
     }
 }
 
@@ -144,6 +150,15 @@ extension Cell {
         return cell
     }
 
+    /// Creates a copy of this cell with same-number state updated
+    /// - Parameter sameNumber: Whether the cell has the same number as selected
+    /// - Returns: A new Cell with updated same-number state
+    func withSameNumber(_ sameNumber: Bool) -> Cell {
+        var cell = self
+        cell.isSameNumber = sameNumber
+        return cell
+    }
+
     /// Clears the cell's value and pencil marks
     /// - Returns: A new Cell with value and pencil marks cleared
     func cleared() -> Cell {
@@ -185,6 +200,7 @@ extension Cell: CustomStringConvertible {
             isSelected ? "S" : nil,
             hasError ? "E" : nil,
             isHighlighted ? "H" : nil,
+            isSameNumber ? "SN" : nil,
         ].compactMap { $0 }.joined(separator: ",")
 
         let flagsStr = flags.isEmpty ? "" : " [\(flags)]"

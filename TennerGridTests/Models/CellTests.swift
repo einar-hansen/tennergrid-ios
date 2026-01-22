@@ -22,6 +22,7 @@ struct CellTests {
         #expect(cell.isSelected == false)
         #expect(cell.hasError == false)
         #expect(cell.isHighlighted == false)
+        #expect(cell.isSameNumber == false)
     }
 
     @Test func fullInitialization() {
@@ -34,7 +35,8 @@ struct CellTests {
             pencilMarks: marks,
             isSelected: true,
             hasError: true,
-            isHighlighted: true
+            isHighlighted: true,
+            isSameNumber: true
         )
 
         #expect(cell.position == position)
@@ -44,6 +46,7 @@ struct CellTests {
         #expect(cell.isSelected == true)
         #expect(cell.hasError == true)
         #expect(cell.isHighlighted == true)
+        #expect(cell.isSameNumber == true)
     }
 
     // MARK: - Factory Methods Tests
@@ -221,6 +224,17 @@ struct CellTests {
         #expect(unhighlighted.isHighlighted == false)
     }
 
+    @Test func testWithSameNumber() {
+        let position = CellPosition(row: 0, column: 0)
+        let original = Cell(position: position, isSameNumber: false)
+
+        let sameNumber = original.withSameNumber(true)
+        #expect(sameNumber.isSameNumber == true)
+
+        let notSameNumber = sameNumber.withSameNumber(false)
+        #expect(notSameNumber.isSameNumber == false)
+    }
+
     @Test func testCleared() {
         let position = CellPosition(row: 0, column: 0)
         let original = Cell(
@@ -317,7 +331,8 @@ struct CellTests {
             isInitial: true,
             isSelected: true,
             hasError: true,
-            isHighlighted: true
+            isHighlighted: true,
+            isSameNumber: true
         )
         let description = cell.description
 
@@ -325,6 +340,7 @@ struct CellTests {
         #expect(description.contains("S")) // Selected
         #expect(description.contains("E")) // Error
         #expect(description.contains("H")) // Highlighted
+        #expect(description.contains("SN")) // Same Number
     }
 
     @Test func descriptionWithPencilMarks() {
@@ -366,7 +382,8 @@ struct CellTests {
             "pencilMarks": [1, 2, 3],
             "isSelected": false,
             "hasError": false,
-            "isHighlighted": false
+            "isHighlighted": false,
+            "isSameNumber": false
         }
         """
 
@@ -388,7 +405,8 @@ struct CellTests {
             pencilMarks: [2, 4, 6, 8],
             isSelected: true,
             hasError: false,
-            isHighlighted: true
+            isHighlighted: true,
+            isSameNumber: true
         )
 
         let encoder = JSONEncoder()
@@ -467,11 +485,13 @@ struct CellTests {
             .withSelection(true)
             .withError(true)
             .withHighlight(true)
+            .withSameNumber(true)
 
         #expect(modified.value == 5)
         #expect(modified.isSelected)
         #expect(modified.hasError)
         #expect(modified.isHighlighted)
+        #expect(modified.isSameNumber)
         #expect(original.isEmpty) // Original unchanged
     }
 }
