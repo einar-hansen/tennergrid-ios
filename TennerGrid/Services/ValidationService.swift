@@ -61,7 +61,8 @@ struct ValidationService {
         let adjacentPositions = position.adjacentPositions(maxRows: puzzle.rows, maxColumns: puzzle.columns)
         for adjacentPos in adjacentPositions {
             if let adjacentValue = grid[adjacentPos.row][adjacentPos.column],
-               adjacentValue == value {
+               adjacentValue == value
+            {
                 conflicts.append(adjacentPos)
             }
         }
@@ -70,7 +71,8 @@ struct ValidationService {
         let rowPositions = position.rowPositions(maxColumns: puzzle.columns)
         for rowPos in rowPositions {
             if let rowValue = grid[rowPos.row][rowPos.column],
-               rowValue == value {
+               rowValue == value
+            {
                 conflicts.append(rowPos)
             }
         }
@@ -95,7 +97,7 @@ struct ValidationService {
         var sum = 0
 
         // Calculate the sum of all values in the column
-        for row in 0..<puzzle.rows {
+        for row in 0 ..< puzzle.rows {
             guard let value = grid[row][column] else {
                 // Column is incomplete
                 return false
@@ -125,8 +127,8 @@ struct ValidationService {
         }
 
         // Check all cells for conflicts
-        for row in 0..<puzzle.rows {
-            for col in 0..<puzzle.columns {
+        for row in 0 ..< puzzle.rows {
+            for col in 0 ..< puzzle.columns {
                 let position = CellPosition(row: row, column: col)
                 let conflicts = detectConflicts(at: position, in: grid, puzzle: puzzle)
                 if !conflicts.isEmpty {
@@ -136,7 +138,7 @@ struct ValidationService {
         }
 
         // Check all column sums
-        for col in 0..<puzzle.columns {
+        for col in 0 ..< puzzle.columns {
             if !isColumnSumValid(column: col, in: grid, puzzle: puzzle) {
                 return false
             }
@@ -161,7 +163,8 @@ struct ValidationService {
 
         for adjacentPos in adjacentPositions {
             if let adjacentValue = grid[adjacentPos.row][adjacentPos.column],
-               adjacentValue == value {
+               adjacentValue == value
+            {
                 return true
             }
         }
@@ -180,7 +183,8 @@ struct ValidationService {
 
         for rowPos in rowPositions {
             if let rowValue = grid[rowPos.row][rowPos.column],
-               rowValue == value {
+               rowValue == value
+            {
                 return true
             }
         }

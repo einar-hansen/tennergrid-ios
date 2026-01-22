@@ -17,7 +17,7 @@ struct Achievement: Equatable, Codable, Identifiable {
     let title: String
 
     /// Detailed description explaining how to unlock it
-    let description: String
+    let achievementDescription: String
 
     /// Current progress toward unlocking (0.0 to 1.0)
     var progress: Double
@@ -47,7 +47,7 @@ struct Achievement: Equatable, Codable, Identifiable {
     /// - Parameters:
     ///   - id: Unique identifier
     ///   - title: Display title
-    ///   - description: How to unlock description
+    ///   - achievementDescription: How to unlock description
     ///   - category: Achievement category
     ///   - iconName: SF Symbol name
     ///   - targetValue: Target value to reach
@@ -56,7 +56,7 @@ struct Achievement: Equatable, Codable, Identifiable {
     init(
         id: String,
         title: String,
-        description: String,
+        achievementDescription: String,
         category: AchievementCategory,
         iconName: String,
         targetValue: Int = 1,
@@ -65,7 +65,7 @@ struct Achievement: Equatable, Codable, Identifiable {
     ) {
         self.id = id
         self.title = title
-        self.description = description
+        self.achievementDescription = achievementDescription
         self.category = category
         self.iconName = iconName
         self.targetValue = targetValue
@@ -158,7 +158,7 @@ extension Achievement {
         let previousProgress = progress
         progress = min(Double(currentValue) / Double(targetValue), 1.0)
 
-        if progress >= 1.0 && !isUnlocked {
+        if progress >= 1.0, !isUnlocked {
             unlock()
             return true
         }
@@ -207,7 +207,7 @@ extension Achievement {
 
     /// Display title (hidden achievements show "???" until unlocked)
     var displayTitle: String {
-        if isHidden && !isUnlocked {
+        if isHidden, !isUnlocked {
             "???"
         } else {
             title
@@ -216,16 +216,16 @@ extension Achievement {
 
     /// Display description (hidden achievements show generic text until unlocked)
     var displayDescription: String {
-        if isHidden && !isUnlocked {
+        if isHidden, !isUnlocked {
             "This achievement is hidden. Keep playing to discover it!"
         } else {
-            description
+            achievementDescription
         }
     }
 
     /// Icon name to display (hidden achievements show question mark)
     var displayIconName: String {
-        if isHidden && !isUnlocked {
+        if isHidden, !isUnlocked {
             "questionmark.circle.fill"
         } else {
             iconName
@@ -249,7 +249,7 @@ extension Achievement {
     /// - Parameters:
     ///   - id: Unique identifier
     ///   - title: Display title
-    ///   - description: How to unlock description
+    ///   - achievementDescription: How to unlock description
     ///   - category: Achievement category
     ///   - iconName: SF Symbol name
     ///   - isHidden: Whether hidden until unlocked
@@ -258,7 +258,7 @@ extension Achievement {
     static func oneTime(
         id: String,
         title: String,
-        description: String,
+        achievementDescription: String,
         category: AchievementCategory,
         iconName: String,
         isHidden: Bool = false,
@@ -267,7 +267,7 @@ extension Achievement {
         Achievement(
             id: id,
             title: title,
-            description: description,
+            achievementDescription: achievementDescription,
             category: category,
             iconName: iconName,
             targetValue: 1,
@@ -280,7 +280,7 @@ extension Achievement {
     /// - Parameters:
     ///   - id: Unique identifier
     ///   - title: Display title
-    ///   - description: How to unlock description
+    ///   - achievementDescription: How to unlock description
     ///   - category: Achievement category
     ///   - iconName: SF Symbol name
     ///   - targetValue: Number of times to complete
@@ -289,7 +289,7 @@ extension Achievement {
     static func progressive(
         id: String,
         title: String,
-        description: String,
+        achievementDescription: String,
         category: AchievementCategory,
         iconName: String,
         targetValue: Int,
@@ -298,7 +298,7 @@ extension Achievement {
         Achievement(
             id: id,
             title: title,
-            description: description,
+            achievementDescription: achievementDescription,
             category: category,
             iconName: iconName,
             targetValue: targetValue,
@@ -318,7 +318,7 @@ extension Achievement {
             .oneTime(
                 id: "first_game",
                 title: "First Steps",
-                description: "Complete your first puzzle",
+                achievementDescription: "Complete your first puzzle",
                 category: .games,
                 iconName: "flag.checkered",
                 points: 10
@@ -326,7 +326,7 @@ extension Achievement {
             .progressive(
                 id: "games_10",
                 title: "Getting Started",
-                description: "Complete 10 puzzles",
+                achievementDescription: "Complete 10 puzzles",
                 category: .games,
                 iconName: "10.circle.fill",
                 targetValue: 10,
@@ -335,7 +335,7 @@ extension Achievement {
             .progressive(
                 id: "games_50",
                 title: "Dedicated Player",
-                description: "Complete 50 puzzles",
+                achievementDescription: "Complete 50 puzzles",
                 category: .games,
                 iconName: "50.circle.fill",
                 targetValue: 50,
@@ -344,7 +344,7 @@ extension Achievement {
             .progressive(
                 id: "games_100",
                 title: "Centurion",
-                description: "Complete 100 puzzles",
+                achievementDescription: "Complete 100 puzzles",
                 category: .games,
                 iconName: "100.circle.fill",
                 targetValue: 100,
@@ -355,7 +355,7 @@ extension Achievement {
             .oneTime(
                 id: "easy_master",
                 title: "Easy Rider",
-                description: "Complete 10 Easy puzzles",
+                achievementDescription: "Complete 10 Easy puzzles",
                 category: .difficulty,
                 iconName: "leaf.fill",
                 points: 15
@@ -363,7 +363,7 @@ extension Achievement {
             .oneTime(
                 id: "medium_master",
                 title: "Rising Challenge",
-                description: "Complete 10 Medium puzzles",
+                achievementDescription: "Complete 10 Medium puzzles",
                 category: .difficulty,
                 iconName: "chart.line.uptrend.xyaxis",
                 points: 25
@@ -371,7 +371,7 @@ extension Achievement {
             .oneTime(
                 id: "hard_master",
                 title: "Hard Core",
-                description: "Complete 10 Hard puzzles",
+                achievementDescription: "Complete 10 Hard puzzles",
                 category: .difficulty,
                 iconName: "bolt.fill",
                 points: 40
@@ -379,7 +379,7 @@ extension Achievement {
             .oneTime(
                 id: "expert_master",
                 title: "Expert Level",
-                description: "Complete 10 Expert puzzles",
+                achievementDescription: "Complete 10 Expert puzzles",
                 category: .difficulty,
                 iconName: "crown.fill",
                 points: 75
@@ -389,7 +389,7 @@ extension Achievement {
             .oneTime(
                 id: "speed_easy",
                 title: "Quick Thinker",
-                description: "Complete an Easy puzzle in under 3 minutes",
+                achievementDescription: "Complete an Easy puzzle in under 3 minutes",
                 category: .speed,
                 iconName: "hare.fill",
                 points: 15
@@ -397,7 +397,7 @@ extension Achievement {
             .oneTime(
                 id: "speed_medium",
                 title: "Speed Demon",
-                description: "Complete a Medium puzzle in under 5 minutes",
+                achievementDescription: "Complete a Medium puzzle in under 5 minutes",
                 category: .speed,
                 iconName: "bolt.fill",
                 points: 30
@@ -405,7 +405,7 @@ extension Achievement {
             .oneTime(
                 id: "speed_hard",
                 title: "Lightning Fast",
-                description: "Complete a Hard puzzle in under 10 minutes",
+                achievementDescription: "Complete a Hard puzzle in under 10 minutes",
                 category: .speed,
                 iconName: "cloud.bolt.fill",
                 points: 50
@@ -415,7 +415,7 @@ extension Achievement {
             .oneTime(
                 id: "no_hints",
                 title: "Self-Sufficient",
-                description: "Complete a puzzle without using any hints",
+                achievementDescription: "Complete a puzzle without using any hints",
                 category: .mastery,
                 iconName: "lightbulb.slash.fill",
                 points: 20
@@ -423,7 +423,7 @@ extension Achievement {
             .oneTime(
                 id: "perfect_game",
                 title: "Perfection",
-                description: "Complete a puzzle without any errors",
+                achievementDescription: "Complete a puzzle without any errors",
                 category: .mastery,
                 iconName: "checkmark.seal.fill",
                 points: 30
@@ -433,7 +433,7 @@ extension Achievement {
             .progressive(
                 id: "streak_3",
                 title: "On Fire",
-                description: "Play 3 days in a row",
+                achievementDescription: "Play 3 days in a row",
                 category: .streaks,
                 iconName: "flame.fill",
                 targetValue: 3,
@@ -442,7 +442,7 @@ extension Achievement {
             .progressive(
                 id: "streak_7",
                 title: "Week Warrior",
-                description: "Play 7 days in a row",
+                achievementDescription: "Play 7 days in a row",
                 category: .streaks,
                 iconName: "calendar.badge.exclamationmark",
                 targetValue: 7,
@@ -451,7 +451,7 @@ extension Achievement {
             .progressive(
                 id: "streak_30",
                 title: "Monthly Master",
-                description: "Play 30 days in a row",
+                achievementDescription: "Play 30 days in a row",
                 category: .streaks,
                 iconName: "calendar.badge.clock",
                 targetValue: 30,
@@ -462,12 +462,12 @@ extension Achievement {
             .oneTime(
                 id: "calculator_complete",
                 title: "The Calculator",
-                description: "Complete a Calculator difficulty puzzle",
+                achievementDescription: "Complete a Calculator difficulty puzzle",
                 category: .special,
                 iconName: "function",
                 isHidden: true,
                 points: 150
-            )
+            ),
         ]
     }
 }

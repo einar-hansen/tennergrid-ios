@@ -16,7 +16,7 @@ struct AchievementTests {
         let achievement = Achievement(
             id: "test_achievement",
             title: "Test Achievement",
-            description: "Complete a test",
+            achievementDescription: "Complete a test",
             category: .games,
             iconName: "star.fill",
             targetValue: 10,
@@ -26,7 +26,7 @@ struct AchievementTests {
 
         #expect(achievement.id == "test_achievement")
         #expect(achievement.title == "Test Achievement")
-        #expect(achievement.description == "Complete a test")
+        #expect(achievement.achievementDescription == "Complete a test")
         #expect(achievement.category == .games)
         #expect(achievement.iconName == "star.fill")
         #expect(achievement.targetValue == 10)
@@ -41,7 +41,7 @@ struct AchievementTests {
         let achievement = Achievement(
             id: "simple",
             title: "Simple",
-            description: "A simple achievement",
+            achievementDescription: "A simple achievement",
             category: .mastery,
             iconName: "checkmark"
         )
@@ -57,7 +57,7 @@ struct AchievementTests {
         let achievement = Achievement.oneTime(
             id: "first_win",
             title: "First Win",
-            description: "Win your first game",
+            achievementDescription: "Win your first game",
             category: .games,
             iconName: "flag.fill",
             points: 15
@@ -72,7 +72,7 @@ struct AchievementTests {
         let achievement = Achievement.oneTime(
             id: "secret",
             title: "Secret Achievement",
-            description: "Find the secret",
+            achievementDescription: "Find the secret",
             category: .special,
             iconName: "sparkles",
             isHidden: true,
@@ -87,7 +87,7 @@ struct AchievementTests {
         let achievement = Achievement.progressive(
             id: "win_100",
             title: "Centurion",
-            description: "Win 100 games",
+            achievementDescription: "Win 100 games",
             category: .games,
             iconName: "100.circle",
             targetValue: 100,
@@ -136,7 +136,7 @@ struct AchievementTests {
         var achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star"
         )
@@ -152,7 +152,7 @@ struct AchievementTests {
         var achievement = Achievement.progressive(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star",
             targetValue: 10
@@ -169,7 +169,7 @@ struct AchievementTests {
         var achievement = Achievement.progressive(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star",
             targetValue: 10
@@ -188,7 +188,7 @@ struct AchievementTests {
         var achievement = Achievement.progressive(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star",
             targetValue: 10
@@ -204,7 +204,7 @@ struct AchievementTests {
         var achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star"
         )
@@ -220,7 +220,7 @@ struct AchievementTests {
         var achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star"
         )
@@ -240,7 +240,7 @@ struct AchievementTests {
         var achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star"
         )
@@ -258,7 +258,7 @@ struct AchievementTests {
         var achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star"
         )
@@ -277,7 +277,7 @@ struct AchievementTests {
         let achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star"
         )
@@ -289,7 +289,7 @@ struct AchievementTests {
         var achievement = Achievement.progressive(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star",
             targetValue: 10
@@ -304,7 +304,7 @@ struct AchievementTests {
         var achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star"
         )
@@ -318,7 +318,7 @@ struct AchievementTests {
         var achievement = Achievement.progressive(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star",
             targetValue: 20
@@ -335,7 +335,7 @@ struct AchievementTests {
         var achievement = Achievement.progressive(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star",
             targetValue: 50
@@ -350,7 +350,7 @@ struct AchievementTests {
         let achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star",
             isHidden: false
@@ -363,7 +363,7 @@ struct AchievementTests {
         let achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .special,
             iconName: "star",
             isHidden: true
@@ -376,7 +376,7 @@ struct AchievementTests {
         var achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .special,
             iconName: "star",
             isHidden: true
@@ -391,7 +391,7 @@ struct AchievementTests {
         var achievement = Achievement.oneTime(
             id: "test",
             title: "Amazing Achievement",
-            description: "You did it!",
+            achievementDescription: "You did it!",
             category: .games,
             iconName: "star",
             isHidden: true
@@ -406,7 +406,7 @@ struct AchievementTests {
         let achievement = Achievement.oneTime(
             id: "test",
             title: "Secret Achievement",
-            description: "Find the secret",
+            achievementDescription: "Find the secret",
             category: .special,
             iconName: "star",
             isHidden: true
@@ -419,7 +419,7 @@ struct AchievementTests {
         let achievement = Achievement.oneTime(
             id: "test",
             title: "Public Achievement",
-            description: "Everyone can see this",
+            achievementDescription: "Everyone can see this",
             category: .games,
             iconName: "star",
             isHidden: false
@@ -432,7 +432,7 @@ struct AchievementTests {
         var achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
-            description: "The real description",
+            achievementDescription: "The real description",
             category: .games,
             iconName: "star",
             isHidden: true
@@ -447,7 +447,7 @@ struct AchievementTests {
         let achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
-            description: "The real description",
+            achievementDescription: "The real description",
             category: .special,
             iconName: "star",
             isHidden: true
@@ -460,7 +460,7 @@ struct AchievementTests {
         var achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
-            description: "Test",
+            achievementDescription: "Test",
             category: .games,
             iconName: "trophy.fill",
             isHidden: true
@@ -475,7 +475,7 @@ struct AchievementTests {
         let achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
-            description: "Test",
+            achievementDescription: "Test",
             category: .special,
             iconName: "trophy.fill",
             isHidden: true
@@ -488,7 +488,7 @@ struct AchievementTests {
         let achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
-            description: "Test",
+            achievementDescription: "Test",
             category: .games,
             iconName: "star"
         )
@@ -500,7 +500,7 @@ struct AchievementTests {
         var achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
-            description: "Test",
+            achievementDescription: "Test",
             category: .games,
             iconName: "star"
         )
@@ -521,7 +521,7 @@ struct AchievementTests {
 
     @Test func allAchievementsHaveUniqueIds() {
         let achievements = Achievement.allAchievements
-        let ids = achievements.map { $0.id }
+        let ids = achievements.map(\.id)
         let uniqueIds = Set(ids)
 
         #expect(ids.count == uniqueIds.count)
@@ -605,7 +605,7 @@ struct AchievementTests {
         let achievement1 = Achievement(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star"
         )
@@ -613,7 +613,7 @@ struct AchievementTests {
         let achievement2 = Achievement(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star"
         )
@@ -625,7 +625,7 @@ struct AchievementTests {
         let achievement1 = Achievement(
             id: "test1",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star"
         )
@@ -633,7 +633,7 @@ struct AchievementTests {
         let achievement2 = Achievement(
             id: "test2",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star"
         )
@@ -645,7 +645,7 @@ struct AchievementTests {
         var achievement1 = Achievement(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star"
         )
@@ -653,7 +653,7 @@ struct AchievementTests {
         let achievement2 = Achievement(
             id: "test",
             title: "Test",
-            description: "Test achievement",
+            achievementDescription: "Test achievement",
             category: .games,
             iconName: "star"
         )
@@ -669,7 +669,7 @@ struct AchievementTests {
         var achievement = Achievement(
             id: "test",
             title: "Test Achievement",
-            description: "Test description",
+            achievementDescription: "Test description",
             category: .games,
             iconName: "star.fill",
             targetValue: 10,
@@ -688,7 +688,7 @@ struct AchievementTests {
         var original = Achievement(
             id: "test",
             title: "Test Achievement",
-            description: "Test description",
+            achievementDescription: "Test description",
             category: .games,
             iconName: "star.fill",
             targetValue: 10,
@@ -710,7 +710,7 @@ struct AchievementTests {
         var achievement = Achievement(
             id: "complex_test",
             title: "Complex Test",
-            description: "A complex achievement for testing",
+            achievementDescription: "A complex achievement for testing",
             category: .mastery,
             iconName: "crown.fill",
             targetValue: 25,
@@ -728,7 +728,7 @@ struct AchievementTests {
 
         #expect(decoded.id == achievement.id)
         #expect(decoded.title == achievement.title)
-        #expect(decoded.description == achievement.description)
+        #expect(decoded.achievementDescription == achievement.achievementDescription)
         #expect(decoded.category == achievement.category)
         #expect(decoded.iconName == achievement.iconName)
         #expect(decoded.targetValue == achievement.targetValue)
@@ -742,7 +742,7 @@ struct AchievementTests {
         var achievement = Achievement.oneTime(
             id: "unlocked_test",
             title: "Unlocked Test",
-            description: "An unlocked achievement",
+            achievementDescription: "An unlocked achievement",
             category: .games,
             iconName: "checkmark"
         )
@@ -766,7 +766,7 @@ struct AchievementTests {
         let achievement = Achievement(
             id: "unique_id",
             title: "Test",
-            description: "Test",
+            achievementDescription: "Test",
             category: .games,
             iconName: "star"
         )
@@ -780,7 +780,7 @@ struct AchievementTests {
         var achievement = Achievement.progressive(
             id: "test_100",
             title: "Century",
-            description: "Reach 100",
+            achievementDescription: "Reach 100",
             category: .games,
             iconName: "100.circle",
             targetValue: 100,
@@ -802,7 +802,7 @@ struct AchievementTests {
         let achievement = Achievement.oneTime(
             id: "secret",
             title: "Secret",
-            description: "Find the secret",
+            achievementDescription: "Find the secret",
             category: .special,
             iconName: "sparkles",
             isHidden: true
@@ -819,7 +819,7 @@ struct AchievementTests {
         let achievement = Achievement(
             id: "test",
             title: "Test",
-            description: "Test",
+            achievementDescription: "Test",
             category: .games,
             iconName: "star",
             targetValue: 0
@@ -833,7 +833,7 @@ struct AchievementTests {
         var achievement = Achievement.progressive(
             id: "marathon",
             title: "Marathon",
-            description: "Play 10000 games",
+            achievementDescription: "Play 10000 games",
             category: .games,
             iconName: "figure.run",
             targetValue: 10000
@@ -849,7 +849,7 @@ struct AchievementTests {
         var achievement = Achievement.progressive(
             id: "test",
             title: "Test",
-            description: "Test",
+            achievementDescription: "Test",
             category: .games,
             iconName: "star",
             targetValue: 100
@@ -873,7 +873,7 @@ struct AchievementTests {
         var achievement = Achievement.progressive(
             id: "test",
             title: "Test",
-            description: "Test",
+            achievementDescription: "Test",
             category: .games,
             iconName: "star",
             targetValue: 100

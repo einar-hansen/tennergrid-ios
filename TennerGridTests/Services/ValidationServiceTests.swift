@@ -5,8 +5,8 @@
 //  Created by Claude on 2026-01-22.
 //
 
-import XCTest
 @testable import TennerGrid
+import XCTest
 
 final class ValidationServiceTests: XCTestCase {
     var service: ValidationService!
@@ -23,14 +23,14 @@ final class ValidationServiceTests: XCTestCase {
             [nil, nil, 3, nil, nil],
             [5, nil, nil, nil, nil],
             [nil, nil, nil, 7, nil],
-            [nil, nil, nil, nil, 9]
+            [nil, nil, nil, nil, 9],
         ]
         let solution: [[Int]] = [
             [1, 2, 3, 4, 5],
             [6, 7, 3, 8, 0],
             [5, 9, 1, 7, 3],
             [2, 4, 6, 7, 8],
-            [0, 3, 5, 1, 9]
+            [0, 3, 5, 1, 9],
         ]
 
         testPuzzle = TennerGridPuzzle(
@@ -58,7 +58,7 @@ final class ValidationServiceTests: XCTestCase {
             [nil, nil, 3, nil, nil],
             [5, nil, nil, nil, nil],
             [nil, nil, nil, 7, nil],
-            [nil, nil, nil, nil, 9]
+            [nil, nil, nil, nil, 9],
         ]
         let position = CellPosition(row: 0, column: 0)
 
@@ -81,7 +81,7 @@ final class ValidationServiceTests: XCTestCase {
             [nil, nil, 3, nil, nil],
             [5, nil, nil, nil, nil],
             [nil, nil, nil, 7, nil],
-            [nil, nil, nil, nil, 9]
+            [nil, nil, nil, nil, 9],
         ]
         let position = CellPosition(row: 0, column: 0)
 
@@ -104,7 +104,7 @@ final class ValidationServiceTests: XCTestCase {
             [3, nil, 3, nil, nil],
             [5, nil, nil, nil, nil],
             [nil, nil, nil, 7, nil],
-            [nil, nil, nil, nil, 9]
+            [nil, nil, nil, nil, 9],
         ]
         let position = CellPosition(row: 0, column: 0)
 
@@ -127,7 +127,7 @@ final class ValidationServiceTests: XCTestCase {
             [nil, 4, 3, nil, nil],
             [5, nil, nil, nil, nil],
             [nil, nil, nil, 7, nil],
-            [nil, nil, nil, nil, 9]
+            [nil, nil, nil, nil, 9],
         ]
         let position = CellPosition(row: 0, column: 0)
 
@@ -150,7 +150,7 @@ final class ValidationServiceTests: XCTestCase {
             [nil, nil, 3, nil, nil],
             [5, nil, nil, nil, nil],
             [nil, nil, nil, 7, nil],
-            [nil, nil, nil, nil, 9]
+            [nil, nil, nil, nil, 9],
         ]
         let position = CellPosition(row: 0, column: 0)
 
@@ -173,7 +173,7 @@ final class ValidationServiceTests: XCTestCase {
             [nil, nil, 3, nil, nil],
             [5, nil, nil, nil, nil],
             [nil, nil, nil, 7, nil],
-            [nil, nil, nil, nil, 9]
+            [nil, nil, nil, nil, 9],
         ]
         let position = CellPosition(row: 0, column: 0)
 
@@ -203,7 +203,7 @@ final class ValidationServiceTests: XCTestCase {
             [nil, nil, 3, nil, nil],
             [5, nil, nil, nil, nil],
             [nil, nil, nil, 7, nil],
-            [nil, nil, nil, nil, 9]
+            [nil, nil, nil, nil, 9],
         ]
         let position = CellPosition(row: 10, column: 10)
 
@@ -228,7 +228,7 @@ final class ValidationServiceTests: XCTestCase {
             [nil, nil, 3, nil, nil],
             [5, nil, nil, nil, nil],
             [nil, nil, nil, 7, nil],
-            [nil, nil, nil, nil, 9]
+            [nil, nil, nil, nil, 9],
         ]
         let position = CellPosition(row: 0, column: 0)
 
@@ -246,7 +246,7 @@ final class ValidationServiceTests: XCTestCase {
             [5, nil, 3, nil, nil],
             [5, nil, nil, nil, nil],
             [nil, nil, nil, 7, nil],
-            [nil, nil, nil, nil, 9]
+            [nil, nil, nil, nil, 9],
         ]
         let position = CellPosition(row: 0, column: 0)
 
@@ -266,7 +266,7 @@ final class ValidationServiceTests: XCTestCase {
             [nil, nil, 3, nil, nil],
             [1, nil, nil, nil, nil],
             [nil, nil, nil, 7, nil],
-            [nil, nil, nil, nil, 9]
+            [nil, nil, nil, nil, 9],
         ]
         let position = CellPosition(row: 0, column: 0)
 
@@ -285,7 +285,7 @@ final class ValidationServiceTests: XCTestCase {
             [5, nil, 3, nil, nil],
             [nil, nil, nil, nil, nil],
             [nil, nil, nil, 7, nil],
-            [nil, nil, nil, nil, 9]
+            [nil, nil, nil, nil, 9],
         ]
         let position = CellPosition(row: 0, column: 0)
 
@@ -306,7 +306,7 @@ final class ValidationServiceTests: XCTestCase {
             [nil, nil, 3, nil, nil],
             [5, nil, nil, nil, nil],
             [nil, nil, nil, 7, nil],
-            [nil, nil, nil, nil, 9]
+            [nil, nil, nil, nil, 9],
         ]
         let position = CellPosition(row: 0, column: 0)
 
@@ -328,7 +328,7 @@ final class ValidationServiceTests: XCTestCase {
             [6, nil, 3, nil, nil],
             [5, nil, nil, nil, nil],
             [2, nil, nil, 7, nil],
-            [0, nil, nil, nil, 9]
+            [0, nil, nil, nil, 9],
         ]
 
         let puzzle = TennerGridPuzzle(
@@ -355,7 +355,7 @@ final class ValidationServiceTests: XCTestCase {
             [6, nil, 3, nil, nil],
             [5, nil, nil, nil, nil],
             [2, nil, nil, 7, nil],
-            [0, nil, nil, nil, 9]
+            [0, nil, nil, nil, 9],
         ]
 
         let puzzle = TennerGridPuzzle(
@@ -381,7 +381,7 @@ final class ValidationServiceTests: XCTestCase {
             [6, nil, 3, nil, nil],
             [nil, nil, nil, nil, nil],
             [2, nil, nil, 7, nil],
-            [0, nil, nil, nil, 9]
+            [0, nil, nil, nil, 9],
         ]
 
         // When: Validating the column sum
@@ -398,7 +398,7 @@ final class ValidationServiceTests: XCTestCase {
             [6, nil, 3, nil, nil],
             [5, nil, nil, nil, nil],
             [2, nil, nil, 7, nil],
-            [0, nil, nil, nil, 9]
+            [0, nil, nil, nil, 9],
         ]
 
         // When: Validating an out-of-bounds column
@@ -419,11 +419,11 @@ final class ValidationServiceTests: XCTestCase {
             [6, 7, 3, 8, 0],
             [5, 9, 1, 7, 3],
             [2, 4, 6, 7, 8],
-            [0, 3, 5, 1, 9]
+            [0, 3, 5, 1, 9],
         ]
 
         // Adjust target sums to match the actual column sums
-        let actualSums = (0..<5).map { col in
+        let actualSums = (0 ..< 5).map { col in
             grid.compactMap { $0[col] }.reduce(0, +)
         }
         let puzzle = TennerGridPuzzle(
@@ -450,7 +450,7 @@ final class ValidationServiceTests: XCTestCase {
             [6, 7, 3, 8, 0],
             [5, 9, 1, 7, nil],
             [2, 4, 6, 7, 8],
-            [0, 3, 5, 1, 9]
+            [0, 3, 5, 1, 9],
         ]
 
         // When: Checking if puzzle is complete
@@ -463,11 +463,11 @@ final class ValidationServiceTests: XCTestCase {
     func testPuzzleComplete_WithConflicts() {
         // Given: A complete grid with conflicts
         let grid: [[Int?]] = [
-            [1, 1, 3, 4, 5],  // Row duplicate: 1 appears twice
+            [1, 1, 3, 4, 5], // Row duplicate: 1 appears twice
             [6, 7, 3, 8, 0],
             [5, 9, 1, 7, 3],
             [2, 4, 6, 7, 8],
-            [0, 3, 5, 1, 9]
+            [0, 3, 5, 1, 9],
         ]
 
         // When: Checking if puzzle is complete
@@ -484,7 +484,7 @@ final class ValidationServiceTests: XCTestCase {
             [6, 7, 3, 8, 1],
             [5, 9, 1, 7, 3],
             [2, 4, 6, 0, 8],
-            [1, 3, 5, 2, 9]
+            [1, 3, 5, 2, 9],
         ]
 
         // When: Checking if puzzle is complete
@@ -520,7 +520,7 @@ final class ValidationServiceTests: XCTestCase {
             [2, nil, 3, nil, nil],
             [nil, 4, nil, nil, nil],
             [nil, nil, nil, 7, nil],
-            [nil, nil, nil, nil, 9]
+            [nil, nil, nil, nil, 9],
         ]
         let position = CellPosition(row: 1, column: 1)
 
