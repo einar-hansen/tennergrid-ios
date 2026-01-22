@@ -57,7 +57,7 @@ final class PuzzleManager: ObservableObject {
         // Run generation on background thread to avoid blocking UI
         return await Task.detached(priority: .userInitiated) { [weak self] in
             guard let self else { return nil }
-            return self.generator.generatePuzzle(
+            return generator.generatePuzzle(
                 columns: columns,
                 rows: rows,
                 difficulty: difficulty
@@ -79,7 +79,7 @@ final class PuzzleManager: ObservableObject {
             guard let self else { return nil }
 
             // Daily puzzles use standard 10x5 grid with medium difficulty
-            return self.generator.generatePuzzle(
+            return generator.generatePuzzle(
                 columns: 10,
                 rows: 5,
                 difficulty: .medium,
@@ -103,7 +103,7 @@ final class PuzzleManager: ObservableObject {
             guard let self else { return nil }
 
             // Daily puzzles use standard 10x5 grid with medium difficulty
-            return self.generator.generatePuzzle(
+            return generator.generatePuzzle(
                 columns: 10,
                 rows: 5,
                 difficulty: .medium,
@@ -176,7 +176,7 @@ final class PuzzleManager: ObservableObject {
 
         // Combine components into a single seed
         // Formula: year * 10000 + month * 100 + day
-        return year * 10_000 + month * 100 + day
+        return year * 10000 + month * 100 + day
     }
 
     /// Loads saved games from persistent storage

@@ -100,11 +100,11 @@
 
 ### 2.4 Puzzle Manager
 
-- [ ] Create `PuzzleManager` as ObservableObject to manage puzzle library
-- [ ] Implement method to generate new puzzle with specified parameters
-- [ ] Implement method to generate daily puzzle (deterministic based on date)
-- [ ] Add saved games list management (add, remove, load)
-- [ ] Write unit tests for PuzzleManager
+- [x] Create `PuzzleManager` as ObservableObject to manage puzzle library
+- [x] Implement method to generate new puzzle with specified parameters
+- [x] Implement method to generate daily puzzle (deterministic based on date)
+- [x] Add saved games list management (add, remove, load)
+- [x] Write unit tests for PuzzleManager
 
 ---
 
