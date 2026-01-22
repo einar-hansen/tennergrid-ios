@@ -727,6 +727,40 @@ final class GameViewModel: ObservableObject {
     func isEmpty(at position: CellPosition) -> Bool {
         gameState.isEmpty(at: position)
     }
+
+    // MARK: - Grid Support
+
+    /// Get the cell at a specific position
+    /// - Parameter position: The cell position
+    /// - Returns: The cell at that position
+    func cell(at position: CellPosition) -> Cell {
+        gameState.currentGrid[position.row][position.column]
+    }
+
+    /// Calculate the current sum for a column
+    /// - Parameter column: The column index
+    /// - Returns: The sum of all values in the column
+    func columnSum(for column: Int) -> Int {
+        var sum = 0
+        for row in 0 ..< gameState.puzzle.rows {
+            if let value = gameState.currentGrid[row][column].value {
+                sum += value
+            }
+        }
+        return sum
+    }
+
+    /// Check if a column is completely filled
+    /// - Parameter column: The column index
+    /// - Returns: True if all cells in the column have values
+    func isColumnComplete(_ column: Int) -> Bool {
+        for row in 0 ..< gameState.puzzle.rows {
+            if gameState.currentGrid[row][column].value == nil {
+                return false
+            }
+        }
+        return true
+    }
 }
 
 // MARK: - CustomStringConvertible

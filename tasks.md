@@ -120,7 +120,7 @@
 
 ### 3.2 Grid View
 
-- [ ] Create `GridView` with dynamic LazyVGrid layout for 5-10 columns
+- [x] Create `GridView` with dynamic LazyVGrid layout for 5-10 columns
 - [ ] Add column sum display below each column
 - [ ] Implement cell selection coordination with GameViewModel
 - [ ] Add visual feedback for adjacent cells and same numbers
