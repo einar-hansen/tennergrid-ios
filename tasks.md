@@ -4,7 +4,7 @@
 **Technology**: SwiftUI + iOS 16+
 **Platform**: iPhone & iPad (Universal)
 **Domain**: tennergrid.com
-**Last Updated**: January 21, 2026
+**Last Updated**: January 22, 2026
 
 ---
 
@@ -40,31 +40,31 @@
 
 ### 1.1 Validation Service
 
-- [x] Implement `ValidationService` with method to check if a number placement is valid (no adjacent duplicates, no row duplicates)
-- [x] Add method to detect all conflicts for a given cell position
+- [x] [COMPLEX] Implement `ValidationService` with method to check if a number placement is valid (no adjacent duplicates, no row duplicates)
+- [x] [COMPLEX] Add method to detect all conflicts for a given cell position
 - [x] Add method to validate column sum against target sum
 - [x] Add method to check if entire puzzle is correctly completed
 - [x] Write comprehensive unit tests for `ValidationService` with edge cases
 
 ### 1.2 Puzzle Solver
 
-- [x] Implement `PuzzleSolver` with backtracking algorithm to solve Tenner Grid puzzles
-- [x] Add constraint propagation optimization to improve solve speed
-- [x] Add method to verify a puzzle has a unique solution
+- [x] [COMPLEX] Implement `PuzzleSolver` with backtracking algorithm to solve Tenner Grid puzzles
+- [x] [COMPLEX] Add constraint propagation optimization to improve solve speed
+- [x] [COMPLEX] Add method to verify a puzzle has a unique solution
 - [x] Add method to find the next logical move (for hints)
 - [x] Write unit tests for `PuzzleSolver` with various puzzle difficulties
 
 ### 1.3 Puzzle Generator
 
-- [x] Implement `PuzzleGenerator` to create random valid completed grids
-- [x] Add method to remove cells based on difficulty while maintaining unique solution
+- [x] [COMPLEX] Implement `PuzzleGenerator` to create random valid completed grids
+- [x] [COMPLEX] Add method to remove cells based on difficulty while maintaining unique solution
 - [x] Add method to calculate column sums from completed grid
-- [x] Add method to generate full puzzle with specified columns, rows, and difficulty
+- [x] [COMPLEX] Add method to generate full puzzle with specified columns, rows, and difficulty
 - [x] Write unit tests ensuring generated puzzles are valid and solvable
 
 ### 1.4 Hint Service
 
-- [x] Implement `HintService` to identify next cell(s) to fill
+- [x] [COMPLEX] Implement `HintService` to identify next cell(s) to fill
 - [x] Add method to get all possible valid values for a selected cell
 - [x] Add method to reveal the correct value for a cell
 - [x] Track hint usage count in game state
@@ -76,7 +76,7 @@
 
 ### 2.1 Game View Model
 
-- [x] Create `GameViewModel` as ObservableObject with published game state
+- [x] [COMPLEX] Create `GameViewModel` as ObservableObject with published game state
 - [x] Implement cell selection logic with published selectedPosition
 - [x] Implement number entry with validation and error handling
 - [x] Implement notes/pencil marks toggle and management
@@ -84,9 +84,9 @@
 
 ### 2.2 Undo/Redo System
 
-- [x] Add undo/redo action history stack to GameViewModel
-- [x] Implement undo method that restores previous game state
-- [x] Implement redo method that replays undone actions
+- [x] [COMPLEX] Add undo/redo action history stack to GameViewModel
+- [x] [COMPLEX] Implement undo method that restores previous game state
+- [x] [COMPLEX] Implement redo method that replays undone actions
 - [x] Limit history to last 50 actions to manage memory
 - [x] Write unit tests for undo/redo with multiple action sequences
 
@@ -131,8 +131,8 @@
 - [x] Create `NumberPadView` with buttons for digits 0-9
 - [x] Show conflict count or disabled state for invalid numbers
 - [x] Highlight currently selected number
-- [ ] Add tap handling connected to GameViewModel
-- [ ] Test number pad on iPhone and iPad
+- [x] Add tap handling connected to GameViewModel
+- [x] Test number pad on iPhone and iPad
 
 ### 3.4 Game Toolbar
 
@@ -285,9 +285,9 @@
 
 ### 8.2 Statistics Manager
 
-- [ ] Create `StatisticsManager` service with methods to record game completion
+- [ ] [COMPLEX] Create `StatisticsManager` service with methods to record game completion
 - [ ] Add method to update streaks
-- [ ] Add method to calculate averages and trends
+- [ ] [COMPLEX] Add method to calculate averages and trends
 - [ ] Persist statistics to UserDefaults or local file
 - [ ] Write unit tests for statistics calculations
 
@@ -313,15 +313,15 @@
 
 ### 9.1 Local Persistence Setup
 
-- [ ] Choose persistence approach: SwiftData (iOS 17+) or Codable + FileManager
-- [ ] Create persistence schema for SavedGame, Statistics, Achievements, Settings
-- [ ] Implement migration strategy for schema updates
+- [ ] [COMPLEX] Choose persistence approach: SwiftData (iOS 17+) or Codable + FileManager
+- [ ] [COMPLEX] Create persistence schema for SavedGame, Statistics, Achievements, Settings
+- [ ] [COMPLEX] Implement migration strategy for schema updates
 - [ ] Set up proper file paths and directories
 - [ ] Write unit tests for persistence layer
 
 ### 9.2 Persistence Manager
 
-- [ ] Create `PersistenceManager` service with save/load methods
+- [ ] [COMPLEX] Create `PersistenceManager` service with save/load methods
 - [ ] Implement saveGame and loadGame methods
 - [ ] Implement saveStatistics and loadStatistics
 - [ ] Implement saveAchievements and loadAchievements
@@ -414,7 +414,7 @@
 ### 12.1 Unit Test Coverage
 
 - [ ] Achieve 80%+ code coverage for Models
-- [ ] Achieve 80%+ code coverage for Services (ValidationService, PuzzleGenerator, PuzzleSolver)
+- [ ] [COMPLEX] Achieve 80%+ code coverage for Services (ValidationService, PuzzleGenerator, PuzzleSolver)
 - [ ] Achieve 70%+ code coverage for ViewModels
 - [ ] Fix any failing tests
 - [ ] Add tests for edge cases and error conditions
@@ -429,9 +429,9 @@
 
 ### 12.3 Performance Testing
 
-- [ ] Profile app with Instruments for memory leaks
+- [ ] [COMPLEX] Profile app with Instruments for memory leaks
 - [ ] Ensure 60 FPS during gameplay
-- [ ] Optimize puzzle generation to <1 second
+- [ ] [COMPLEX] Optimize puzzle generation to <1 second
 - [ ] Test app launch time (<2 seconds)
 - [ ] Test on older devices (iPhone SE)
 
@@ -449,17 +449,17 @@
 
 ### 13.1 AdMob Integration Setup
 
-- [ ] Create AdMob account and register app
-- [ ] Add Google Mobile Ads SDK via Swift Package Manager
+- [ ] [COMPLEX] Create AdMob account and register app
+- [ ] [COMPLEX] Add Google Mobile Ads SDK via Swift Package Manager
 - [ ] Configure AdMob App ID in Info.plist
 - [ ] Initialize Mobile Ads SDK on app launch
 - [ ] Test ads display in simulator (test ad units)
 
 ### 13.2 Ad Manager Service
 
-- [ ] Create `AdManager` service to load and display banner ads
-- [ ] Implement interstitial ad loading and display
-- [ ] Implement rewarded video ad loading and display
+- [ ] [COMPLEX] Create `AdManager` service to load and display banner ads
+- [ ] [COMPLEX] Implement interstitial ad loading and display
+- [ ] [COMPLEX] Implement rewarded video ad loading and display
 - [ ] Add ad lifecycle event handlers
 - [ ] Test ads on physical device (simulator shows test ads only)
 
@@ -473,7 +473,7 @@
 
 ### 13.4 In-App Purchase Setup
 
-- [ ] Create non-consumable IAP product in App Store Connect: "Remove Ads" ($2.99)
+- [ ] [COMPLEX] Create non-consumable IAP product in App Store Connect: "Remove Ads" ($2.99)
 - [ ] Configure App Store Connect with product ID, descriptions, pricing
 - [ ] Add StoreKit configuration file for local testing
 - [ ] Create sandbox test accounts
@@ -481,9 +481,9 @@
 
 ### 13.5 IAP Manager Service
 
-- [ ] Create `IAPManager` service with StoreKit 2
-- [ ] Implement product fetching from App Store
-- [ ] Implement purchase flow with error handling
+- [ ] [COMPLEX] Create `IAPManager` service with StoreKit 2
+- [ ] [COMPLEX] Implement product fetching from App Store
+- [ ] [COMPLEX] Implement purchase flow with error handling
 - [ ] Implement restore purchases functionality
 - [ ] Persist purchase status to UserDefaults and verify on launch
 
@@ -600,6 +600,11 @@
 ## Summary
 
 **Total Tasks**: 187 tasks organized in 16 phases
+
+**Model Strategy**:
+- [COMPLEX] markers use Sonnet for advanced logic
+- Unmarked tasks use Haiku for speed
+- Build failures automatically use Sonnet
 
 **Estimated Timeline**: 10-14 weeks (solo developer, part-time)
 
