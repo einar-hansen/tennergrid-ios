@@ -378,4 +378,437 @@ final class PuzzleGeneratorTests: XCTestCase {
             )
         }
     }
+
+    // MARK: - removeCells Tests
+
+    func testRemoveCells_EasyDifficulty() {
+        // Given: A completed grid and easy difficulty (45% pre-filled)
+        let rows = 5
+        let columns = 5
+        guard let completedGrid = generator.generateCompletedGrid(rows: rows, columns: columns) else {
+            XCTFail("Failed to generate completed grid")
+            return
+        }
+
+        // Calculate column sums
+        let targetSums = calculateColumnSums(grid: completedGrid)
+
+        // When: Removing cells for easy difficulty
+        let puzzleGrid = generator.removeCells(
+            from: completedGrid,
+            targetSums: targetSums,
+            difficulty: .easy
+        )
+
+        // Then: Should successfully create a puzzle
+        XCTAssertNotNil(puzzleGrid, "Should create a puzzle grid")
+
+        if let puzzle = puzzleGrid {
+            // Verify dimensions
+            XCTAssertEqual(puzzle.count, rows, "Puzzle should have correct number of rows")
+            XCTAssertEqual(puzzle[0].count, columns, "Puzzle should have correct number of columns")
+
+            // Count pre-filled cells
+            let filledCount = countFilledCells(grid: puzzle)
+            let totalCells = rows * columns
+            let filledPercentage = Double(filledCount) / Double(totalCells)
+
+            // Should be close to 45% (allow some variance)
+            XCTAssertTrue(
+                filledPercentage >= 0.35 && filledPercentage <= 0.55,
+                "Easy puzzle should have ~45% pre-filled cells, got \(filledPercentage * 100)%"
+            )
+
+            // Verify remaining cells match the original solution
+            verifyConsistencyWithSolution(puzzleGrid: puzzle, solution: completedGrid)
+        }
+    }
+
+    func testRemoveCells_MediumDifficulty() {
+        // Given: A completed grid and medium difficulty (35% pre-filled)
+        let rows = 6
+        let columns = 6
+        guard let completedGrid = generator.generateCompletedGrid(rows: rows, columns: columns) else {
+            XCTFail("Failed to generate completed grid")
+            return
+        }
+
+        let targetSums = calculateColumnSums(grid: completedGrid)
+
+        // When: Removing cells for medium difficulty
+        let puzzleGrid = generator.removeCells(
+            from: completedGrid,
+            targetSums: targetSums,
+            difficulty: .medium
+        )
+
+        // Then: Should successfully create a puzzle
+        XCTAssertNotNil(puzzleGrid, "Should create a puzzle grid")
+
+        if let puzzle = puzzleGrid {
+            let filledCount = countFilledCells(grid: puzzle)
+            let totalCells = rows * columns
+            let filledPercentage = Double(filledCount) / Double(totalCells)
+
+            // Should be close to 35% (allow variance)
+            XCTAssertTrue(
+                filledPercentage >= 0.25 && filledPercentage <= 0.45,
+                "Medium puzzle should have ~35% pre-filled cells, got \(filledPercentage * 100)%"
+            )
+
+            verifyConsistencyWithSolution(puzzleGrid: puzzle, solution: completedGrid)
+        }
+    }
+
+    func testRemoveCells_HardDifficulty() {
+        // Given: A completed grid and hard difficulty (25% pre-filled)
+        let rows = 5
+        let columns = 5
+        guard let completedGrid = generator.generateCompletedGrid(rows: rows, columns: columns) else {
+            XCTFail("Failed to generate completed grid")
+            return
+        }
+
+        let targetSums = calculateColumnSums(grid: completedGrid)
+
+        // When: Removing cells for hard difficulty
+        let puzzleGrid = generator.removeCells(
+            from: completedGrid,
+            targetSums: targetSums,
+            difficulty: .hard
+        )
+
+        // Then: Should successfully create a puzzle
+        XCTAssertNotNil(puzzleGrid, "Should create a puzzle grid")
+
+        if let puzzle = puzzleGrid {
+            let filledCount = countFilledCells(grid: puzzle)
+            let totalCells = rows * columns
+            let filledPercentage = Double(filledCount) / Double(totalCells)
+
+            // Should be close to 25% (allow variance)
+            XCTAssertTrue(
+                filledPercentage >= 0.15 && filledPercentage <= 0.35,
+                "Hard puzzle should have ~25% pre-filled cells, got \(filledPercentage * 100)%"
+            )
+
+            verifyConsistencyWithSolution(puzzleGrid: puzzle, solution: completedGrid)
+        }
+    }
+
+    func testRemoveCells_ExpertDifficulty() {
+        // Given: A completed grid and expert difficulty (15% pre-filled)
+        let rows = 5
+        let columns = 5
+        guard let completedGrid = generator.generateCompletedGrid(rows: rows, columns: columns) else {
+            XCTFail("Failed to generate completed grid")
+            return
+        }
+
+        let targetSums = calculateColumnSums(grid: completedGrid)
+
+        // When: Removing cells for expert difficulty
+        let puzzleGrid = generator.removeCells(
+            from: completedGrid,
+            targetSums: targetSums,
+            difficulty: .expert
+        )
+
+        // Then: Should successfully create a puzzle (may be challenging)
+        XCTAssertNotNil(puzzleGrid, "Should create a puzzle grid")
+
+        if let puzzle = puzzleGrid {
+            let filledCount = countFilledCells(grid: puzzle)
+            let totalCells = rows * columns
+            let filledPercentage = Double(filledCount) / Double(totalCells)
+
+            // Should be close to 15% (allow variance)
+            XCTAssertTrue(
+                filledPercentage >= 0.10 && filledPercentage <= 0.30,
+                "Expert puzzle should have ~15% pre-filled cells, got \(filledPercentage * 100)%"
+            )
+
+            verifyConsistencyWithSolution(puzzleGrid: puzzle, solution: completedGrid)
+        }
+    }
+
+    func testRemoveCells_WithSeed_Deterministic() {
+        // Given: Same completed grid and seed
+        let rows = 5
+        let columns = 5
+        let seed: UInt64 = 99999
+        guard let completedGrid = generator.generateCompletedGrid(rows: rows, columns: columns, seed: seed) else {
+            XCTFail("Failed to generate completed grid")
+            return
+        }
+
+        let targetSums = calculateColumnSums(grid: completedGrid)
+
+        // When: Removing cells with the same seed twice
+        let puzzle1 = generator.removeCells(
+            from: completedGrid,
+            targetSums: targetSums,
+            difficulty: .medium,
+            seed: seed
+        )
+
+        let puzzle2 = generator.removeCells(
+            from: completedGrid,
+            targetSums: targetSums,
+            difficulty: .medium,
+            seed: seed
+        )
+
+        // Then: Should generate identical puzzles
+        XCTAssertNotNil(puzzle1, "First puzzle should be generated")
+        XCTAssertNotNil(puzzle2, "Second puzzle should be generated")
+
+        if let p1 = puzzle1, let p2 = puzzle2 {
+            XCTAssertEqual(p1.count, p2.count, "Puzzles should have same number of rows")
+            for row in 0 ..< p1.count {
+                XCTAssertEqual(p1[row].count, p2[row].count, "Rows should have same length")
+                for col in 0 ..< p1[row].count {
+                    XCTAssertEqual(
+                        p1[row][col],
+                        p2[row][col],
+                        "Cell at (\(row),\(col)) should be identical"
+                    )
+                }
+            }
+        }
+    }
+
+    func testRemoveCells_InvalidGrid_Empty() {
+        // Given: Empty grid
+        let emptyGrid: [[Int]] = []
+        let targetSums: [Int] = []
+
+        // When: Attempting to remove cells from empty grid
+        let result = generator.removeCells(
+            from: emptyGrid,
+            targetSums: targetSums,
+            difficulty: .easy
+        )
+
+        // Then: Should return nil
+        XCTAssertNil(result, "Should return nil for empty grid")
+    }
+
+    func testRemoveCells_InvalidGrid_EmptyRow() {
+        // Given: Grid with empty row
+        let invalidGrid: [[Int]] = [[]]
+        let targetSums: [Int] = []
+
+        // When: Attempting to remove cells
+        let result = generator.removeCells(
+            from: invalidGrid,
+            targetSums: targetSums,
+            difficulty: .easy
+        )
+
+        // Then: Should return nil
+        XCTAssertNil(result, "Should return nil for grid with empty row")
+    }
+
+    func testRemoveCells_ConsistentWithSolution() {
+        // Given: A completed grid
+        let rows = 6
+        let columns = 6
+        guard let completedGrid = generator.generateCompletedGrid(rows: rows, columns: columns) else {
+            XCTFail("Failed to generate completed grid")
+            return
+        }
+
+        let targetSums = calculateColumnSums(grid: completedGrid)
+
+        // When: Removing cells
+        let puzzleGrid = generator.removeCells(
+            from: completedGrid,
+            targetSums: targetSums,
+            difficulty: .medium
+        )
+
+        // Then: All remaining filled cells should match the solution
+        XCTAssertNotNil(puzzleGrid, "Should create a puzzle grid")
+
+        if let puzzle = puzzleGrid {
+            for row in 0 ..< rows {
+                for col in 0 ..< columns {
+                    if let puzzleValue = puzzle[row][col] {
+                        let solutionValue = completedGrid[row][col]
+                        XCTAssertEqual(
+                            puzzleValue,
+                            solutionValue,
+                            "Filled cell at (\(row),\(col)) should match solution"
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    func testRemoveCells_UniqueSolution() {
+        // Given: A completed grid
+        let rows = 5
+        let columns = 5
+        guard let completedGrid = generator.generateCompletedGrid(rows: rows, columns: columns) else {
+            XCTFail("Failed to generate completed grid")
+            return
+        }
+
+        let targetSums = calculateColumnSums(grid: completedGrid)
+
+        // When: Removing cells
+        let puzzleGrid = generator.removeCells(
+            from: completedGrid,
+            targetSums: targetSums,
+            difficulty: .medium
+        )
+
+        // Then: The resulting puzzle should have a unique solution
+        XCTAssertNotNil(puzzleGrid, "Should create a puzzle grid")
+
+        if let puzzle = puzzleGrid {
+            let testPuzzle = TennerGridPuzzle(
+                id: UUID(),
+                rows: rows,
+                columns: columns,
+                difficulty: .medium,
+                targetSums: targetSums,
+                initialGrid: puzzle,
+                solution: completedGrid
+            )
+
+            let solver = PuzzleSolver()
+            XCTAssertTrue(
+                solver.hasUniqueSolution(puzzle: testPuzzle),
+                "Generated puzzle should have a unique solution"
+            )
+        }
+    }
+
+    func testRemoveCells_MultipleGenerations_AllValid() {
+        // Given: Standard dimensions
+        let rows = 5
+        let columns = 5
+        let attempts = 5
+
+        // When: Generating multiple puzzles
+        var successCount = 0
+
+        for _ in 0 ..< attempts {
+            guard let completedGrid = generator.generateCompletedGrid(rows: rows, columns: columns) else {
+                continue
+            }
+
+            let targetSums = calculateColumnSums(grid: completedGrid)
+
+            if let puzzle = generator.removeCells(
+                from: completedGrid,
+                targetSums: targetSums,
+                difficulty: .medium
+            ) {
+                successCount += 1
+
+                // Verify puzzle is valid
+                verifyConsistencyWithSolution(puzzleGrid: puzzle, solution: completedGrid)
+
+                // Verify some cells were removed
+                let filledCount = countFilledCells(grid: puzzle)
+                let totalCells = rows * columns
+                XCTAssertLessThan(
+                    filledCount,
+                    totalCells,
+                    "Should have removed at least some cells"
+                )
+            }
+        }
+
+        // Then: Should successfully generate most puzzles
+        XCTAssertTrue(
+            successCount >= attempts / 2,
+            "Should successfully generate at least half of the attempts"
+        )
+    }
+
+    func testRemoveCells_Performance() {
+        // Given: A completed grid
+        let rows = 6
+        let columns = 6
+        guard let completedGrid = generator.generateCompletedGrid(rows: rows, columns: columns) else {
+            XCTFail("Failed to generate completed grid")
+            return
+        }
+
+        let targetSums = calculateColumnSums(grid: completedGrid)
+
+        // When: Measuring cell removal time
+        measure {
+            _ = generator.removeCells(
+                from: completedGrid,
+                targetSums: targetSums,
+                difficulty: .medium
+            )
+        }
+
+        // Then: Performance is measured
+    }
+
+    // MARK: - Additional Helper Methods
+
+    /// Calculates column sums from a completed grid
+    private func calculateColumnSums(grid: [[Int]]) -> [Int] {
+        guard !grid.isEmpty else { return [] }
+
+        let rows = grid.count
+        let columns = grid[0].count
+        var sums: [Int] = []
+
+        for col in 0 ..< columns {
+            var sum = 0
+            for row in 0 ..< rows {
+                sum += grid[row][col]
+            }
+            sums.append(sum)
+        }
+
+        return sums
+    }
+
+    /// Counts the number of filled cells in a puzzle grid
+    private func countFilledCells(grid: [[Int?]]) -> Int {
+        var count = 0
+        for row in grid {
+            for cell in row {
+                if cell != nil {
+                    count += 1
+                }
+            }
+        }
+        return count
+    }
+
+    /// Verifies that all filled cells in the puzzle match the solution
+    private func verifyConsistencyWithSolution(puzzleGrid: [[Int?]], solution: [[Int]]) {
+        XCTAssertEqual(puzzleGrid.count, solution.count, "Should have same number of rows")
+
+        for row in 0 ..< puzzleGrid.count {
+            XCTAssertEqual(
+                puzzleGrid[row].count,
+                solution[row].count,
+                "Row \(row) should have same number of columns"
+            )
+
+            for col in 0 ..< puzzleGrid[row].count {
+                if let puzzleValue = puzzleGrid[row][col] {
+                    let solutionValue = solution[row][col]
+                    XCTAssertEqual(
+                        puzzleValue,
+                        solutionValue,
+                        "Filled cell at (\(row),\(col)) should match solution"
+                    )
+                }
+            }
+        }
+    }
 }

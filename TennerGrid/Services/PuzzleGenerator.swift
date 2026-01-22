@@ -285,6 +285,112 @@ struct PuzzleGenerator {
 
         return true
     }
+
+    /// Removes cells from a completed grid based on difficulty while maintaining a unique solution
+    /// - Parameters:
+    ///   - completedGrid: A fully solved grid
+    ///   - targetSums: Target sums for each column
+    ///   - difficulty: The desired difficulty level
+    ///   - seed: Optional seed for deterministic generation
+    /// - Returns: A puzzle grid with cells removed, or nil if removal fails
+    func removeCells(
+        from completedGrid: [[Int]],
+        targetSums: [Int],
+        difficulty: Difficulty,
+        seed: UInt64? = nil
+    ) -> [[Int?]]? {
+        guard !completedGrid.isEmpty, !completedGrid[0].isEmpty else { return nil }
+
+        let rows = completedGrid.count
+        let columns = completedGrid[0].count
+
+        // Create seeded random number generator if seed provided
+        var rng: RandomNumberGenerator = seed.map { SeededRandomNumberGenerator(seed: $0) } ?? SystemRandomNumberGenerator()
+
+        // Convert completed grid to optional grid (all cells filled initially)
+        var puzzleGrid: [[Int?]] = completedGrid.map { row in
+            row.map { Int?($0) }
+        }
+
+        // Calculate total cells and target number of cells to remove
+        let totalCells = rows * columns
+        let cellsToRemove = Int(Double(totalCells) * (1.0 - difficulty.prefilledPercentage))
+
+        // Create list of all cell positions
+        var cellPositions: [CellPosition] = []
+        for row in 0 ..< rows {
+            for column in 0 ..< columns {
+                cellPositions.append(CellPosition(row: row, column: column))
+            }
+        }
+
+        // Shuffle positions for random removal order
+        cellPositions.shuffle(using: &rng)
+
+        // Create a temporary puzzle for testing uniqueness
+        let temporaryPuzzle = TennerGridPuzzle(
+            id: UUID(),
+            rows: rows,
+            columns: columns,
+            difficulty: difficulty,
+            targetSums: targetSums,
+            initialGrid: puzzleGrid,
+            solution: completedGrid
+        )
+
+        var removedCount = 0
+        var attemptedPositions: Set<CellPosition> = []
+
+        // Try to remove cells one by one
+        for position in cellPositions {
+            // Skip if already attempted
+            guard !attemptedPositions.contains(position) else { continue }
+            attemptedPositions.insert(position)
+
+            // Skip if cell is already empty
+            guard puzzleGrid[position.row][position.column] != nil else { continue }
+
+            // Save the current value
+            let originalValue = puzzleGrid[position.row][position.column]
+
+            // Remove the cell
+            puzzleGrid[position.row][position.column] = nil
+
+            // Create updated puzzle for testing
+            let testPuzzle = TennerGridPuzzle(
+                id: temporaryPuzzle.id,
+                rows: rows,
+                columns: columns,
+                difficulty: difficulty,
+                targetSums: targetSums,
+                initialGrid: puzzleGrid,
+                solution: completedGrid
+            )
+
+            // Check if puzzle still has unique solution
+            if solver.hasUniqueSolution(puzzle: testPuzzle) {
+                // Successfully removed - keep the cell empty
+                removedCount += 1
+
+                // If we've removed enough cells, we're done
+                if removedCount >= cellsToRemove {
+                    break
+                }
+            } else {
+                // Removing this cell creates multiple solutions - restore it
+                puzzleGrid[position.row][position.column] = originalValue
+            }
+        }
+
+        // Check if we removed at least some cells (accept puzzles that are close to target)
+        // We allow puzzles with at least 80% of target removed cells
+        let minimumRemoved = Int(Double(cellsToRemove) * 0.8)
+        guard removedCount >= minimumRemoved else {
+            return nil
+        }
+
+        return puzzleGrid
+    }
 }
 
 // MARK: - Seeded Random Number Generator
