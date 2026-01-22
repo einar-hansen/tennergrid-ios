@@ -28,7 +28,7 @@
 
 ### 0.3 Game State Models
 
-- [ ] Create `GameState` model with puzzle, currentGrid, pencilMarks, selectedCell, timing, and completion data
+- [x] Create `GameState` model with puzzle, currentGrid, pencilMarks, selectedCell, timing, and completion data
 - [ ] Create `GameAction` struct for undo/redo system with action type, position, old/new values
 - [ ] Create `GameStatistics` model with games played, win rate, time tracking, and difficulty breakdowns
 - [ ] Create `Achievement` model with id, title, description, progress, and unlock status
