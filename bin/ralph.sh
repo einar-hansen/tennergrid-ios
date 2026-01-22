@@ -39,11 +39,7 @@ SCHEME_NAME=${3:-TennerGrid}
 COMPLETE_FLAG="tasks_complete"
 BUILD_FAILED_FLAG="build_failed"
 BUILD_ERROR_LOG="/tmp/ralph_build_errors.log"
-
-# Model configuration - Hybrid approach
-DEFAULT_MODEL="haiku"      # Fast model for simple tasks
-COMPLEX_MODEL="sonnet"     # Powerful model for complex tasks
-CLEAN_INTERVAL=5           # Run clean build every N iterations
+MODEL="opus"
 
 # Configuration
 XCODE_PROJECT="TennerGrid.xcodeproj"  # Change to your project name
@@ -56,8 +52,6 @@ TEST_DESTINATION="platform=iOS Simulator,id=2B6CC595-D05B-456B-8DE0-F70C454F354C
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-MAGENTA='\033[0;35m'
 NC='\033[0m' # No Color
 
 # Helper functions
@@ -71,14 +65,6 @@ log_warn() {
 
 log_error() {
   echo -e "${RED}[ERROR]${NC} $1"
-}
-
-log_debug() {
-  echo -e "${BLUE}[DEBUG]${NC} $1"
-}
-
-log_model() {
-  echo -e "${MAGENTA}[MODEL]${NC} $1"
 }
 
 # Check if tasks file exists
@@ -103,31 +89,15 @@ else
   BUILD_FLAG="-project $XCODE_PROJECT"
 fi
 
-log_info "Starting Ralph iOS automation"
-log_info "Default model: $DEFAULT_MODEL | Complex model: $COMPLEX_MODEL"
-log_info "Clean interval: every ${CLEAN_INTERVAL} iterations"
-log_info "Tip: Mark complex tasks with [COMPLEX] to use $COMPLEX_MODEL"
-echo ""
-
 for i in $(seq 1 "$MAX_ITERATIONS"); do
-  ITERATION_START=$(date +%s)
   check_interrupt  # Check if we should exit before starting iteration
 
-  log_info "=========================================="
   log_info "Starting iteration $i of $MAX_ITERATIONS"
-  log_info "=========================================="
 
   # Exit if we've created the completion flag
   if [[ -f "$COMPLETE_FLAG" ]]; then
     log_info "All tasks completed (found $COMPLETE_FLAG). Exiting."
     exit 0
-  fi
-
-  # Determine if this is a clean build iteration
-  SHOULD_CLEAN=false
-  if (( i % CLEAN_INTERVAL == 0 )); then
-    SHOULD_CLEAN=true
-    log_info "Clean build scheduled for this iteration"
   fi
 
   # Check if build is currently failing
@@ -136,32 +106,6 @@ for i in $(seq 1 "$MAX_ITERATIONS"); do
     BUILD_IS_FAILING=true
     log_error "🚨 Build failure detected from previous iteration!"
     log_error "Priority: Fix compilation errors before continuing with tasks"
-  fi
-
-  # Determine which model to use based on task complexity
-  ITERATION_MODEL="$DEFAULT_MODEL"
-
-  if [[ "$BUILD_IS_FAILING" == true ]]; then
-    # Build failures might need the smarter model
-    ITERATION_MODEL="$COMPLEX_MODEL"
-    log_model "Using $COMPLEX_MODEL for build failure fix"
-  else
-    # Check the next task for complexity markers
-    CURRENT_TASK=$(grep -m 1 "^- \[ \]" "$TASKS_FILE" || echo "")
-
-    if [[ "$CURRENT_TASK" == *"[COMPLEX]"* ]]; then
-      ITERATION_MODEL="$COMPLEX_MODEL"
-      log_model "Complex task detected, using $COMPLEX_MODEL"
-      log_debug "Task: $CURRENT_TASK"
-    elif [[ "$CURRENT_TASK" == *"[SIMPLE]"* ]]; then
-      ITERATION_MODEL="$DEFAULT_MODEL"
-      log_model "Simple task detected, using $DEFAULT_MODEL"
-      log_debug "Task: $CURRENT_TASK"
-    else
-      # No marker - use default
-      ITERATION_MODEL="$DEFAULT_MODEL"
-      log_model "Using default model: $DEFAULT_MODEL"
-    fi
   fi
 
   # Prepare the agent prompt
@@ -178,15 +122,14 @@ Your task for this iteration:
 1. Review the compilation errors in $BUILD_ERROR_LOG
 2. Check the recent git history to see what has changed or introduced the errors
 3. Fix ALL compilation errors to get the build passing
-4. Test that the build succeeds by running:
-   xcodebuild build $BUILD_FLAG -scheme "$SCHEME_NAME" -destination "$TEST_DESTINATION"
+4. Test that the build succeeds
 5. Commit your fixes with message: "Fix compilation errors"
 
 DO NOT work on any tasks from $TASKS_FILE until the build is fixed.
 
 Project context:
 - Scheme: $SCHEME_NAME
-- Build command: xcodebuild build $BUILD_FLAG -scheme "$SCHEME_NAME" -destination "$TEST_DESTINATION"
+- Build command: xcodebuild clean build $BUILD_FLAG -scheme "$SCHEME_NAME" -destination "$TEST_DESTINATION"
 
 Common Swift compilation errors and fixes:
 - Duplicate declarations: Remove or rename the duplicate
@@ -226,25 +169,21 @@ Your instructions:
 2. Select EXACTLY ONE uncompleted task (marked with "- [ ]") to work on.
    - Choose the first uncompleted task in the list, OR
    - Choose the most important/blocking task if priority is indicated
-   - Ignore any [COMPLEX] or [SIMPLE] markers - these are for the automation script
 3. Complete that ONE task fully and thoroughly.
 4. For feature tasks: Write the implementation following SwiftUI/Swift best practices
 5. For test tasks: Write comprehensive XCTest unit tests with good coverage
-6. Build the project to verify no compilation errors:
-   xcodebuild build $BUILD_FLAG -scheme "$SCHEME_NAME" -destination "$TEST_DESTINATION"
-7. If there are compilation errors, fix them before proceeding
-8. Run the relevant tests (or full test suite if appropriate):
-   xcodebuild test $BUILD_FLAG -scheme "$SCHEME_NAME" -destination "$TEST_DESTINATION"
-9. Ensure all tests pass
-10. Commit your changes with a descriptive message mentioning which task you completed
-11. After committing, mark the task as done by changing "- [ ]" to "- [x]" in $TASKS_FILE
-12. Report which task you completed and summarize what you did
+6. Build the project and fix any compilation errors
+7. Run the test suite and ensure all tests pass
+8. Run SwiftLint and fix any warnings/errors
+9. Run SwiftFormat to ensure consistent code style
+10. Commit your changes with a descriptive message mentioning which task you completed.
+11. After completing the task, mark it as done by changing "- [ ]" to "- [x]" in $TASKS_FILE.
+12. Report which task you completed and summarize what you did.
 
 Important:
-- Work on ONLY ONE task this iteration
-- YOU must build and test - the script will verify after you're done
-- Do NOT create the completion flag - the script handles that automatically
-- If a task is unclear or blocked, mark it with "- [?]" and explain why in the commit message
+- Work on ONLY ONE task this iteration.
+- Do NOT create the completion flag - the script handles that automatically.
+- If a task is unclear or blocked, mark it with "- [?]" and explain why in the commit message.
 - Follow iOS/Swift best practices: MVVM architecture, SwiftUI, Combine, async/await
 - Write clean, testable code with proper separation of concerns
 - Use guard statements for early returns
@@ -253,8 +192,9 @@ Important:
 
 Project context:
 - Scheme: $SCHEME_NAME
-- You can build with: xcodebuild build $BUILD_FLAG -scheme "$SCHEME_NAME" -destination "$TEST_DESTINATION"
-- You can test with: xcodebuild test $BUILD_FLAG -scheme "$SCHEME_NAME" -destination "$TEST_DESTINATION"
+- Tests will be run with: xcodebuild test
+- Linting: swiftlint
+- Formatting: swiftformat
 
 Focus on quality over speed. Make sure each task is truly complete before marking it done.
 PROMPT
@@ -263,50 +203,28 @@ PROMPT
 
   check_interrupt  # Check before calling agent
 
-  # Call the agent with the selected model
-  AGENT_START=$(date +%s)
-  log_info "Calling Claude Code agent..."
-  log_model "Active model: $ITERATION_MODEL"
-  echo ""
-
+  # Call the agent
+  log_info "Calling Claude Code agent... Model $MODEL..."
   claude --print \
     --no-session-persistence \
-    --model "$ITERATION_MODEL" \
+    --model "$MODEL" \
     --permission-mode acceptEdits \
     "$AGENT_PROMPT"
-
-  AGENT_END=$(date +%s)
-  AGENT_DURATION=$((AGENT_END - AGENT_START))
-  echo ""
-  log_debug "Agent completed in ${AGENT_DURATION}s"
 
   check_interrupt  # Check after agent completes
 
   echo ""
-  log_info "Running quality checks..."
+  log_info "Agent completed. Running quality checks..."
   echo ""
 
-  # Step 1: Build verification
-  BUILD_START=$(date +%s)
-
-  if [[ "$SHOULD_CLEAN" == true ]]; then
-    log_info "Running clean build (iteration $i / $CLEAN_INTERVAL)..."
-    BUILD_CMD="xcodebuild clean build"
-  else
-    log_info "Running incremental build..."
-    BUILD_CMD="xcodebuild build"
-  fi
-
-  if $BUILD_CMD \
+  # Step 1: Build the project
+  log_info "Building project..."
+  if xcodebuild clean build \
     $BUILD_FLAG \
     -scheme "$SCHEME_NAME" \
     -destination "$TEST_DESTINATION" \
-    -quiet \
     2>&1 | tee "$BUILD_ERROR_LOG"; then
-
-    BUILD_END=$(date +%s)
-    BUILD_DURATION=$((BUILD_END - BUILD_START))
-    log_info "✓ Build succeeded (${BUILD_DURATION}s)"
+    log_info "✓ Build succeeded"
 
     # Remove build failed flag if it exists
     if [[ -f "$BUILD_FAILED_FLAG" ]]; then
@@ -314,9 +232,7 @@ PROMPT
       rm "$BUILD_FAILED_FLAG"
     fi
   else
-    BUILD_END=$(date +%s)
-    BUILD_DURATION=$((BUILD_END - BUILD_START))
-    log_error "✗ Build failed (${BUILD_DURATION}s). Creating build failed flag."
+    log_error "✗ Build failed. Creating build failed flag."
 
     # Create the build failed flag
     echo "Build failed at iteration $i on $(date)" > "$BUILD_FAILED_FLAG"
@@ -330,12 +246,9 @@ PROMPT
       git commit -m "Ralph iOS: iteration $i - build failed (errors logged)" || true
     fi
 
-    # Calculate iteration time and continue
-    ITERATION_END=$(date +%s)
-    ITERATION_DURATION=$((ITERATION_END - ITERATION_START))
+    # Continue to next iteration to fix the build
     echo ""
-    log_info "=== Iteration $i Complete (build failed) - ${ITERATION_DURATION}s ==="
-    echo "  Model used: $ITERATION_MODEL"
+    log_info "=== Iteration $i Complete (build failed) ==="
     echo "  Next iteration will focus on fixing compilation errors"
     echo ""
     echo "---"
@@ -346,26 +259,16 @@ PROMPT
   check_interrupt  # Check before tests
 
   # Step 2: Run tests (only if build succeeded)
-  # Skip if agent likely already ran them
-  if [[ "$BUILD_IS_FAILING" == true ]]; then
-    # If we just fixed a build failure, run tests to verify
-    TEST_START=$(date +%s)
-    log_info "Running tests to verify build fix..."
-    if xcodebuild test \
-      $BUILD_FLAG \
-      -scheme "$SCHEME_NAME" \
-      -destination "$TEST_DESTINATION" \
-      -quiet; then
-      TEST_END=$(date +%s)
-      TEST_DURATION=$((TEST_END - TEST_START))
-      log_info "✓ All tests passed (${TEST_DURATION}s)"
-    else
-      TEST_END=$(date +%s)
-      TEST_DURATION=$((TEST_END - TEST_START))
-      log_warn "✗ Some tests failed (${TEST_DURATION}s). Review test output above."
-    fi
+  log_info "Running tests..."
+  if xcodebuild test \
+    $BUILD_FLAG \
+    -scheme "$SCHEME_NAME" \
+    -destination "$TEST_DESTINATION" \
+    -quiet; then
+    log_info "✓ All tests passed"
   else
-    log_info "Skipping test run (agent should have run tests already)"
+    log_warn "✗ Some tests failed. Review test output above."
+    # Don't exit - let the developer decide whether to continue
   fi
 
   check_interrupt  # Check before linting
@@ -380,7 +283,7 @@ PROMPT
       swiftlint lint --fix --quiet || true
     fi
   else
-    log_debug "SwiftLint not installed. Install with: brew install swiftlint"
+    log_warn "SwiftLint not installed. Skipping. Install with: brew install swiftlint"
   fi
 
   # Step 4: Run SwiftFormat (if installed)
@@ -389,7 +292,7 @@ PROMPT
     swiftformat . --swiftversion 5.9 --quiet
     log_info "✓ SwiftFormat completed"
   else
-    log_debug "SwiftFormat not installed. Install with: brew install swiftformat"
+    log_warn "SwiftFormat not installed. Skipping. Install with: brew install swiftformat"
   fi
 
   check_interrupt  # Check before commit
@@ -404,31 +307,15 @@ PROMPT
     log_info "No changes to commit (agent may have already committed)"
   fi
 
-  # Calculate iteration time
-  ITERATION_END=$(date +%s)
-  ITERATION_DURATION=$((ITERATION_END - ITERATION_START))
-
   # Print progress
   echo ""
-  log_info "=========================================="
-  log_info "Iteration $i Complete - ${ITERATION_DURATION}s total"
-  log_info "=========================================="
-
+  log_info "=== Iteration $i Complete ==="
   REMAINING=$(grep -c "^- \[ \]" "$TASKS_FILE" || echo "0")
   COMPLETED=$(grep -c "^- \[x\]" "$TASKS_FILE" || echo "0")
-  echo "  Model used: $ITERATION_MODEL"
   echo "  Completed tasks: $COMPLETED"
   echo "  Remaining tasks: $REMAINING"
   if [[ $((COMPLETED + REMAINING)) -gt 0 ]]; then
-    PROGRESS=$(( (COMPLETED * 100) / (COMPLETED + REMAINING) ))
-    echo "  Progress: ${PROGRESS}%"
-  fi
-  echo ""
-  log_debug "Timing breakdown:"
-  log_debug "  - Agent: ${AGENT_DURATION}s"
-  log_debug "  - Build: ${BUILD_DURATION}s"
-  if [[ -n "${TEST_DURATION:-}" ]]; then
-    log_debug "  - Tests: ${TEST_DURATION}s"
+    echo "  Progress: $(( (COMPLETED * 100) / (COMPLETED + REMAINING) ))%"
   fi
   echo ""
   echo "---"
