@@ -18,6 +18,7 @@ excluded:
 # Rules that are disabled
 disabled_rules:
   - trailing_whitespace # Handled by SwiftFormat
+  - trailing_comma # Handled by SwiftFormat (adds trailing commas, which is best practice)
   - todo # Allow TODO comments during development
   - orphaned_doc_comment # Can be overly strict with SwiftUI
 
@@ -46,6 +47,7 @@ opt_in_rules:
   - yoda_condition
   - sorted_imports
   - sorted_first_last
+  - collection_alignment
 
   # Idiomatic
   - toggle_bool
@@ -109,8 +111,6 @@ cyclomatic_complexity:
 nesting:
   type_level:
     warning: 2
-  statement_level:
-    warning: 5
 
 # Type name: Enforce proper type naming conventions
 type_name:

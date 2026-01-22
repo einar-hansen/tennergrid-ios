@@ -1,0 +1,41 @@
+# SwiftFormat Configuration for TennerGrid iOS App
+# https://github.com/nicklockwood/SwiftFormat
+
+# Swift version (should match Xcode project setting)
+--swiftversion 5.9
+
+# Trailing commas in collection literals (enabled for cleaner diffs)
+--trailingcommas always
+
+# Enable all rules by default, with specific customizations below
+--enable isEmpty
+
+# Indentation and spacing
+--indent 4
+--indentcase false
+--trimwhitespace always
+--maxwidth 120
+
+# Disable some opinionated rules that conflict with team style
+--disable redundantSelf
+
+# File header comments
+--header strip
+
+# Sort imports
+--importgrouping testable-bottom
+
+# Wrap arguments and parameters
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+
+# Disable experimental rules
+--disable unusedArguments
+
+# Organization of declarations
+--organizetypes actor,class,enum,struct,extension
+
+# Self keyword
+--self remove
+--selfrequired
