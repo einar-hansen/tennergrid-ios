@@ -502,7 +502,7 @@ final class GameViewModel: ObservableObject {
     }
 
     /// Stops the timer (internal use)
-    private func stopTimer() {
+    nonisolated private func stopTimer() {
         timer?.invalidate()
         timer = nil
         lastTimerUpdate = nil
