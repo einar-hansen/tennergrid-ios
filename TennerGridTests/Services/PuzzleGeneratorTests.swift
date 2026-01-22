@@ -671,8 +671,8 @@ final class PuzzleGeneratorTests: XCTestCase {
         if let puzzle = puzzleGrid {
             let testPuzzle = TennerGridPuzzle(
                 id: UUID(),
-                rows: rows,
                 columns: columns,
+                rows: rows,
                 difficulty: .medium,
                 targetSums: targetSums,
                 initialGrid: puzzle,

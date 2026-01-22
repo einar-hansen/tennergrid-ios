@@ -330,8 +330,8 @@ struct PuzzleGenerator {
         // Create a temporary puzzle for testing uniqueness
         let temporaryPuzzle = TennerGridPuzzle(
             id: UUID(),
-            rows: rows,
             columns: columns,
+            rows: rows,
             difficulty: difficulty,
             targetSums: targetSums,
             initialGrid: puzzleGrid,
@@ -359,8 +359,8 @@ struct PuzzleGenerator {
             // Create updated puzzle for testing
             let testPuzzle = TennerGridPuzzle(
                 id: temporaryPuzzle.id,
-                rows: rows,
                 columns: columns,
+                rows: rows,
                 difficulty: difficulty,
                 targetSums: targetSums,
                 initialGrid: puzzleGrid,
