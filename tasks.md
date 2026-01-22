@@ -157,7 +157,7 @@
 ### 4.1 Main Game View
 
 - [x] Create `GameView` composing GridView, NumberPad, Toolbar, and Header
-- [ ] Add keyboard support for number entry (0-9 keys, backspace)
+- [x] Add keyboard support for number entry (0-9 keys, backspace)
 - [x] Implement pause overlay that blurs the grid
 - [x] Add basic win screen navigation
 - [ ] Test complete game flow: start, play, complete
