@@ -52,7 +52,7 @@
 - [x] Add constraint propagation optimization to improve solve speed
 - [x] Add method to verify a puzzle has a unique solution
 - [x] Add method to find the next logical move (for hints)
-- [ ] Write unit tests for `PuzzleSolver` with various puzzle difficulties
+- [x] Write unit tests for `PuzzleSolver` with various puzzle difficulties
 
 ### 1.3 Puzzle Generator
 

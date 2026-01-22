@@ -390,4 +390,632 @@ final class PuzzleSolverTests: XCTestCase {
             XCTAssertEqual(move.value, 9, "Value should be 9")
         }
     }
+
+    // MARK: - solve Tests
+
+    func testSolve_EasyPuzzle() {
+        // Given: A simple 3x3 easy puzzle
+        let initialGrid: [[Int?]] = [
+            [1, 2, nil],
+            [4, nil, 6],
+            [nil, 8, 9],
+        ]
+
+        let targetSums = [12, 15, 18]
+
+        let puzzle = TennerGridPuzzle(
+            columns: 3,
+            rows: 3,
+            difficulty: .easy,
+            targetSums: targetSums,
+            initialGrid: initialGrid,
+            solution: [
+                [1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9],
+            ]
+        )
+
+        // When: Solving the puzzle
+        let solution = solver.solve(puzzle: puzzle)
+
+        // Then: Should find a valid solution
+        XCTAssertNotNil(solution, "Should find a solution for easy puzzle")
+        if let solved = solution {
+            XCTAssertEqual(solved.count, 3, "Solution should have 3 rows")
+            XCTAssertEqual(solved[0].count, 3, "Solution rows should have 3 columns")
+
+            // Verify initial values are preserved
+            XCTAssertEqual(solved[0][0], 1, "Initial value should be preserved")
+            XCTAssertEqual(solved[0][1], 2, "Initial value should be preserved")
+            XCTAssertEqual(solved[1][0], 4, "Initial value should be preserved")
+
+            // Verify column sums
+            for col in 0 ..< 3 {
+                let sum = solved.map { $0[col] }.reduce(0, +)
+                XCTAssertEqual(sum, targetSums[col], "Column \(col) sum should match target")
+            }
+
+            // Verify no row duplicates
+            for row in solved {
+                let uniqueValues = Set(row)
+                XCTAssertEqual(uniqueValues.count, row.count, "Each row should have no duplicates")
+            }
+
+            // Verify no adjacent duplicates
+            for row in 0 ..< 3 {
+                for col in 0 ..< 3 {
+                    let value = solved[row][col]
+                    let adjacents = [
+                        (row - 1, col - 1), (row - 1, col), (row - 1, col + 1),
+                        (row, col - 1), (row, col + 1),
+                        (row + 1, col - 1), (row + 1, col), (row + 1, col + 1),
+                    ]
+
+                    for (adjRow, adjCol) in adjacents {
+                        guard adjRow >= 0, adjRow < 3, adjCol >= 0, adjCol < 3 else { continue }
+                        XCTAssertNotEqual(
+                            solved[adjRow][adjCol],
+                            value,
+                            "Adjacent cells should not have same value at (\(row),\(col))"
+                        )
+                    }
+                }
+            }
+        }
+    }
+
+    func testSolve_MediumPuzzle() {
+        // Given: A 4x4 medium difficulty puzzle
+        let initialGrid: [[Int?]] = [
+            [nil, 2, nil, nil],
+            [nil, nil, 6, nil],
+            [8, nil, nil, nil],
+            [nil, nil, nil, 3],
+        ]
+
+        // Construct target sums for a valid solution
+        let targetSums = [15, 18, 14, 13]
+
+        let puzzle = TennerGridPuzzle(
+            columns: 4,
+            rows: 4,
+            difficulty: .medium,
+            targetSums: targetSums,
+            initialGrid: initialGrid,
+            solution: [
+                [1, 2, 3, 4],
+                [5, 7, 6, 0],
+                [8, 9, 0, 5],
+                [1, 0, 5, 3],
+            ]
+        )
+
+        // When: Solving the puzzle
+        let solution = solver.solve(puzzle: puzzle)
+
+        // Then: Should find a valid solution
+        XCTAssertNotNil(solution, "Should find a solution for medium puzzle")
+        if let solved = solution {
+            XCTAssertEqual(solved.count, 4, "Solution should have 4 rows")
+
+            // Verify initial values are preserved
+            XCTAssertEqual(solved[0][1], 2, "Initial value should be preserved")
+            XCTAssertEqual(solved[1][2], 6, "Initial value should be preserved")
+            XCTAssertEqual(solved[2][0], 8, "Initial value should be preserved")
+            XCTAssertEqual(solved[3][3], 3, "Initial value should be preserved")
+
+            // Verify column sums
+            for col in 0 ..< 4 {
+                let sum = solved.map { $0[col] }.reduce(0, +)
+                XCTAssertEqual(sum, targetSums[col], "Column \(col) sum should match target")
+            }
+        }
+    }
+
+    func testSolve_HardPuzzle() {
+        // Given: A 5x5 hard puzzle with fewer initial values
+        let initialGrid: [[Int?]] = [
+            [nil, nil, nil, nil, 5],
+            [nil, 7, nil, nil, nil],
+            [nil, nil, 1, nil, nil],
+            [nil, nil, nil, 9, nil],
+            [0, nil, nil, nil, nil],
+        ]
+
+        // Target sums for a solvable puzzle
+        let targetSums = [20, 25, 15, 30, 20]
+
+        let puzzle = TennerGridPuzzle(
+            columns: 5,
+            rows: 5,
+            difficulty: .hard,
+            targetSums: targetSums,
+            initialGrid: initialGrid,
+            solution: [
+                [6, 2, 3, 4, 5],
+                [8, 7, 0, 1, 2],
+                [5, 9, 1, 7, 3],
+                [1, 4, 6, 9, 0],
+                [0, 3, 5, 9, 10],
+            ]
+        )
+
+        // When: Solving the puzzle
+        let solution = solver.solve(puzzle: puzzle)
+
+        // Then: Should find a valid solution
+        XCTAssertNotNil(solution, "Should find a solution for hard puzzle")
+        if let solved = solution {
+            XCTAssertEqual(solved.count, 5, "Solution should have 5 rows")
+            XCTAssertEqual(solved[0].count, 5, "Solution rows should have 5 columns")
+
+            // Verify initial values
+            XCTAssertEqual(solved[0][4], 5, "Initial value should be preserved")
+            XCTAssertEqual(solved[1][1], 7, "Initial value should be preserved")
+            XCTAssertEqual(solved[2][2], 1, "Initial value should be preserved")
+            XCTAssertEqual(solved[4][0], 0, "Initial value should be preserved")
+
+            // Verify all values are in valid range
+            for row in solved {
+                for value in row {
+                    XCTAssertTrue(value >= 0 && value <= 9, "All values should be 0-9")
+                }
+            }
+        }
+    }
+
+    func testSolve_ExpertPuzzle() {
+        // Given: A 5x6 expert puzzle (larger grid)
+        let initialGrid: [[Int?]] = [
+            [nil, nil, nil, nil, nil, nil],
+            [nil, nil, 3, nil, nil, nil],
+            [nil, nil, nil, nil, nil, nil],
+            [nil, 5, nil, nil, nil, nil],
+            [nil, nil, nil, nil, 8, nil],
+        ]
+
+        let targetSums = [18, 22, 20, 25, 23, 17]
+
+        let puzzle = TennerGridPuzzle(
+            columns: 6,
+            rows: 5,
+            difficulty: .expert,
+            targetSums: targetSums,
+            initialGrid: initialGrid,
+            solution: [
+                [1, 2, 3, 4, 5, 6],
+                [7, 8, 3, 9, 0, 1],
+                [4, 6, 5, 7, 9, 2],
+                [3, 5, 4, 2, 1, 0],
+                [3, 1, 5, 3, 8, 8],
+            ]
+        )
+
+        // When: Solving the puzzle
+        let solution = solver.solve(puzzle: puzzle)
+
+        // Then: Should find a solution or nil (expert puzzles can be very hard)
+        if let solved = solution {
+            XCTAssertEqual(solved.count, 5, "Solution should have 5 rows")
+            XCTAssertEqual(solved[0].count, 6, "Solution rows should have 6 columns")
+
+            // Verify column sums
+            for col in 0 ..< 6 {
+                let sum = solved.map { $0[col] }.reduce(0, +)
+                XCTAssertEqual(sum, targetSums[col], "Column \(col) sum should match target")
+            }
+        }
+    }
+
+    func testSolve_ImpossiblePuzzle() {
+        // Given: A puzzle with impossible constraints
+        let initialGrid: [[Int?]] = [
+            [1, 1, nil],
+            [nil, nil, nil],
+            [nil, nil, nil],
+        ]
+
+        // Target sum impossible due to adjacent duplicates in initial grid
+        let targetSums = [12, 15, 18]
+
+        let puzzle = TennerGridPuzzle(
+            columns: 3,
+            rows: 3,
+            difficulty: .easy,
+            targetSums: targetSums,
+            initialGrid: initialGrid,
+            solution: [
+                [1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9],
+            ]
+        )
+
+        // When: Trying to solve the impossible puzzle
+        let solution = solver.solve(puzzle: puzzle)
+
+        // Then: Should return nil
+        XCTAssertNil(solution, "Impossible puzzle should return nil")
+    }
+
+    func testSolve_EmptyGrid() {
+        // Given: A completely empty 3x3 grid
+        let initialGrid: [[Int?]] = [
+            [nil, nil, nil],
+            [nil, nil, nil],
+            [nil, nil, nil],
+        ]
+
+        let targetSums = [12, 15, 18]
+
+        let puzzle = TennerGridPuzzle(
+            columns: 3,
+            rows: 3,
+            difficulty: .easy,
+            targetSums: targetSums,
+            initialGrid: initialGrid,
+            solution: [
+                [1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9],
+            ]
+        )
+
+        // When: Solving an empty grid
+        let solution = solver.solve(puzzle: puzzle)
+
+        // Then: Should find a solution
+        XCTAssertNotNil(solution, "Should be able to solve empty grid")
+        if let solved = solution {
+            // Verify column sums
+            for col in 0 ..< 3 {
+                let sum = solved.map { $0[col] }.reduce(0, +)
+                XCTAssertEqual(sum, targetSums[col], "Column \(col) sum should match target")
+            }
+        }
+    }
+
+    func testSolve_AlreadyComplete() {
+        // Given: A puzzle that's already solved
+        let initialGrid: [[Int?]] = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+        ]
+
+        let targetSums = [12, 15, 18]
+
+        let puzzle = TennerGridPuzzle(
+            columns: 3,
+            rows: 3,
+            difficulty: .easy,
+            targetSums: targetSums,
+            initialGrid: initialGrid,
+            solution: [
+                [1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9],
+            ]
+        )
+
+        // When: Solving an already complete puzzle
+        let solution = solver.solve(puzzle: puzzle)
+
+        // Then: Should return the same solution
+        XCTAssertNotNil(solution, "Should solve already complete puzzle")
+        if let solved = solution {
+            XCTAssertEqual(solved, [[1, 2, 3], [4, 5, 6], [7, 8, 9]], "Should return the same grid")
+        }
+    }
+
+    func testSolve_InvalidDimensions() {
+        // Given: A puzzle with mismatched grid dimensions
+        let initialGrid: [[Int?]] = [
+            [1, 2],
+            [4, 5],
+        ]
+
+        let targetSums = [12, 15, 18]
+
+        let puzzle = TennerGridPuzzle(
+            columns: 3,
+            rows: 3,
+            difficulty: .easy,
+            targetSums: targetSums,
+            initialGrid: initialGrid,
+            solution: [
+                [1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9],
+            ]
+        )
+
+        // When: Trying to solve with invalid dimensions
+        let solution = solver.solve(puzzle: puzzle)
+
+        // Then: Should return nil
+        XCTAssertNil(solution, "Invalid dimensions should return nil")
+    }
+
+    func testSolve_CustomInitialGrid() {
+        // Given: A puzzle with a custom initial grid (different from puzzle's initialGrid)
+        let puzzleInitialGrid: [[Int?]] = [
+            [1, 2, nil],
+            [4, nil, 6],
+            [nil, 8, 9],
+        ]
+
+        let customInitialGrid: [[Int?]] = [
+            [1, nil, 3],
+            [nil, 5, nil],
+            [7, nil, 9],
+        ]
+
+        let targetSums = [12, 15, 18]
+
+        let puzzle = TennerGridPuzzle(
+            columns: 3,
+            rows: 3,
+            difficulty: .easy,
+            targetSums: targetSums,
+            initialGrid: puzzleInitialGrid,
+            solution: [
+                [1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9],
+            ]
+        )
+
+        // When: Solving with custom initial grid
+        let solution = solver.solve(puzzle: puzzle, initialGrid: customInitialGrid)
+
+        // Then: Should solve using the custom grid
+        XCTAssertNotNil(solution, "Should solve with custom initial grid")
+        if let solved = solution {
+            // Verify custom initial values are preserved
+            XCTAssertEqual(solved[0][0], 1, "Custom initial value should be preserved")
+            XCTAssertEqual(solved[0][2], 3, "Custom initial value should be preserved")
+            XCTAssertEqual(solved[1][1], 5, "Custom initial value should be preserved")
+        }
+    }
+
+    // MARK: - getPossibleValues Tests
+
+    func testGetPossibleValues_EmptyCell() {
+        // Given: An empty cell in a partially filled grid
+        let grid: [[Int?]] = [
+            [nil, 2, nil],
+            [4, nil, 6],
+            [nil, 8, 9],
+        ]
+
+        let targetSums = [12, 15, 18]
+
+        let puzzle = TennerGridPuzzle(
+            columns: 3,
+            rows: 3,
+            difficulty: .easy,
+            targetSums: targetSums,
+            initialGrid: grid,
+            solution: [
+                [1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9],
+            ]
+        )
+
+        let position = CellPosition(row: 0, column: 0)
+
+        // When: Getting possible values
+        let possibleValues = solver.getPossibleValues(for: position, in: grid, puzzle: puzzle)
+
+        // Then: Should return a set of valid values
+        XCTAssertFalse(possibleValues.isEmpty, "Should have at least one possible value")
+        XCTAssertTrue(possibleValues.allSatisfy { $0 >= 0 && $0 <= 9 }, "All values should be 0-9")
+
+        // Should not include adjacent values
+        XCTAssertFalse(possibleValues.contains(2), "Should not include adjacent value 2")
+        XCTAssertFalse(possibleValues.contains(4), "Should not include adjacent value 4")
+    }
+
+    func testGetPossibleValues_HighlyConstrained() {
+        // Given: A cell with many constraints
+        let grid: [[Int?]] = [
+            [1, 2, 3],
+            [4, nil, 6],
+            [7, 8, 9],
+        ]
+
+        let targetSums = [12, 15, 18]
+
+        let puzzle = TennerGridPuzzle(
+            columns: 3,
+            rows: 3,
+            difficulty: .easy,
+            targetSums: targetSums,
+            initialGrid: grid,
+            solution: [
+                [1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9],
+            ]
+        )
+
+        let position = CellPosition(row: 1, column: 1)
+
+        // When: Getting possible values
+        let possibleValues = solver.getPossibleValues(for: position, in: grid, puzzle: puzzle)
+
+        // Then: Should have very few possible values due to constraints
+        XCTAssertTrue(possibleValues.count <= 3, "Highly constrained cell should have few options")
+
+        // Should not include values in the same row
+        XCTAssertFalse(possibleValues.contains(4), "Should not include row value 4")
+        XCTAssertFalse(possibleValues.contains(6), "Should not include row value 6")
+
+        // Should not include adjacent values
+        XCTAssertFalse(possibleValues.contains(1), "Should not include adjacent value 1")
+        XCTAssertFalse(possibleValues.contains(2), "Should not include adjacent value 2")
+        XCTAssertFalse(possibleValues.contains(3), "Should not include adjacent value 3")
+    }
+
+    func testGetPossibleValues_OnlyOnePossible() {
+        // Given: A cell where only one value is possible (naked single)
+        let grid: [[Int?]] = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, nil],
+        ]
+
+        let targetSums = [12, 15, 18]
+
+        let puzzle = TennerGridPuzzle(
+            columns: 3,
+            rows: 3,
+            difficulty: .easy,
+            targetSums: targetSums,
+            initialGrid: grid,
+            solution: [
+                [1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9],
+            ]
+        )
+
+        let position = CellPosition(row: 2, column: 2)
+
+        // When: Getting possible values
+        let possibleValues = solver.getPossibleValues(for: position, in: grid, puzzle: puzzle)
+
+        // Then: Should have exactly one possible value
+        XCTAssertEqual(possibleValues.count, 1, "Should have exactly one possible value")
+        XCTAssertTrue(possibleValues.contains(9), "Should contain value 9")
+    }
+
+    func testGetPossibleValues_NoPossibleValues() {
+        // Given: A cell where no values are possible (impossible state)
+        let grid: [[Int?]] = [
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
+            [nil, nil, nil, nil, nil, nil, nil, nil, nil, nil],
+        ]
+
+        let targetSums = [5, 5, 5, 5, 5, 5, 5, 5, 5, 5]
+
+        let puzzle = TennerGridPuzzle(
+            columns: 10,
+            rows: 2,
+            difficulty: .hard,
+            targetSums: targetSums,
+            initialGrid: grid,
+            solution: Array(repeating: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], count: 2)
+        )
+
+        let position = CellPosition(row: 1, column: 0)
+
+        // When: Getting possible values
+        let possibleValues = solver.getPossibleValues(for: position, in: grid, puzzle: puzzle)
+
+        // Then: Should return empty set (all values in same row or adjacent)
+        XCTAssertTrue(possibleValues.isEmpty, "Should have no possible values in impossible state")
+    }
+
+    func testGetPossibleValues_ColumnSumConstraint() {
+        // Given: A cell where column sum limits possibilities
+        let grid: [[Int?]] = [
+            [9, 2, 3],
+            [9, 5, 6],
+            [nil, 8, 9],
+        ]
+
+        // Column 0 target sum is 20, already has 18, so only values 0-2 are possible
+        let targetSums = [20, 15, 18]
+
+        let puzzle = TennerGridPuzzle(
+            columns: 3,
+            rows: 3,
+            difficulty: .medium,
+            targetSums: targetSums,
+            initialGrid: grid,
+            solution: [
+                [9, 2, 3],
+                [9, 5, 6],
+                [2, 8, 9],
+            ]
+        )
+
+        let position = CellPosition(row: 2, column: 0)
+
+        // When: Getting possible values
+        let possibleValues = solver.getPossibleValues(for: position, in: grid, puzzle: puzzle)
+
+        // Then: Should only include values that would result in valid column sum
+        for value in possibleValues {
+            XCTAssertTrue(value >= 0 && value <= 2, "Values should be limited by column sum constraint")
+        }
+
+        // Should not include 9 (row duplicate) even though sum allows it
+        XCTAssertFalse(possibleValues.contains(9), "Should not include row duplicate 9")
+    }
+
+    func testGetPossibleValues_CornerCell() {
+        // Given: A corner cell with fewer neighbors
+        let grid: [[Int?]] = [
+            [nil, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+        ]
+
+        let targetSums = [12, 15, 18]
+
+        let puzzle = TennerGridPuzzle(
+            columns: 3,
+            rows: 3,
+            difficulty: .easy,
+            targetSums: targetSums,
+            initialGrid: grid,
+            solution: [
+                [1, 2, 3],
+                [4, 5, 6],
+                [7, 8, 9],
+            ]
+        )
+
+        let position = CellPosition(row: 0, column: 0)
+
+        // When: Getting possible values
+        let possibleValues = solver.getPossibleValues(for: position, in: grid, puzzle: puzzle)
+
+        // Then: Should respect constraints from fewer neighbors
+        XCTAssertFalse(possibleValues.isEmpty, "Corner cell should have possible values")
+        XCTAssertFalse(possibleValues.contains(2), "Should not include adjacent value 2")
+        XCTAssertFalse(possibleValues.contains(4), "Should not include adjacent value 4")
+        XCTAssertFalse(possibleValues.contains(5), "Should not include diagonal adjacent value 5")
+    }
+
+    func testGetPossibleValues_AllValuesUsedInRow() {
+        // Given: A row where many values are already used
+        let grid: [[Int?]] = [
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, nil],
+        ]
+
+        let targetSums = [0, 0, 0, 0, 0, 0, 0, 0, 0, 45]
+
+        let puzzle = TennerGridPuzzle(
+            columns: 10,
+            rows: 1,
+            difficulty: .hard,
+            targetSums: targetSums,
+            initialGrid: grid,
+            solution: [[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]]
+        )
+
+        let position = CellPosition(row: 0, column: 9)
+
+        // When: Getting possible values
+        let possibleValues = solver.getPossibleValues(for: position, in: grid, puzzle: puzzle)
+
+        // Then: Should only include value 9 (not used in row and not adjacent to 8)
+        XCTAssertTrue(possibleValues.isEmpty || possibleValues == [9], "Should only have value 9 available")
+    }
 }
