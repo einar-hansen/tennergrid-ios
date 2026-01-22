@@ -513,6 +513,30 @@ final class GameViewModel: ObservableObject {
         updateConflicts()
     }
 
+    /// Redoes the last undone action
+    func redo() {
+        // Check if there's anything to redo
+        guard !redoStack.isEmpty else {
+            errorMessage = "Nothing to redo"
+            return
+        }
+
+        // Pop the last undone action
+        let action = redoStack.removeLast()
+
+        // Replay the action (use new values)
+        applyAction(action, isUndo: false)
+
+        // Add back to undo stack
+        undoStack.append(action)
+
+        // Clear any error messages
+        errorMessage = nil
+
+        // Update conflicts
+        updateConflicts()
+    }
+
     /// Applies an action to the game state
     /// - Parameters:
     ///   - action: The action to apply

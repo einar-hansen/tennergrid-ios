@@ -779,4 +779,282 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.canRedo)
         XCTAssertEqual(viewModel.redoCount, 0)
     }
+
+    func testRedoBasicAction() {
+        let position = CellPosition(row: 0, column: 1)
+        viewModel.selectCell(at: position)
+
+        // Perform action
+        viewModel.enterNumber(2)
+        XCTAssertEqual(viewModel.value(at: position), 2)
+
+        // Undo
+        viewModel.undo()
+        XCTAssertNil(viewModel.value(at: position))
+        XCTAssertTrue(viewModel.canRedo)
+
+        // Redo should restore the value
+        viewModel.redo()
+        XCTAssertEqual(viewModel.value(at: position), 2)
+        XCTAssertNil(viewModel.errorMessage)
+    }
+
+    func testRedoWithoutHistory() {
+        XCTAssertFalse(viewModel.canRedo)
+
+        // Attempt to redo with no history
+        viewModel.redo()
+        XCTAssertEqual(viewModel.errorMessage, "Nothing to redo")
+    }
+
+    func testRedoMovesToUndoStack() {
+        let position = CellPosition(row: 0, column: 1)
+        viewModel.selectCell(at: position)
+        viewModel.enterNumber(2)
+
+        // Undo
+        viewModel.undo()
+        XCTAssertEqual(viewModel.undoCount, 0)
+        XCTAssertEqual(viewModel.redoCount, 1)
+
+        // Redo should move action back to undo stack
+        viewModel.redo()
+        XCTAssertEqual(viewModel.undoCount, 1)
+        XCTAssertEqual(viewModel.redoCount, 0)
+        XCTAssertTrue(viewModel.canUndo)
+        XCTAssertFalse(viewModel.canRedo)
+    }
+
+    func testRedoMultipleActions() {
+        let position1 = CellPosition(row: 0, column: 1)
+        let position2 = CellPosition(row: 1, column: 0)
+
+        // Perform multiple actions
+        viewModel.selectCell(at: position1)
+        viewModel.enterNumber(2)
+
+        viewModel.selectCell(at: position2)
+        viewModel.enterNumber(3)
+
+        XCTAssertEqual(viewModel.value(at: position1), 2)
+        XCTAssertEqual(viewModel.value(at: position2), 3)
+
+        // Undo both actions
+        viewModel.undo()
+        viewModel.undo()
+        XCTAssertNil(viewModel.value(at: position1))
+        XCTAssertNil(viewModel.value(at: position2))
+        XCTAssertEqual(viewModel.redoCount, 2)
+
+        // Redo first action
+        viewModel.redo()
+        XCTAssertEqual(viewModel.value(at: position1), 2)
+        XCTAssertNil(viewModel.value(at: position2))
+        XCTAssertEqual(viewModel.redoCount, 1)
+
+        // Redo second action
+        viewModel.redo()
+        XCTAssertEqual(viewModel.value(at: position1), 2)
+        XCTAssertEqual(viewModel.value(at: position2), 3)
+        XCTAssertEqual(viewModel.redoCount, 0)
+    }
+
+    func testRedoClearCell() {
+        let position = CellPosition(row: 0, column: 1)
+        viewModel.selectCell(at: position)
+
+        // Enter a value
+        viewModel.enterNumber(2)
+        XCTAssertEqual(viewModel.value(at: position), 2)
+
+        // Clear the cell
+        viewModel.clearSelectedCell()
+        XCTAssertNil(viewModel.value(at: position))
+
+        // Undo clear
+        viewModel.undo()
+        XCTAssertEqual(viewModel.value(at: position), 2)
+
+        // Redo clear
+        viewModel.redo()
+        XCTAssertNil(viewModel.value(at: position))
+    }
+
+    func testRedoPencilMarks() {
+        let position = CellPosition(row: 0, column: 1)
+        viewModel.selectCell(at: position)
+
+        // Add pencil marks
+        viewModel.addPencilMark(2)
+        viewModel.addPencilMark(5)
+        XCTAssertTrue(viewModel.marks(at: position).contains(2))
+        XCTAssertTrue(viewModel.marks(at: position).contains(5))
+
+        // Undo both marks
+        viewModel.undo()
+        viewModel.undo()
+        XCTAssertTrue(viewModel.marks(at: position).isEmpty)
+
+        // Redo first mark
+        viewModel.redo()
+        XCTAssertTrue(viewModel.marks(at: position).contains(2))
+        XCTAssertFalse(viewModel.marks(at: position).contains(5))
+
+        // Redo second mark
+        viewModel.redo()
+        XCTAssertTrue(viewModel.marks(at: position).contains(2))
+        XCTAssertTrue(viewModel.marks(at: position).contains(5))
+    }
+
+    func testRedoTogglePencilMark() {
+        let position = CellPosition(row: 0, column: 1)
+        viewModel.selectCell(at: position)
+
+        // Toggle to add mark
+        viewModel.togglePencilMark(5)
+        XCTAssertTrue(viewModel.marks(at: position).contains(5))
+
+        // Toggle to remove mark
+        viewModel.togglePencilMark(5)
+        XCTAssertFalse(viewModel.marks(at: position).contains(5))
+
+        // Undo remove
+        viewModel.undo()
+        XCTAssertTrue(viewModel.marks(at: position).contains(5))
+
+        // Undo add
+        viewModel.undo()
+        XCTAssertFalse(viewModel.marks(at: position).contains(5))
+
+        // Redo add
+        viewModel.redo()
+        XCTAssertTrue(viewModel.marks(at: position).contains(5))
+
+        // Redo remove
+        viewModel.redo()
+        XCTAssertFalse(viewModel.marks(at: position).contains(5))
+    }
+
+    func testRedoInNotesMode() {
+        let position = CellPosition(row: 0, column: 1)
+        viewModel.selectCell(at: position)
+        viewModel.setNotesMode(true)
+
+        // Enter numbers as pencil marks
+        viewModel.enterNumber(2)
+        viewModel.enterNumber(5)
+        XCTAssertTrue(viewModel.marks(at: position).contains(2))
+        XCTAssertTrue(viewModel.marks(at: position).contains(5))
+
+        // Undo both marks
+        viewModel.undo()
+        viewModel.undo()
+        XCTAssertTrue(viewModel.marks(at: position).isEmpty)
+
+        // Redo first mark
+        viewModel.redo()
+        XCTAssertTrue(viewModel.marks(at: position).contains(2))
+        XCTAssertFalse(viewModel.marks(at: position).contains(5))
+
+        // Redo second mark
+        viewModel.redo()
+        XCTAssertTrue(viewModel.marks(at: position).contains(2))
+        XCTAssertTrue(viewModel.marks(at: position).contains(5))
+    }
+
+    func testRedoRestoresPencilMarksWhenCleared() {
+        let position = CellPosition(row: 0, column: 1)
+        viewModel.selectCell(at: position)
+
+        // Add pencil marks
+        viewModel.addPencilMark(2)
+        viewModel.addPencilMark(5)
+
+        // Enter a value (clears pencil marks)
+        viewModel.enterNumber(2)
+        XCTAssertEqual(viewModel.value(at: position), 2)
+        XCTAssertTrue(viewModel.marks(at: position).isEmpty)
+
+        // Undo setValue
+        viewModel.undo()
+        XCTAssertNil(viewModel.value(at: position))
+        XCTAssertTrue(viewModel.marks(at: position).contains(2))
+        XCTAssertTrue(viewModel.marks(at: position).contains(5))
+
+        // Redo setValue
+        viewModel.redo()
+        XCTAssertEqual(viewModel.value(at: position), 2)
+        XCTAssertTrue(viewModel.marks(at: position).isEmpty)
+    }
+
+    func testRedoUpdatesConflicts() {
+        let position1 = CellPosition(row: 0, column: 1)
+        let position2 = CellPosition(row: 0, column: 2)
+
+        // Place valid numbers
+        viewModel.selectCell(at: position1)
+        viewModel.enterNumber(2)
+
+        viewModel.selectCell(at: position2)
+        viewModel.enterNumber(0)
+
+        XCTAssertTrue(viewModel.conflictingPositions.isEmpty)
+
+        // Undo both
+        viewModel.undo()
+        viewModel.undo()
+
+        // Redo should update conflicts correctly
+        viewModel.redo()
+        viewModel.redo()
+        XCTAssertTrue(viewModel.conflictingPositions.isEmpty)
+    }
+
+    func testRedoClearsErrorMessage() {
+        let position = CellPosition(row: 0, column: 1)
+        viewModel.selectCell(at: position)
+
+        // Enter a value
+        viewModel.enterNumber(2)
+
+        // Undo
+        viewModel.undo()
+
+        // Create an error by trying invalid action
+        viewModel.enterNumber(1) // Invalid
+        XCTAssertNotNil(viewModel.errorMessage)
+
+        // Redo should clear error
+        viewModel.redo()
+        XCTAssertNil(viewModel.errorMessage)
+    }
+
+    func testUndoRedoSequence() {
+        let position = CellPosition(row: 0, column: 1)
+        viewModel.selectCell(at: position)
+
+        // Perform action
+        viewModel.enterNumber(2)
+        XCTAssertEqual(viewModel.value(at: position), 2)
+
+        // Undo
+        viewModel.undo()
+        XCTAssertNil(viewModel.value(at: position))
+
+        // Redo
+        viewModel.redo()
+        XCTAssertEqual(viewModel.value(at: position), 2)
+
+        // Undo again
+        viewModel.undo()
+        XCTAssertNil(viewModel.value(at: position))
+
+        // Redo again
+        viewModel.redo()
+        XCTAssertEqual(viewModel.value(at: position), 2)
+
+        // Verify final state
+        XCTAssertTrue(viewModel.canUndo)
+        XCTAssertFalse(viewModel.canRedo)
+    }
 }
