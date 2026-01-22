@@ -338,4 +338,199 @@ struct PuzzleSolver {
 
         return true
     }
+
+    /// Finds the next logical move that can be determined without guessing
+    /// This method looks for cells that have only one possible value (naked singles)
+    /// or uses other logical deduction techniques
+    /// - Parameters:
+    ///   - grid: The current grid state
+    ///   - puzzle: The puzzle definition
+    /// - Returns: A tuple containing the position and value of the next logical move, or nil if no logical move exists
+    func findNextLogicalMove(in grid: [[Int?]], puzzle: TennerGridPuzzle) -> (position: CellPosition, value: Int)? {
+        // Strategy 1: Look for naked singles - cells with only one possible value
+        var nakedSingles: [(position: CellPosition, value: Int, priority: Int)] = []
+
+        for row in 0 ..< puzzle.rows {
+            for column in 0 ..< puzzle.columns {
+                // Skip filled cells
+                guard grid[row][column] == nil else { continue }
+
+                let position = CellPosition(row: row, column: column)
+                let possibleValues = getPossibleValues(for: position, in: grid, puzzle: puzzle)
+
+                // If cell has exactly one possible value, it's a naked single
+                if possibleValues.count == 1, let value = possibleValues.first {
+                    // Priority: prefer cells that are more constrained or in nearly complete rows/columns
+                    let priority = calculateCellPriority(position: position, in: grid, puzzle: puzzle)
+                    nakedSingles.append((position: position, value: value, priority: priority))
+                }
+            }
+        }
+
+        // Return the highest priority naked single
+        if let bestMove = nakedSingles.max(by: { $0.priority < $1.priority }) {
+            return (position: bestMove.position, value: bestMove.value)
+        }
+
+        // Strategy 2: Look for hidden singles - values that can only go in one cell in a row or column
+        if let hiddenSingle = findHiddenSingle(in: grid, puzzle: puzzle) {
+            return hiddenSingle
+        }
+
+        // Strategy 3: Look for cells where column sum constraints force a specific value
+        if let columnConstraintMove = findColumnConstraintMove(in: grid, puzzle: puzzle) {
+            return columnConstraintMove
+        }
+
+        // No logical move found - would require guessing
+        return nil
+    }
+
+    /// Calculates priority for a cell based on how constrained it is
+    /// Higher priority cells are more critical to solve first
+    /// - Parameters:
+    ///   - position: The cell position
+    ///   - grid: The current grid state
+    ///   - puzzle: The puzzle definition
+    /// - Returns: Priority score (higher is better)
+    private func calculateCellPriority(position: CellPosition, in grid: [[Int?]], puzzle: TennerGridPuzzle) -> Int {
+        var priority = 0
+
+        // Count filled cells in the same row
+        let filledInRow = grid[position.row].compactMap { $0 }.count
+        priority += filledInRow * 10
+
+        // Count filled cells in the same column
+        var filledInColumn = 0
+        for row in 0 ..< puzzle.rows {
+            if grid[row][position.column] != nil {
+                filledInColumn += 1
+            }
+        }
+        priority += filledInColumn * 10
+
+        // Count filled adjacent cells
+        let adjacentOffsets = [
+            (-1, -1), (-1, 0), (-1, 1),
+            (0, -1), (0, 1),
+            (1, -1), (1, 0), (1, 1),
+        ]
+
+        for (rowOffset, colOffset) in adjacentOffsets {
+            let neighborRow = position.row + rowOffset
+            let neighborCol = position.column + colOffset
+
+            guard neighborRow >= 0, neighborRow < puzzle.rows,
+                  neighborCol >= 0, neighborCol < puzzle.columns
+            else {
+                continue
+            }
+
+            if grid[neighborRow][neighborCol] != nil {
+                priority += 5
+            }
+        }
+
+        return priority
+    }
+
+    /// Finds a hidden single - a value that can only go in one position in a row or column
+    /// - Parameters:
+    ///   - grid: The current grid state
+    ///   - puzzle: The puzzle definition
+    /// - Returns: Position and value of hidden single, or nil if none found
+    private func findHiddenSingle(in grid: [[Int?]], puzzle: TennerGridPuzzle) -> (position: CellPosition, value: Int)? {
+        // Check rows for hidden singles
+        for row in 0 ..< puzzle.rows {
+            for value in 0 ... 9 {
+                var possiblePositions: [CellPosition] = []
+
+                for column in 0 ..< puzzle.columns {
+                    // Skip filled cells
+                    guard grid[row][column] == nil else { continue }
+
+                    let position = CellPosition(row: row, column: column)
+                    let possibleValues = getPossibleValues(for: position, in: grid, puzzle: puzzle)
+
+                    if possibleValues.contains(value) {
+                        possiblePositions.append(position)
+                    }
+                }
+
+                // If value can only go in one position in this row, it's a hidden single
+                if possiblePositions.count == 1 {
+                    return (position: possiblePositions[0], value: value)
+                }
+            }
+        }
+
+        // Check columns for hidden singles
+        for column in 0 ..< puzzle.columns {
+            for value in 0 ... 9 {
+                var possiblePositions: [CellPosition] = []
+
+                for row in 0 ..< puzzle.rows {
+                    // Skip filled cells
+                    guard grid[row][column] == nil else { continue }
+
+                    let position = CellPosition(row: row, column: column)
+                    let possibleValues = getPossibleValues(for: position, in: grid, puzzle: puzzle)
+
+                    if possibleValues.contains(value) {
+                        possiblePositions.append(position)
+                    }
+                }
+
+                // If value can only go in one position in this column, it's a hidden single
+                if possiblePositions.count == 1 {
+                    return (position: possiblePositions[0], value: value)
+                }
+            }
+        }
+
+        return nil
+    }
+
+    /// Finds a move forced by column sum constraints
+    /// When a column is nearly complete, the sum constraint may force specific values
+    /// - Parameters:
+    ///   - grid: The current grid state
+    ///   - puzzle: The puzzle definition
+    /// - Returns: Position and value of forced move, or nil if none found
+    private func findColumnConstraintMove(in grid: [[Int?]], puzzle: TennerGridPuzzle) -> (position: CellPosition, value: Int)? {
+        for column in 0 ..< puzzle.columns {
+            guard column < puzzle.targetSums.count else { continue }
+
+            var emptyPositions: [CellPosition] = []
+            var currentSum = 0
+
+            // Calculate current sum and find empty cells
+            for row in 0 ..< puzzle.rows {
+                if let value = grid[row][column] {
+                    currentSum += value
+                } else {
+                    emptyPositions.append(CellPosition(row: row, column: column))
+                }
+            }
+
+            // If only one empty cell remains, its value is determined by the target sum
+            if emptyPositions.count == 1 {
+                let targetSum = puzzle.targetSums[column]
+                let requiredValue = targetSum - currentSum
+
+                // Verify the required value is valid (0-9) and can be placed
+                if requiredValue >= 0, requiredValue <= 9 {
+                    let position = emptyPositions[0]
+                    let possibleValues = getPossibleValues(for: position, in: grid, puzzle: puzzle)
+
+                    // If the required value is actually valid for this position, return it
+                    if possibleValues.contains(requiredValue) {
+                        return (position: position, value: requiredValue)
+                    }
+                }
+            }
+        }
+
+        return nil
+    }
 }
