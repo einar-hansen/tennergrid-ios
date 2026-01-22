@@ -31,8 +31,8 @@
 - [x] Create `GameState` model with puzzle, currentGrid, pencilMarks, selectedCell, timing, and completion data
 - [x] Create `GameAction` struct for undo/redo system with action type, position, old/new values
 - [x] Create `GameStatistics` model with games played, win rate, time tracking, and difficulty breakdowns
-- [ ] Create `Achievement` model with id, title, description, progress, and unlock status
-- [ ] Write unit tests for all game state models
+- [x] Create `Achievement` model with id, title, description, progress, and unlock status
+- [x] Write unit tests for all game state models
 
 ---
 
@@ -40,11 +40,11 @@
 
 ### 1.1 Validation Service
 
-- [ ] Implement `ValidationService` with method to check if a number placement is valid (no adjacent duplicates, no row duplicates)
-- [ ] Add method to detect all conflicts for a given cell position
-- [ ] Add method to validate column sum against target sum
-- [ ] Add method to check if entire puzzle is correctly completed
-- [ ] Write comprehensive unit tests for `ValidationService` with edge cases
+- [x] Implement `ValidationService` with method to check if a number placement is valid (no adjacent duplicates, no row duplicates)
+- [x] Add method to detect all conflicts for a given cell position
+- [x] Add method to validate column sum against target sum
+- [x] Add method to check if entire puzzle is correctly completed
+- [x] Write comprehensive unit tests for `ValidationService` with edge cases
 
 ### 1.2 Puzzle Solver
 

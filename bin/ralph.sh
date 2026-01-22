@@ -10,6 +10,8 @@ MAX_ITERATIONS=${1:-50}
 TASKS_FILE=${2:-tasks.md}
 SCHEME_NAME=${3:-TennerGrid}
 COMPLETE_FLAG="tasks_complete"
+BUILD_FAILED_FLAG="build_failed"
+BUILD_ERROR_LOG="/tmp/ralph_build_errors.log"
 
 # Configuration
 XCODE_PROJECT="TennerGrid.xcodeproj"  # Change to your project name
@@ -68,22 +70,62 @@ for i in $(seq 1 "$MAX_ITERATIONS"); do
     exit 0
   fi
 
-  # Read the current tasks file
-  log_info "Reading tasks from $TASKS_FILE..."
-
-  # Check if there are any uncompleted tasks (lines starting with "- [ ]")
-  UNCOMPLETED_COUNT=$(grep -c "^- \[ \]" "$TASKS_FILE" || true)
-
-  if [[ $UNCOMPLETED_COUNT -eq 0 ]]; then
-    log_info "No uncompleted tasks found. Creating completion flag."
-    touch "$COMPLETE_FLAG"
-    exit 0
+  # Check if build is currently failing
+  BUILD_IS_FAILING=false
+  if [[ -f "$BUILD_FAILED_FLAG" ]]; then
+    BUILD_IS_FAILING=true
+    log_error "🚨 Build failure detected from previous iteration!"
+    log_error "Priority: Fix compilation errors before continuing with tasks"
   fi
 
-  log_info "Found $UNCOMPLETED_COUNT uncompleted task(s)."
+  # Prepare the agent prompt
+  if [[ "$BUILD_IS_FAILING" == true ]]; then
+    # Build is broken - tell agent to fix it
+    AGENT_PROMPT=$(cat <<PROMPT
+🚨 **CRITICAL: BUILD IS CURRENTLY FAILING** 🚨
 
-  # Prepare the agent prompt with the current tasks
-  AGENT_PROMPT=$(cat <<PROMPT
+The project failed to compile in the previous iteration. You MUST fix the compilation errors before working on any other tasks.
+
+Build error log is available at: $BUILD_ERROR_LOG
+
+Your task for this iteration:
+1. Review the compilation errors in $BUILD_ERROR_LOG
+2. Fix ALL compilation errors to get the build passing
+3. Test that the build succeeds
+4. Commit your fixes with message: "Fix compilation errors"
+
+DO NOT work on any tasks from $TASKS_FILE until the build is fixed.
+
+Project context:
+- Scheme: $SCHEME_NAME
+- Build command: xcodebuild clean build $BUILD_FLAG -scheme "$SCHEME_NAME" -destination "$TEST_DESTINATION"
+
+Common Swift compilation errors and fixes:
+- Duplicate declarations: Remove or rename the duplicate
+- Missing imports: Add required import statements
+- Type mismatches: Fix type annotations or conversions
+- Access control: Adjust public/private/internal modifiers
+- Protocol conformance: Implement required methods/properties
+
+Once the build succeeds, the build_failed flag will be automatically removed and normal task work will resume.
+PROMPT
+)
+  else
+    # Build is working - proceed with normal tasks
+    log_info "Reading tasks from $TASKS_FILE..."
+
+    # Check if there are any uncompleted tasks (lines starting with "- [ ]")
+    UNCOMPLETED_COUNT=$(grep -c "^- \[ \]" "$TASKS_FILE" || true)
+
+    if [[ $UNCOMPLETED_COUNT -eq 0 ]]; then
+      log_info "No uncompleted tasks found. Creating completion flag."
+      touch "$COMPLETE_FLAG"
+      exit 0
+    fi
+
+    log_info "Found $UNCOMPLETED_COUNT uncompleted task(s)."
+
+    AGENT_PROMPT=$(cat <<PROMPT
 You are working through a task list for an iOS/Swift project, one task at a time.
 
 Current tasks file ($TASKS_FILE):
@@ -126,6 +168,7 @@ Project context:
 Focus on quality over speed. Make sure each task is truly complete before marking it done.
 PROMPT
 )
+  fi
 
   # Call the agent
   log_info "Calling Claude Code agent..."
@@ -144,14 +187,40 @@ PROMPT
     $BUILD_FLAG \
     -scheme "$SCHEME_NAME" \
     -destination "$TEST_DESTINATION" \
-    -quiet; then
+    2>&1 | tee "$BUILD_ERROR_LOG"; then
     log_info "✓ Build succeeded"
+
+    # Remove build failed flag if it exists
+    if [[ -f "$BUILD_FAILED_FLAG" ]]; then
+      log_info "Removing build failed flag (build now passing)"
+      rm "$BUILD_FAILED_FLAG"
+    fi
   else
-    log_error "✗ Build failed. Please fix compilation errors."
-    exit 1
+    log_error "✗ Build failed. Creating build failed flag."
+
+    # Create the build failed flag
+    echo "Build failed at iteration $i on $(date)" > "$BUILD_FAILED_FLAG"
+
+    log_error "Build errors have been logged to: $BUILD_ERROR_LOG"
+    log_error "Next iteration will prioritize fixing these compilation errors."
+
+    # Commit current state so agent can see what failed
+    if [[ -n "$(git status --porcelain)" ]]; then
+      git add -A
+      git commit -m "Ralph iOS: iteration $i - build failed (errors logged)" || true
+    fi
+
+    # Continue to next iteration to fix the build
+    echo ""
+    log_info "=== Iteration $i Complete (build failed) ==="
+    echo "  Next iteration will focus on fixing compilation errors"
+    echo ""
+    echo "---"
+    echo ""
+    continue
   fi
 
-  # Step 2: Run tests
+  # Step 2: Run tests (only if build succeeded)
   log_info "Running tests..."
   if xcodebuild test \
     $BUILD_FLAG \
@@ -203,7 +272,9 @@ PROMPT
   COMPLETED=$(grep -c "^- \[x\]" "$TASKS_FILE" || echo "0")
   echo "  Completed tasks: $COMPLETED"
   echo "  Remaining tasks: $REMAINING"
-  echo "  Progress: $(( (COMPLETED * 100) / (COMPLETED + REMAINING) ))%"
+  if [[ $((COMPLETED + REMAINING)) -gt 0 ]]; then
+    echo "  Progress: $(( (COMPLETED * 100) / (COMPLETED + REMAINING) ))%"
+  fi
   echo ""
   echo "---"
   echo ""
