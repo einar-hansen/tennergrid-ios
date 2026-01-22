@@ -124,7 +124,7 @@
 - [x] Add column sum display below each column
 - [x] Implement cell selection coordination with GameViewModel
 - [x] Add visual feedback for adjacent cells and same numbers
-- [ ] Test grid rendering with different puzzle sizes
+- [x] Test grid rendering with different puzzle sizes
 
 ### 3.3 Number Pad
 

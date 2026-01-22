@@ -12,6 +12,7 @@ SCHEME_NAME=${3:-TennerGrid}
 COMPLETE_FLAG="tasks_complete"
 BUILD_FAILED_FLAG="build_failed"
 BUILD_ERROR_LOG="/tmp/ralph_build_errors.log"
+MODEL="opus"
 
 # Configuration
 XCODE_PROJECT="TennerGrid.xcodeproj"  # Change to your project name
@@ -172,9 +173,10 @@ PROMPT
   fi
 
   # Call the agent
-  log_info "Calling Claude Code agent..."
+  log_info "Calling Claude Code agent… Model $MODEL…"
   claude --print \
     --no-session-persistence \
+    --model "$MODEL"
     --permission-mode acceptEdits \
     "$AGENT_PROMPT"
 
