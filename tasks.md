@@ -64,11 +64,11 @@
 
 ### 1.4 Hint Service
 
-- [ ] Implement `HintService` to identify next cell(s) to fill
-- [ ] Add method to get all possible valid values for a selected cell
-- [ ] Add method to reveal the correct value for a cell
-- [ ] Track hint usage count in game state
-- [ ] Write unit tests for hint service with various game states
+- [x] Implement `HintService` to identify next cell(s) to fill
+- [x] Add method to get all possible valid values for a selected cell
+- [x] Add method to reveal the correct value for a cell
+- [x] Track hint usage count in game state
+- [x] Write unit tests for hint service with various game states
 
 ---
 
