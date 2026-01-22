@@ -15,15 +15,6 @@ struct CellPosition: Equatable, Hashable, Codable {
     /// The column index (0-based)
     let column: Int
 
-    /// Creates a new cell position
-    /// - Parameters:
-    ///   - row: The row index (0-based)
-    ///   - column: The column index (0-based)
-    init(row: Int, column: Int) {
-        self.row = row
-        self.column = column
-    }
-
     /// Returns all adjacent positions (including diagonals)
     /// - Parameters:
     ///   - maxRows: Maximum number of rows in the grid
