@@ -1582,4 +1582,49 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertEqual(newViewModel.elapsedTime, savedTime, accuracy: 0.1)
         XCTAssertEqual(newViewModel.gameState.elapsedTime, savedTime, accuracy: 0.1)
     }
+
+    func testViewModelDeallocatesCleanlyWithRunningTimer() async {
+        // Create a view model in a scope that will deallocate it
+        weak var weakViewModel: GameViewModel?
+
+        autoreleasepool {
+            let tempViewModel = GameViewModel(puzzle: puzzle)
+            weakViewModel = tempViewModel
+
+            // Verify timer is running
+            XCTAssertTrue(tempViewModel.isTimerRunning)
+
+            // Let it run briefly
+            try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+
+            // tempViewModel goes out of scope and should deallocate
+        }
+
+        // Wait for deallocation to complete
+        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+
+        // Verify the view model was deallocated (no memory leak)
+        XCTAssertNil(weakViewModel, "GameViewModel should deallocate cleanly even with running timer")
+    }
+
+    func testViewModelDeallocatesCleanlyWhenPaused() async {
+        weak var weakViewModel: GameViewModel?
+
+        autoreleasepool {
+            let tempViewModel = GameViewModel(puzzle: puzzle)
+            weakViewModel = tempViewModel
+
+            // Pause the timer before deallocation
+            tempViewModel.pauseTimer()
+            XCTAssertFalse(tempViewModel.isTimerRunning)
+
+            // tempViewModel goes out of scope and should deallocate
+        }
+
+        // Wait for deallocation to complete
+        try? await Task.sleep(nanoseconds: 100_000_000) // 0.1 seconds
+
+        // Verify the view model was deallocated
+        XCTAssertNil(weakViewModel, "GameViewModel should deallocate cleanly when paused")
+    }
 }
