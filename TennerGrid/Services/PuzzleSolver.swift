@@ -234,4 +234,108 @@ struct PuzzleSolver {
         // The target is reachable if it's within the possible range
         return remainingSum >= minPossible && remainingSum <= maxPossible
     }
+
+    /// Verifies that a puzzle has exactly one unique solution
+    /// - Parameters:
+    ///   - puzzle: The puzzle to verify
+    ///   - initialGrid: The initial grid state (optional, defaults to puzzle's initial grid)
+    /// - Returns: True if the puzzle has exactly one unique solution, false if it has zero or multiple solutions
+    func hasUniqueSolution(puzzle: TennerGridPuzzle, initialGrid: [[Int?]]? = nil) -> Bool {
+        var grid = initialGrid ?? puzzle.initialGrid
+
+        // Validate dimensions match
+        guard grid.count == puzzle.rows,
+              grid.allSatisfy({ $0.count == puzzle.columns })
+        else {
+            return false
+        }
+
+        var solutionCount = 0
+        var firstSolution: [[Int]]?
+
+        // Find all solutions (up to 2 - we only need to know if there's more than one)
+        _ = countSolutions(
+            grid: &grid,
+            puzzle: puzzle,
+            maxSolutions: 2,
+            foundSolutions: &solutionCount,
+            firstSolution: &firstSolution
+        )
+
+        return solutionCount == 1
+    }
+
+    /// Recursively counts solutions for a puzzle using backtracking
+    /// Stops when maxSolutions is reached for efficiency
+    /// - Parameters:
+    ///   - grid: The current grid state (will be modified in place)
+    ///   - puzzle: The puzzle definition
+    ///   - maxSolutions: Maximum number of solutions to find before stopping
+    ///   - foundSolutions: Counter for number of solutions found (inout)
+    ///   - firstSolution: The first solution found (inout, optional)
+    /// - Returns: True if should continue searching, false if maxSolutions reached
+    private func countSolutions(
+        grid: inout [[Int?]],
+        puzzle: TennerGridPuzzle,
+        maxSolutions: Int,
+        foundSolutions: inout Int,
+        firstSolution: inout [[Int]]?
+    ) -> Bool {
+        // If we've found enough solutions, stop searching
+        if foundSolutions >= maxSolutions {
+            return false
+        }
+
+        // Find next empty cell
+        guard let position = findNextEmptyCell(in: grid, puzzle: puzzle) else {
+            // No empty cells left - check if solution is valid
+            if validationService.isPuzzleComplete(grid: grid, puzzle: puzzle) {
+                foundSolutions += 1
+                if firstSolution == nil {
+                    // Store the first solution
+                    firstSolution = grid.map { row in
+                        row.compactMap { $0 }
+                    }
+                }
+            }
+            return foundSolutions < maxSolutions
+        }
+
+        // Get possible values using constraint propagation
+        let possibleValues = getPossibleValues(for: position, in: grid, puzzle: puzzle)
+
+        // Early termination if no valid values
+        guard !possibleValues.isEmpty else {
+            return true
+        }
+
+        // Try each possible value
+        for value in possibleValues.sorted() {
+            // Place the value
+            grid[position.row][position.column] = value
+
+            // Forward checking
+            if forwardCheck(grid: grid, changedPosition: position, puzzle: puzzle) {
+                // Recursively try to solve the rest
+                let shouldContinue = countSolutions(
+                    grid: &grid,
+                    puzzle: puzzle,
+                    maxSolutions: maxSolutions,
+                    foundSolutions: &foundSolutions,
+                    firstSolution: &firstSolution
+                )
+
+                // If we've found enough solutions, stop
+                if !shouldContinue {
+                    grid[position.row][position.column] = nil
+                    return false
+                }
+            }
+
+            // Backtrack - remove the value
+            grid[position.row][position.column] = nil
+        }
+
+        return true
+    }
 }
