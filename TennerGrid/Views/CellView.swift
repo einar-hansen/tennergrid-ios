@@ -77,6 +77,7 @@ struct CellView: View {
                     }
                 }
             }
+            .padding(6)
         }
         .frame(width: cellSize, height: cellSize)
     }
