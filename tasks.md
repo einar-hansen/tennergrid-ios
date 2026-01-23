@@ -208,10 +208,10 @@
 
 ### 5.2 Difficulty Selection
 
-- [ ] Create `DifficultySelectionView` as modal sheet
-- [ ] List all difficulty levels with color indicators
-- [ ] Add optional "Custom Grid Size" option
-- [ ] Wire up selection to start new game
+- [x] Create `DifficultySelectionView` as modal sheet
+- [x] List all difficulty levels with color indicators
+- [x] Add optional "Custom Grid Size" option
+- [x] Wire up selection to start new game
 - [ ] Test difficulty selection flow
 
 ### 5.3 Tab Navigation
