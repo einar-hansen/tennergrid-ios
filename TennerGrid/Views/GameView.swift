@@ -71,8 +71,21 @@ struct GameView: View {
 
     // MARK: - Subviews
 
-    /// Main game content layout
+    /// Main game content layout - adapts to portrait or landscape
     private var gameContent: some View {
+        GeometryReader { geometry in
+            if geometry.size.width > geometry.size.height {
+                // Landscape layout
+                landscapeLayout
+            } else {
+                // Portrait layout (original)
+                portraitLayout
+            }
+        }
+    }
+
+    /// Portrait layout - vertical arrangement
+    private var portraitLayout: some View {
         VStack(spacing: 16) {
             // Header with timer, difficulty, and controls
             GameHeaderView(
@@ -96,6 +109,44 @@ struct GameView: View {
             NumberPadView(viewModel: viewModel)
                 .padding(.bottom, 16)
         }
+    }
+
+    /// Landscape layout - horizontal arrangement
+    private var landscapeLayout: some View {
+        HStack(spacing: 20) {
+            // Left side: Grid takes most of the space
+            VStack(spacing: 8) {
+                // Compact header for landscape
+                GameHeaderView(
+                    viewModel: viewModel,
+                    onPause: handlePause,
+                    onSettings: handleSettings
+                )
+
+                // Main puzzle grid
+                GridView(viewModel: viewModel)
+            }
+            .frame(maxWidth: .infinity)
+
+            // Right side: Controls in a vertical stack
+            VStack(spacing: 16) {
+                Spacer()
+
+                // Game toolbar with action buttons
+                GameToolbarView(viewModel: viewModel)
+
+                Spacer()
+                    .frame(maxHeight: 40)
+
+                // Number pad for input
+                NumberPadView(viewModel: viewModel)
+
+                Spacer()
+            }
+            .frame(maxWidth: 400) // Limit control panel width
+            .padding(.trailing, 16)
+        }
+        .padding(.horizontal, 16)
     }
 
     /// Pause overlay shown when game is paused
@@ -369,4 +420,15 @@ private struct KeyboardInputModifierIOS17: ViewModifier {
 
 #Preview("iPad") {
     GameView(puzzle: PreviewPuzzles.hard7Row)
+}
+
+#Preview("Landscape - iPhone") {
+    GameView(puzzle: PreviewPuzzles.medium5Row)
+        .previewInterfaceOrientation(.landscapeLeft)
+}
+
+#Preview("Landscape - iPad") {
+    GameView(puzzle: PreviewPuzzles.hard7Row)
+        .previewInterfaceOrientation(.landscapeRight)
+        .previewDevice(PreviewDevice(rawValue: "iPad Pro (12.9-inch) (6th generation)"))
 }
