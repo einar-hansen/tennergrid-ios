@@ -2,6 +2,7 @@
 set -euo pipefail
 
 # ralph_ios.sh - iOS/Swift version of Ralph Wiggum task automation
+
 # Unset API key to force Claude Code to use subscription
 unset ANTHROPIC_API_KEY
 
@@ -12,13 +13,10 @@ trap 'handle_interrupt' INT TERM
 handle_interrupt() {
   echo -e "\n${YELLOW}[WARN]${NC} Interrupt signal received. Cleaning up..."
   touch "$INTERRUPT_FLAG"
-
   # Kill any running xcodebuild processes spawned by this script
   pkill -P $$ xcodebuild 2>/dev/null || true
-
   # Clean up interrupt flag on exit
   rm -f "$INTERRUPT_FLAG" 2>/dev/null || true
-
   echo -e "${GREEN}[INFO]${NC} Exiting gracefully..."
   exit 130
 }
@@ -36,15 +34,17 @@ check_interrupt() {
 MAX_ITERATIONS=${1:-50}
 TASKS_FILE=${2:-tasks.md}
 SCHEME_NAME=${3:-TennerGrid}
+
 COMPLETE_FLAG="tasks_complete"
 BUILD_FAILED_FLAG="build_failed"
+TESTS_FAILED_FLAG="tests_failed"
 BUILD_ERROR_LOG="/tmp/ralph_build_errors.log"
+TEST_OUTPUT="test_output.txt"
 MODEL="sonnet"
 
 # Configuration
 XCODE_PROJECT="TennerGrid.xcodeproj"  # Change to your project name
 XCODE_WORKSPACE=""  # Set to "TennerGrid.xcworkspace" if using CocoaPods/SPM
-# TEST_DESTINATION="platform=iOS Simulator,name=iPhone 15,OS=latest"
 TEST_DESTINATION="platform=iOS Simulator,name=iPhone 17"
 
 # Color output
@@ -107,6 +107,14 @@ for i in $(seq 1 "$MAX_ITERATIONS"); do
     log_error "Priority: Fix compilation errors before continuing with tasks"
   fi
 
+  # Check if tests are currently failing
+  TESTS_ARE_FAILING=false
+  if [[ -f "$TESTS_FAILED_FLAG" ]]; then
+    TESTS_ARE_FAILING=true
+    log_warn "⚠️ Test failures detected from previous iteration!"
+    log_warn "Priority: Fix failing tests before continuing with new tasks"
+  fi
+
   # Prepare the agent prompt
   if [[ "$BUILD_IS_FAILING" == true ]]; then
     # Build is broken - tell agent to fix it
@@ -140,8 +148,44 @@ Common Swift compilation errors and fixes:
 Once the build succeeds, the build_failed flag will be automatically removed and normal task work will resume.
 PROMPT
 )
+
+  elif [[ "$TESTS_ARE_FAILING" == true ]]; then
+    # Tests are failing - tell agent to fix them
+    AGENT_PROMPT=$(cat <<PROMPT
+⚠️ **PRIORITY: TESTS ARE CURRENTLY FAILING** ⚠️
+
+Some tests failed in the previous iteration. You should fix the failing tests before working on new tasks.
+
+Test output is available at: $TEST_OUTPUT
+
+Your task for this iteration:
+1. Review the test failures in $TEST_OUTPUT
+2. Identify which tests are failing and why
+3. Fix the failing tests (either fix the test or fix the code being tested)
+4. Run tests locally to verify they pass
+5. Commit your fixes with message: "Fix failing tests"
+
+Current tasks file ($TASKS_FILE):
+\`\`\`markdown
+$(cat "$TASKS_FILE")
+\`\`\`
+
+Project context:
+- Scheme: $SCHEME_NAME
+- Test command: xcodebuild test $BUILD_FLAG -scheme "$SCHEME_NAME" -destination "$TEST_DESTINATION"
+
+Common test failure causes:
+- Assertion failures: Check expected vs actual values
+- Async test timeouts: Ensure expectations are fulfilled
+- Setup/teardown issues: Check test fixtures
+- Mock/stub mismatches: Verify mock configurations
+
+Once all tests pass, the tests_failed flag will be automatically removed and normal task work will resume.
+PROMPT
+)
+
   else
-    # Build is working - proceed with normal tasks
+    # Build is working, tests are passing - proceed with normal tasks
     log_info "Reading tasks from $TASKS_FILE..."
 
     # Check if there are any uncompleted tasks (lines starting with "- [ ]")
@@ -202,12 +246,10 @@ PROMPT
 
   # Call the agent
   log_info "Calling Claude Code agent... Model $MODEL..."
-  # claude --print \
-    # --no-session-persistence \
-    # --model "$MODEL" \
-  claude --model "$MODEL" \
-    --permission-mode acceptEdits \
-    "$AGENT_PROMPT"
+  echo "$AGENT_PROMPT" | claude --print \
+    --no-session-persistence
+    --model "$MODEL" \
+    --permission-mode acceptEdits
 
   check_interrupt  # Check after agent completes
 
@@ -223,7 +265,6 @@ PROMPT
     -destination "$TEST_DESTINATION" \
     2>&1 | tee "$BUILD_ERROR_LOG"; then
     log_info "✓ Build succeeded"
-
     # Remove build failed flag if it exists
     if [[ -f "$BUILD_FAILED_FLAG" ]]; then
       log_info "Removing build failed flag (build now passing)"
@@ -231,10 +272,8 @@ PROMPT
     fi
   else
     log_error "✗ Build failed. Creating build failed flag."
-
     # Create the build failed flag
     echo "Build failed at iteration $i on $(date)" > "$BUILD_FAILED_FLAG"
-
     log_error "Build errors have been logged to: $BUILD_ERROR_LOG"
     log_error "Next iteration will prioritize fixing these compilation errors."
 
@@ -258,15 +297,69 @@ PROMPT
 
   # Step 2: Run tests (only if build succeeded)
   log_info "Running tests..."
+  TESTS_PASSED=true
   if xcodebuild test \
     $BUILD_FLAG \
     -scheme "$SCHEME_NAME" \
     -destination "$TEST_DESTINATION" \
-    -quiet; then
+    -quiet 2>&1 | tee "$TEST_OUTPUT"; then
     log_info "✓ All tests passed"
+    # Remove tests failed flag if it exists
+    if [[ -f "$TESTS_FAILED_FLAG" ]]; then
+      log_info "Removing tests failed flag (all tests now passing)"
+      rm "$TESTS_FAILED_FLAG"
+    fi
   else
-    log_warn "✗ Some tests failed. Review test output above."
-    # Don't exit - let the developer decide whether to continue
+    log_warn "✗ Some tests failed."
+    TESTS_PASSED=false
+    echo "Tests failed at iteration $i on $(date)" > "$TESTS_FAILED_FLAG"
+  fi
+
+  check_interrupt  # Check before test review
+
+  # Step 2.5: Review test output with Claude (separate call)
+  if [[ "$TESTS_PASSED" == false ]]; then
+    log_info "Calling Claude to review test failures..."
+
+    TEST_REVIEW_PROMPT=$(cat <<PROMPT
+Review the following test output and provide a brief analysis:
+
+Test output ($TEST_OUTPUT):
+\`\`\`
+$(tail -200 "$TEST_OUTPUT")
+\`\`\`
+
+Please provide:
+1. A summary of which tests failed
+2. The likely root cause of each failure
+3. Suggested fixes (be specific about which files/methods to change)
+
+Keep your response concise and actionable. This analysis will be used in the next iteration to fix the failures.
+PROMPT
+)
+
+    # Run Claude to review test output (using print mode for quick analysis)
+    log_info "Test failure analysis:"
+    echo "$TEST_REVIEW_PROMPT" | claude --print \
+      --model "$MODEL" \
+      2>&1 | tee /tmp/test_analysis.txt
+
+    echo ""
+    log_warn "Test failures detected. Next iteration will prioritize fixing them."
+
+    # Commit current state
+    if [[ -n "$(git status --porcelain)" ]]; then
+      git add -A
+      git commit -m "Ralph iOS: iteration $i - tests failing (analysis logged)" || true
+    fi
+
+    echo ""
+    log_info "=== Iteration $i Complete (tests failed) ==="
+    echo "  Next iteration will focus on fixing test failures"
+    echo ""
+    echo "---"
+    echo ""
+    continue
   fi
 
   check_interrupt  # Check before linting
