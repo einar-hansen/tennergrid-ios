@@ -200,7 +200,7 @@
 
 ### 5.1 Home Screen
 
-- [ ] Create `HomeView` with app branding and title
+- [x] Create `HomeView` with app branding and title
 - [ ] Add "Continue Game" card if game is in progress
 - [ ] Add "New Game" button that shows difficulty selection
 - [ ] Add "Daily Challenge" card with countdown timer
