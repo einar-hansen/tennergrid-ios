@@ -80,8 +80,8 @@ struct CellView: View {
 
     // MARK: - Styling
 
-    /// Background color based on cell state (priority order: error > selected > same-number > highlighted > initial >
-    /// empty)
+    /// Background color based on cell state (priority order: error > selected > same-number > neighbor > highlighted >
+    /// initial > empty)
     private var backgroundColor: Color {
         if cell.hasError {
             // Error state: red tint to indicate invalid placement
@@ -92,6 +92,9 @@ struct CellView: View {
         } else if cell.isSameNumber {
             // Same-number state: yellow/amber tint for cells with matching value
             Color.yellow.opacity(0.12)
+        } else if cell.isNeighbor {
+            // Neighbor state: purple/indigo tint for adjacent cells (constraint helper)
+            Color.purple.opacity(0.12)
         } else if cell.isHighlighted {
             // Highlighted state: subtle blue tint for related cells (e.g., same row/column)
             Color.blue.opacity(0.08)
@@ -219,6 +222,18 @@ struct CellView_Previews: PreviewProvider {
                 onTap: {}
             )
             .previewDisplayName("Same Number")
+
+            // Neighbor cell
+            CellView(
+                cell: Cell(
+                    position: CellPosition(row: 0, column: 0),
+                    value: 5,
+                    isInitial: false,
+                    isNeighbor: true
+                ),
+                onTap: {}
+            )
+            .previewDisplayName("Neighbor")
 
             // Pencil marks
             CellView(

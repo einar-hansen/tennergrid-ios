@@ -27,6 +27,9 @@ struct Cell: Equatable, Hashable, Codable {
     /// Whether this cell has the same number as the selected cell
     var isSameNumber: Bool
 
+    /// Whether this cell is a neighbor (one of the 8 adjacent cells) to the selected cell
+    var isNeighbor: Bool
+
     /// Creates a new cell
     /// - Parameters:
     ///   - position: The position of the cell in the grid
@@ -37,6 +40,7 @@ struct Cell: Equatable, Hashable, Codable {
     ///   - hasError: Whether the cell has an error (defaults to false)
     ///   - isHighlighted: Whether the cell is highlighted (defaults to false)
     ///   - isSameNumber: Whether the cell has the same number as selected (defaults to false)
+    ///   - isNeighbor: Whether the cell is a neighbor to the selected cell (defaults to false)
     init(
         position: CellPosition,
         value: Int? = nil,
@@ -45,7 +49,8 @@ struct Cell: Equatable, Hashable, Codable {
         isSelected: Bool = false,
         hasError: Bool = false,
         isHighlighted: Bool = false,
-        isSameNumber: Bool = false
+        isSameNumber: Bool = false,
+        isNeighbor: Bool = false
     ) {
         self.position = position
         self.value = value
@@ -55,6 +60,7 @@ struct Cell: Equatable, Hashable, Codable {
         self.hasError = hasError
         self.isHighlighted = isHighlighted
         self.isSameNumber = isSameNumber
+        self.isNeighbor = isNeighbor
     }
 }
 
@@ -152,6 +158,15 @@ extension Cell {
         return cell
     }
 
+    /// Creates a copy of this cell with neighbor state updated
+    /// - Parameter neighbor: Whether the cell is a neighbor to the selected cell
+    /// - Returns: A new Cell with updated neighbor state
+    func withNeighbor(_ neighbor: Bool) -> Cell {
+        var cell = self
+        cell.isNeighbor = neighbor
+        return cell
+    }
+
     /// Clears the cell's value and pencil marks
     /// - Returns: A new Cell with value and pencil marks cleared
     func cleared() -> Cell {
@@ -194,6 +209,7 @@ extension Cell: CustomStringConvertible {
             hasError ? "E" : nil,
             isHighlighted ? "H" : nil,
             isSameNumber ? "SN" : nil,
+            isNeighbor ? "N" : nil,
         ].compactMap { $0 }.joined(separator: ",")
 
         let flagsStr = flags.isEmpty ? "" : " [\(flags)]"

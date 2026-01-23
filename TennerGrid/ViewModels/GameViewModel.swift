@@ -863,6 +863,9 @@ final class GameViewModel: ObservableObject {
         // Check if this cell has the same number as the selected cell
         let isSameNumber = shouldMarkAsSameNumber(position: position, value: value)
 
+        // Check if this cell is a neighbor to the selected cell
+        let isNeighbor = shouldMarkAsNeighbor(position: position)
+
         return Cell(
             position: position,
             value: value,
@@ -871,7 +874,8 @@ final class GameViewModel: ObservableObject {
             isSelected: isSelected,
             hasError: hasError,
             isHighlighted: isHighlighted,
-            isSameNumber: isSameNumber
+            isSameNumber: isSameNumber,
+            isNeighbor: isNeighbor
         )
     }
 
@@ -906,6 +910,28 @@ final class GameViewModel: ObservableObject {
 
         // Adjacent means within 1 row and 1 column
         return rowDiff <= 1 && colDiff <= 1
+    }
+
+    /// Determines if a cell is a neighbor (one of the 8 adjacent cells) to the selected cell
+    /// - Parameter position: The position to check
+    /// - Returns: True if the cell is one of the 8 adjacent neighbors
+    private func shouldMarkAsNeighbor(position: CellPosition) -> Bool {
+        guard let selected = selectedPosition else {
+            return false
+        }
+
+        // Don't mark the selected cell itself as a neighbor
+        if position == selected {
+            return false
+        }
+
+        // Check if within 1 row and 1 column (the 8 adjacent cells)
+        let rowDiff = abs(position.row - selected.row)
+        let colDiff = abs(position.column - selected.column)
+
+        // A neighbor must be adjacent (within 1 in both directions)
+        // and at least one of the differences must be non-zero (not the same cell)
+        return rowDiff <= 1 && colDiff <= 1 && (rowDiff > 0 || colDiff > 0)
     }
 
     /// Determines if a cell should be marked as "same number" (matching the selected cell's value)

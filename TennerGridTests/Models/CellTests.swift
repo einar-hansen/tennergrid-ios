@@ -17,6 +17,7 @@ struct CellTests {
         #expect(cell.hasError == false)
         #expect(cell.isHighlighted == false)
         #expect(cell.isSameNumber == false)
+        #expect(cell.isNeighbor == false)
     }
 
     @Test func fullInitialization() {
@@ -30,7 +31,8 @@ struct CellTests {
             isSelected: true,
             hasError: true,
             isHighlighted: true,
-            isSameNumber: true
+            isSameNumber: true,
+            isNeighbor: true
         )
 
         #expect(cell.position == position)
@@ -41,6 +43,7 @@ struct CellTests {
         #expect(cell.hasError == true)
         #expect(cell.isHighlighted == true)
         #expect(cell.isSameNumber == true)
+        #expect(cell.isNeighbor == true)
     }
 
     // MARK: - Factory Methods Tests
@@ -229,6 +232,17 @@ struct CellTests {
         #expect(notSameNumber.isSameNumber == false)
     }
 
+    @Test func testWithNeighbor() {
+        let position = CellPosition(row: 0, column: 0)
+        let original = Cell(position: position, isNeighbor: false)
+
+        let neighbor = original.withNeighbor(true)
+        #expect(neighbor.isNeighbor == true)
+
+        let notNeighbor = neighbor.withNeighbor(false)
+        #expect(notNeighbor.isNeighbor == false)
+    }
+
     @Test func testCleared() {
         let position = CellPosition(row: 0, column: 0)
         let original = Cell(
@@ -326,7 +340,8 @@ struct CellTests {
             isSelected: true,
             hasError: true,
             isHighlighted: true,
-            isSameNumber: true
+            isSameNumber: true,
+            isNeighbor: true
         )
         let description = cell.description
 
@@ -335,6 +350,7 @@ struct CellTests {
         #expect(description.contains("E")) // Error
         #expect(description.contains("H")) // Highlighted
         #expect(description.contains("SN")) // Same Number
+        #expect(description.contains("N")) // Neighbor
     }
 
     @Test func descriptionWithPencilMarks() {
@@ -377,7 +393,8 @@ struct CellTests {
             "isSelected": false,
             "hasError": false,
             "isHighlighted": false,
-            "isSameNumber": false
+            "isSameNumber": false,
+            "isNeighbor": false
         }
         """
 
@@ -389,6 +406,7 @@ struct CellTests {
         #expect(cell.value == 5)
         #expect(cell.isInitial == true)
         #expect(cell.pencilMarks == [1, 2, 3])
+        #expect(cell.isNeighbor == false)
     }
 
     @Test func codableRoundTrip() throws {
@@ -400,7 +418,8 @@ struct CellTests {
             isSelected: true,
             hasError: false,
             isHighlighted: true,
-            isSameNumber: true
+            isSameNumber: true,
+            isNeighbor: true
         )
 
         let encoder = JSONEncoder()
@@ -480,12 +499,14 @@ struct CellTests {
             .withError(true)
             .withHighlight(true)
             .withSameNumber(true)
+            .withNeighbor(true)
 
         #expect(modified.value == 5)
         #expect(modified.isSelected)
         #expect(modified.hasError)
         #expect(modified.isHighlighted)
         #expect(modified.isSameNumber)
+        #expect(modified.isNeighbor)
         #expect(original.isEmpty) // Original unchanged
     }
 }
