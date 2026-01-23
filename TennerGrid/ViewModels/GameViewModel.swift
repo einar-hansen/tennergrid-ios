@@ -950,6 +950,37 @@ final class GameViewModel: ObservableObject {
         return true
     }
 
+    /// Calculate the remaining sum needed for a column
+    /// - Parameter column: The column index
+    /// - Returns: The remaining sum needed (target - current sum)
+    func remainingSum(for column: Int) -> Int {
+        guard column >= 0, column < gameState.puzzle.columns else { return 0 }
+        let target = gameState.puzzle.targetSums[column]
+        let current = columnSum(for: column)
+        return target - current
+    }
+
+    /// Check if placing a number at a position would exceed the column's remaining sum
+    /// - Parameters:
+    ///   - value: The value to check
+    ///   - position: The position to check
+    /// - Returns: True if the value would exceed the remaining sum
+    func wouldExceedColumnSum(_ value: Int, at position: CellPosition) -> Bool {
+        guard gameState.puzzle.isValidPosition(position) else { return false }
+
+        let column = position.column
+        var remaining = remainingSum(for: column)
+
+        // If the cell currently has a value, we need to add it back to the remaining sum
+        // since we're replacing it
+        if let currentValue = gameState.value(at: position) {
+            remaining += currentValue
+        }
+
+        // Check if the new value would exceed the remaining sum
+        return value > remaining
+    }
+
     // MARK: - Game Reset
 
     /// Resets the game to a new state

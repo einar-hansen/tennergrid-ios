@@ -231,7 +231,12 @@ struct NumberPadView: View {
             return false
         }
 
-        // Check if this placement would be invalid
+        // Check if this placement would exceed the column's remaining sum
+        if viewModel.wouldExceedColumnSum(number, at: selected) {
+            return true
+        }
+
+        // Check if this placement would be invalid (violates game rules)
         return !viewModel.canPlaceValue(number, at: selected)
     }
 }

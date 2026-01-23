@@ -2562,4 +2562,214 @@ final class GameViewModelTests: XCTestCase {
             "Time should not increase after completion"
         )
     }
+
+    // MARK: - Column Sum Tests
+
+    /// Tests that remainingSum calculates correctly for empty columns
+    func testRemainingSumForEmptyColumn() {
+        // Column 0 has target sum of 5
+        // Pre-filled: (0,0)=2, (2,0)=0 → current sum = 2
+        // Remaining: 5 - 2 = 3
+        XCTAssertEqual(viewModel.remainingSum(for: 0), 3)
+    }
+
+    /// Tests that remainingSum calculates correctly for partially filled columns
+    func testRemainingSumForPartiallyFilledColumn() {
+        // Column 1 has target sum of 20
+        // Pre-filled: (1,1)=9, (2,1)=4 → current sum = 13
+        // Remaining: 20 - 13 = 7
+        XCTAssertEqual(viewModel.remainingSum(for: 1), 7)
+
+        // Now fill the empty cell (0,1) with 7
+        viewModel.selectCell(at: CellPosition(row: 0, column: 1))
+        viewModel.enterNumber(7)
+
+        // New current sum: 13 + 7 = 20
+        // Remaining: 20 - 20 = 0
+        XCTAssertEqual(viewModel.remainingSum(for: 1), 0)
+    }
+
+    /// Tests that remainingSum returns correct value for completely filled columns
+    func testRemainingSumForCompleteColumn() {
+        // Column 3 is completely pre-filled
+        // Pre-filled: (0,3)=1, (1,3)=2, (2,3)=1 → current sum = 4
+        // Target sum: 4
+        // Remaining: 4 - 4 = 0
+        XCTAssertEqual(viewModel.remainingSum(for: 3), 0)
+    }
+
+    /// Tests that remainingSum handles invalid column index
+    func testRemainingSumForInvalidColumn() {
+        // Test column index out of bounds
+        XCTAssertEqual(viewModel.remainingSum(for: -1), 0)
+        XCTAssertEqual(viewModel.remainingSum(for: 10), 0)
+        XCTAssertEqual(viewModel.remainingSum(for: 100), 0)
+    }
+
+    /// Tests that wouldExceedColumnSum correctly identifies numbers that exceed remaining sum
+    func testWouldExceedColumnSumWithExcessiveValue() {
+        // Column 0: target=5, pre-filled sum=2, remaining=3
+        // Position (1,0) is empty
+        let position = CellPosition(row: 1, column: 0)
+
+        // Value 4 would exceed remaining sum of 3
+        XCTAssertTrue(viewModel.wouldExceedColumnSum(4, at: position))
+
+        // Value 5 would exceed remaining sum of 3
+        XCTAssertTrue(viewModel.wouldExceedColumnSum(5, at: position))
+
+        // Value 9 would exceed remaining sum of 3
+        XCTAssertTrue(viewModel.wouldExceedColumnSum(9, at: position))
+    }
+
+    /// Tests that wouldExceedColumnSum allows values within remaining sum
+    func testWouldExceedColumnSumWithValidValue() {
+        // Column 0: target=5, pre-filled sum=2, remaining=3
+        // Position (1,0) is empty
+        let position = CellPosition(row: 1, column: 0)
+
+        // Value 0 is within remaining sum of 3
+        XCTAssertFalse(viewModel.wouldExceedColumnSum(0, at: position))
+
+        // Value 1 is within remaining sum of 3
+        XCTAssertFalse(viewModel.wouldExceedColumnSum(1, at: position))
+
+        // Value 3 equals remaining sum (valid)
+        XCTAssertFalse(viewModel.wouldExceedColumnSum(3, at: position))
+    }
+
+    /// Tests that wouldExceedColumnSum accounts for cell's current value when replacing
+    func testWouldExceedColumnSumWhenReplacingValue() {
+        // Column 0: target=5, pre-filled sum=2, remaining=3
+        // Fill position (1,0) with value 1
+        let position = CellPosition(row: 1, column: 0)
+        viewModel.selectCell(at: position)
+        viewModel.enterNumber(1)
+
+        // Now column sum is 2 + 1 = 3, remaining = 5 - 3 = 2
+        // But when replacing, we need to account for the current value (1)
+        // Effective remaining when replacing: 2 + 1 = 3
+
+        // Value 4 would exceed (4 > 3)
+        XCTAssertTrue(viewModel.wouldExceedColumnSum(4, at: position))
+
+        // Value 3 should be allowed (3 <= 3)
+        XCTAssertFalse(viewModel.wouldExceedColumnSum(3, at: position))
+
+        // Value 2 should be allowed
+        XCTAssertFalse(viewModel.wouldExceedColumnSum(2, at: position))
+    }
+
+    /// Tests that wouldExceedColumnSum handles completely filled columns
+    func testWouldExceedColumnSumForCompleteColumn() {
+        // Column 3 is completely pre-filled with target sum = 4
+        // Position (1,3) has value 2
+        let position = CellPosition(row: 1, column: 3)
+
+        // Replacing with any value other than 2 would change the sum
+        // Remaining when replacing: 0 + 2 (current value) = 2
+        XCTAssertFalse(viewModel.wouldExceedColumnSum(2, at: position))
+        XCTAssertTrue(viewModel.wouldExceedColumnSum(3, at: position))
+    }
+
+    /// Tests that wouldExceedColumnSum handles invalid positions
+    func testWouldExceedColumnSumWithInvalidPosition() {
+        // Test with out of bounds position
+        let invalidPosition = CellPosition(row: 10, column: 10)
+        XCTAssertFalse(viewModel.wouldExceedColumnSum(5, at: invalidPosition))
+    }
+
+    /// Tests that column sum validation integrates with number pad disabling
+    func testColumnSumIntegrationWithNumberPad() {
+        // Column 9: target=7, pre-filled=(2,9)=6, remaining=1
+        // Position (0,9) is empty
+        let position = CellPosition(row: 0, column: 9)
+        viewModel.selectCell(at: position)
+
+        // Numbers 2-9 should exceed the remaining sum (1)
+        for number in 2 ... 9 {
+            XCTAssertTrue(
+                viewModel.wouldExceedColumnSum(number, at: position),
+                "Number \(number) should exceed remaining sum of 1"
+            )
+        }
+
+        // Numbers 0-1 should be allowed
+        XCTAssertFalse(viewModel.wouldExceedColumnSum(0, at: position))
+        XCTAssertFalse(viewModel.wouldExceedColumnSum(1, at: position))
+    }
+
+    /// Tests remaining sum updates correctly as puzzle is filled
+    func testRemainingSumUpdatesAsColumnFills() {
+        // Column 1: target=20, pre-filled sum=13, remaining=7
+        XCTAssertEqual(viewModel.remainingSum(for: 1), 7)
+
+        // Fill position (0,1) with 7
+        viewModel.selectCell(at: CellPosition(row: 0, column: 1))
+        viewModel.enterNumber(7)
+
+        // Remaining should now be 0
+        XCTAssertEqual(viewModel.remainingSum(for: 1), 0)
+
+        // Any non-zero value at (0,1) should now exceed (since remaining is 0)
+        for number in 1 ... 9 {
+            XCTAssertTrue(
+                viewModel.wouldExceedColumnSum(number, at: CellPosition(row: 0, column: 1)),
+                "Number \(number) should exceed remaining sum of 0 when replacing 7"
+            )
+        }
+
+        // Only 0 or the current value (7) should be allowed
+        XCTAssertFalse(viewModel.wouldExceedColumnSum(0, at: CellPosition(row: 0, column: 1)))
+        XCTAssertFalse(viewModel.wouldExceedColumnSum(7, at: CellPosition(row: 0, column: 1)))
+    }
+
+    /// Tests that column sum validation works with undo/redo
+    func testColumnSumValidationWithUndoRedo() {
+        // Column 0: target=5, current=2, remaining=3
+        let position = CellPosition(row: 1, column: 0)
+
+        // Fill with value 3 (valid)
+        viewModel.selectCell(at: position)
+        viewModel.enterNumber(3)
+        XCTAssertEqual(viewModel.remainingSum(for: 0), 0)
+
+        // Undo
+        viewModel.undo()
+        XCTAssertEqual(viewModel.remainingSum(for: 0), 3)
+
+        // Now 3 should be allowed again
+        XCTAssertFalse(viewModel.wouldExceedColumnSum(3, at: position))
+
+        // Redo
+        viewModel.redo()
+        XCTAssertEqual(viewModel.remainingSum(for: 0), 0)
+
+        // Now only 0 or 3 (current value) should be allowed
+        XCTAssertFalse(viewModel.wouldExceedColumnSum(3, at: position))
+        XCTAssertTrue(viewModel.wouldExceedColumnSum(4, at: position))
+    }
+
+    /// Tests edge case where remaining sum is exactly zero
+    func testColumnSumWithExactlyZeroRemaining() {
+        // Fill column until remaining is 0
+        // Column 1: target=20, pre-filled=13, need to add 7
+        let position = CellPosition(row: 0, column: 1)
+        viewModel.selectCell(at: position)
+        viewModel.enterNumber(7)
+
+        XCTAssertEqual(viewModel.remainingSum(for: 1), 0)
+
+        // Only 0 or current value (7) should not exceed
+        XCTAssertFalse(viewModel.wouldExceedColumnSum(0, at: position))
+        XCTAssertFalse(viewModel.wouldExceedColumnSum(7, at: position))
+
+        // All other values should exceed
+        for number in 1 ... 6 {
+            XCTAssertTrue(viewModel.wouldExceedColumnSum(number, at: position))
+        }
+        for number in 8 ... 9 {
+            XCTAssertTrue(viewModel.wouldExceedColumnSum(number, at: position))
+        }
+    }
 }
