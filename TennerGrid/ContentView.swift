@@ -18,6 +18,9 @@ struct ContentView: View {
     /// Selected difficulty from sheet (used to start game after sheet dismissal)
     @State private var selectedDifficulty: Difficulty?
 
+    /// Custom game configuration (difficulty and rows)
+    @State private var customGameConfig: (difficulty: Difficulty, rows: Int)?
+
     // MARK: - Body
 
     var body: some View {
@@ -36,16 +39,30 @@ struct ContentView: View {
             }
         }
         .sheet(isPresented: $showingDifficultySelection) {
-            DifficultySelectionView { difficulty in
-                selectedDifficulty = difficulty
-                showingDifficultySelection = false
-            }
+            DifficultySelectionView(
+                onSelect: { difficulty in
+                    selectedDifficulty = difficulty
+                    showingDifficultySelection = false
+                },
+                onCustomGame: { difficulty, rows in
+                    customGameConfig = (difficulty, rows)
+                    showingDifficultySelection = false
+                }
+            )
         }
         .onChange(of: showingDifficultySelection) { isShowing in
             // Start new game after sheet is fully dismissed
-            if !isShowing, let difficulty = selectedDifficulty {
-                selectedDifficulty = nil
-                startNewGame(with: difficulty)
+            if !isShowing {
+                // Handle custom game configuration
+                if let config = customGameConfig {
+                    customGameConfig = nil
+                    startCustomGame(difficulty: config.difficulty, rows: config.rows)
+                }
+                // Handle standard difficulty selection
+                else if let difficulty = selectedDifficulty {
+                    selectedDifficulty = nil
+                    startNewGame(with: difficulty)
+                }
             }
         }
     }
@@ -91,6 +108,17 @@ struct ContentView: View {
     private func startNewGame(with difficulty: Difficulty) {
         // Generate a puzzle with random rows within the difficulty's range
         let rows = Int.random(in: difficulty.minRows ... difficulty.maxRows)
+        guard let puzzle = puzzleManager.randomPuzzle(rows: rows, difficulty: difficulty) else {
+            return
+        }
+        gameViewModel = GameViewModel(puzzle: puzzle)
+    }
+
+    /// Starts a custom game with specific difficulty and row count
+    /// - Parameters:
+    ///   - difficulty: The difficulty level for the new puzzle
+    ///   - rows: The number of rows for the puzzle
+    private func startCustomGame(difficulty: Difficulty, rows: Int) {
         guard let puzzle = puzzleManager.randomPuzzle(rows: rows, difficulty: difficulty) else {
             return
         }
