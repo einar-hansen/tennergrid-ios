@@ -2,6 +2,7 @@ import SwiftUI
 
 /// A win screen view displayed when the puzzle is successfully completed
 /// Shows game statistics and provides options for next actions
+// swiftlint:disable:next swiftui_view_body
 struct WinScreenView: View {
     // MARK: - Properties
 
@@ -31,12 +32,19 @@ struct WinScreenView: View {
     /// Animation state for celebration
     @State private var animationAmount: CGFloat = 0
 
+    /// Confetti particles for celebration effect
+    @State private var confettiParticles: [ConfettiParticle] = []
+
+    /// Trophy bounce animation state
+    @State private var trophyBounce: CGFloat = 1.0
+
     // MARK: - Body
 
     var body: some View {
         ZStack {
             backgroundGradient
             winContent
+            confettiOverlay
         }
         .onAppear(perform: startAnimation)
     }
@@ -83,15 +91,7 @@ struct WinScreenView: View {
     /// The celebration header with trophy icon and congratulations message
     private var celebrationHeader: some View {
         VStack(spacing: 16) {
-            Image(systemName: "trophy.fill")
-                .font(.system(size: 72))
-                .foregroundStyle(difficulty.color.gradient)
-                .scaleEffect(animationAmount)
-                .animation(
-                    .spring(response: 0.6, dampingFraction: 0.6, blendDuration: 0)
-                        .delay(0.1),
-                    value: animationAmount
-                )
+            trophyIcon
 
             Text("Congratulations!")
                 .font(.system(size: 32, weight: .bold, design: .rounded))
@@ -104,6 +104,24 @@ struct WinScreenView: View {
                 .opacity(animationAmount)
                 .animation(.easeIn(duration: 0.4).delay(0.4), value: animationAmount)
         }
+    }
+
+    /// Animated trophy icon
+    private var trophyIcon: some View {
+        Image(systemName: "trophy.fill")
+            .font(.system(size: 72))
+            .foregroundStyle(difficulty.color.gradient)
+            .scaleEffect(animationAmount * trophyBounce)
+            .animation(
+                .spring(response: 0.6, dampingFraction: 0.6, blendDuration: 0)
+                    .delay(0.1),
+                value: animationAmount
+            )
+            .animation(
+                .easeInOut(duration: 0.6)
+                    .repeatForever(autoreverses: true),
+                value: trophyBounce
+            )
     }
 
     /// Statistics section showing game performance
@@ -298,11 +316,90 @@ struct WinScreenView: View {
         return String(format: "%02d:%02d", minutes, seconds)
     }
 
+    // MARK: - Confetti
+
+    /// Confetti overlay for celebration effect
+    private var confettiOverlay: some View {
+        ZStack {
+            ForEach(confettiParticles) { particle in
+                ConfettiView(particle: particle)
+            }
+        }
+        .allowsHitTesting(false)
+    }
+
     // MARK: - Animation
 
     /// Starts the celebration animation
     private func startAnimation() {
         animationAmount = 1.0
+        generateConfetti()
+
+        // Start trophy bounce after initial animation
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+            trophyBounce = 1.05
+        }
+    }
+
+    /// Generates confetti particles for celebration
+    private func generateConfetti() {
+        let particleCount = 50
+        let colors: [Color] = [.red, .blue, .green, .yellow, .orange, .purple, .pink]
+
+        confettiParticles = (0 ..< particleCount).map { index in
+            ConfettiParticle(
+                id: index,
+                color: colors.randomElement() ?? .blue,
+                startX: CGFloat.random(in: 0 ... 1),
+                delay: Double.random(in: 0 ... 0.5),
+                duration: Double.random(in: 2 ... 4),
+                angle: Double.random(in: 0 ... 360)
+            )
+        }
+    }
+}
+
+// MARK: - Confetti Particle Model
+
+/// Represents a single confetti particle with animation properties
+struct ConfettiParticle: Identifiable {
+    let id: Int
+    let color: Color
+    let startX: CGFloat
+    let delay: Double
+    let duration: Double
+    let angle: Double
+}
+
+// MARK: - Confetti View
+
+/// A view that renders and animates a single confetti particle
+// swiftlint:disable:next swiftui_view_body
+struct ConfettiView: View {
+    let particle: ConfettiParticle
+
+    @State private var isAnimating = false
+
+    var body: some View {
+        GeometryReader { geometry in
+            Rectangle()
+                .fill(particle.color)
+                .frame(width: 10, height: 10)
+                .rotationEffect(.degrees(isAnimating ? particle.angle + 360 : particle.angle))
+                .position(
+                    x: geometry.size.width * particle.startX,
+                    y: isAnimating ? geometry.size.height + 50 : -50
+                )
+                .opacity(isAnimating ? 0 : 1)
+                .onAppear {
+                    withAnimation(
+                        .linear(duration: particle.duration)
+                            .delay(particle.delay)
+                    ) {
+                        isAnimating = true
+                    }
+                }
+        }
     }
 }
 

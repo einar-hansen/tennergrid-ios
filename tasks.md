@@ -174,7 +174,7 @@
 
 - [x] Create `WinScreenView` with congratulations message
 - [x] Display game statistics: time, hints used, difficulty
-- [ ] Add celebration animation (simple scale/fade, confetti optional)
+- [x] Add celebration animation (simple scale/fade, confetti optional)
 - [ ] Add buttons: New Game, Change Difficulty, Home
 - [ ] Test win screen with different puzzle completions
 
