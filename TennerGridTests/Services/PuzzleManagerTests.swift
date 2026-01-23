@@ -15,26 +15,26 @@ final class PuzzleManagerTests: XCTestCase {
     // Class-level setup runs once per test class instead of per test
     override class func setUp() {
         super.setUp()
-        // Clear saved games once at start
-        PuzzleManager().removeAllSavedGames()
+        // Clear UserDefaults directly to avoid MainActor issues
+        UserDefaults.standard.removeObject(forKey: "savedGames")
     }
 
     override class func tearDown() {
-        // Clear saved games once at end
-        PuzzleManager().removeAllSavedGames()
+        // Clear UserDefaults directly
+        UserDefaults.standard.removeObject(forKey: "savedGames")
         super.tearDown()
     }
 
     override func setUp() {
         super.setUp()
+        // Clear before creating manager
+        UserDefaults.standard.removeObject(forKey: "savedGames")
         puzzleManager = PuzzleManager()
-        // Only clear if there are saved games to avoid unnecessary I/O
-        if !puzzleManager.savedGames.isEmpty {
-            puzzleManager.removeAllSavedGames()
-        }
     }
 
     override func tearDown() {
+        // Ensure cleanup
+        puzzleManager?.removeAllSavedGames()
         puzzleManager = nil
         super.tearDown()
     }
@@ -268,50 +268,58 @@ final class PuzzleManagerTests: XCTestCase {
 
     // MARK: - Persistence Tests
 
-    func testSavedGamesPersistence() {
+    func testSavedGamesPersistence() async throws {
+        // Ensure clean state
+        puzzleManager.removeAllSavedGames()
+        
         let puzzle = createTestPuzzle()
         let savedGame = SavedGame(puzzle: puzzle, gameState: GameState(puzzle: puzzle))
 
+        // Add the game
         puzzleManager.addSavedGame(savedGame)
-        XCTAssertEqual(puzzleManager.savedGames.count, 1)
+        XCTAssertEqual(puzzleManager.savedGames.count, 1, "Should have 1 saved game after adding")
 
+        // Force UserDefaults to synchronize
+        UserDefaults.standard.synchronize()
+        
+        // Verify data was written to UserDefaults
+        let savedData = UserDefaults.standard.data(forKey: "savedGames")
+        XCTAssertNotNil(savedData, "UserDefaults should contain saved games data")
+        
+        // Verify we can decode the data manually
+        if let savedData = savedData {
+            do {
+                let loadedGames = try JSONDecoder().decode([SavedGame].self, from: savedData)
+                XCTAssertEqual(loadedGames.count, 1, "Should decode 1 saved game")
+                XCTAssertEqual(loadedGames.first?.puzzle.id, puzzle.id, "Decoded game should match")
+            } catch {
+                XCTFail("Failed to decode saved games: \(error)")
+            }
+        }
+        
         // Create a new manager instance (simulating app restart)
-        let newManager = PuzzleManager()
+        // This must happen on MainActor since PuzzleManager is @MainActor isolated
+        let newManager = await MainActor.run {
+            PuzzleManager()
+        }
 
+        // Verify the new manager loaded the saved game
         XCTAssertEqual(newManager.savedGames.count, 1, "Saved games should persist across manager instances")
-        XCTAssertEqual(newManager.savedGames.first?.puzzle.id, puzzle.id)
+        XCTAssertEqual(newManager.savedGames.first?.puzzle.id, puzzle.id, "Loaded game should have same puzzle ID")
 
         // Clean up
         newManager.removeAllSavedGames()
+        UserDefaults.standard.synchronize()
     }
 
     // MARK: - Helper Methods
 
     private func createTestPuzzle() -> TennerGridPuzzle {
-        let targetSums = [25, 30, 20, 35, 25]
-        let initialGrid: [[Int?]] = [
-            [nil, 2, nil, nil, nil],
-            [nil, nil, 3, nil, nil],
-            [5, nil, nil, nil, nil],
-            [nil, nil, nil, 7, nil],
-            [nil, nil, nil, nil, 9],
-        ]
-        let solution: [[Int]] = [
-            [1, 2, 3, 4, 5],
-            [6, 7, 3, 8, 0],
-            [5, 9, 1, 7, 3],
-            [2, 4, 6, 7, 8],
-            [0, 3, 5, 1, 9],
-        ]
-
-        return TennerGridPuzzle(
-            columns: 5,
-            rows: 5,
-            difficulty: .easy,
-            targetSums: targetSums,
-            initialGrid: initialGrid,
-            solution: solution
-        )
+        // Load a puzzle from the bundle instead of hardcoding
+        guard let puzzle = BundledPuzzleService.shared.firstPuzzle(difficulty: .easy, rows: 5) else {
+            fatalError("Failed to load test puzzle from bundle")
+        }
+        return puzzle
     }
 }
 
@@ -390,29 +398,10 @@ final class SavedGameTests: XCTestCase {
     // MARK: - Helper Methods
 
     nonisolated private func createTestPuzzle() -> TennerGridPuzzle {
-        let targetSums = [25, 30, 20, 35, 25]
-        let initialGrid: [[Int?]] = [
-            [nil, 2, nil, nil, nil],
-            [nil, nil, 3, nil, nil],
-            [5, nil, nil, nil, nil],
-            [nil, nil, nil, 7, nil],
-            [nil, nil, nil, nil, 9],
-        ]
-        let solution: [[Int]] = [
-            [1, 2, 3, 4, 5],
-            [6, 7, 3, 8, 0],
-            [5, 9, 1, 7, 3],
-            [2, 4, 6, 7, 8],
-            [0, 3, 5, 1, 9],
-        ]
-
-        return TennerGridPuzzle(
-            columns: 5,
-            rows: 5,
-            difficulty: .easy,
-            targetSums: targetSums,
-            initialGrid: initialGrid,
-            solution: solution
-        )
+        // Load a puzzle from the bundle instead of hardcoding
+        guard let puzzle = BundledPuzzleService.shared.firstPuzzle(difficulty: .easy, rows: 5) else {
+            fatalError("Failed to load test puzzle from bundle")
+        }
+        return puzzle
     }
 }

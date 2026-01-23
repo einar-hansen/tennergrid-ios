@@ -57,7 +57,9 @@ struct GameView: View {
         .modifier(KeyboardSupportModifier(viewModel: viewModel, isGameFocused: $isGameFocused))
         .onChange(of: viewModel.gameState.isCompleted) { isCompleted in
             if isCompleted {
-                showingWinScreen = true
+                Task { @MainActor in
+                    showingWinScreen = true
+                }
             }
         }
         .sheet(isPresented: $showingSettings) {
