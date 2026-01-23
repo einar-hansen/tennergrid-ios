@@ -136,45 +136,26 @@ struct GameView: View {
         }
     }
 
-    /// Placeholder for win screen (to be implemented in Phase 4.3)
+    /// Win screen displayed when puzzle is completed
     private var winScreenPlaceholder: some View {
-        NavigationStack {
-            VStack(spacing: 24) {
-                Image(systemName: "trophy.fill")
-                    .font(.system(size: 64))
-                    .foregroundColor(.yellow)
-
-                Text("Congratulations!")
-                    .font(.largeTitle.bold())
-
-                VStack(spacing: 8) {
-                    Text("Time: \(viewModel.formattedTime)")
-                        .font(.title2)
-
-                    Text("Hints used: \(viewModel.gameState.hintsUsed)")
-                        .font(.title3)
-                        .foregroundColor(.secondary)
-
-                    Text("Difficulty: \(viewModel.gameState.puzzle.difficulty.displayName)")
-                        .font(.title3)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.vertical)
-
-                Button(action: {
-                    showingWinScreen = false
-                }) {
-                    Text("Done")
-                        .font(.headline)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 48)
-                        .padding(.vertical, 14)
-                        .background(Capsule().fill(Color.blue))
-                }
-                .buttonStyle(.plain)
+        WinScreenView(
+            difficulty: viewModel.gameState.puzzle.difficulty,
+            elapsedTime: viewModel.elapsedTime,
+            hintsUsed: viewModel.gameState.hintsUsed,
+            errorCount: viewModel.gameState.errorCount,
+            onNewGame: {
+                showingWinScreen = false
+                handleNewGame()
+            },
+            onChangeDifficulty: {
+                showingWinScreen = false
+                handleNewGame()
+            },
+            onHome: {
+                showingWinScreen = false
+                handleQuit()
             }
-            .padding()
-        }
+        )
     }
 
     // MARK: - Actions
