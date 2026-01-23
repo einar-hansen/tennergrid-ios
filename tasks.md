@@ -175,8 +175,8 @@
 - [x] Create `WinScreenView` with congratulations message
 - [x] Display game statistics: time, hints used, difficulty
 - [x] Add celebration animation (simple scale/fade, confetti optional)
-- [ ] Add buttons: New Game, Change Difficulty, Home
-- [ ] Test win screen with different puzzle completions
+- [x] Add buttons: New Game, Change Difficulty, Home
+- [x] Test win screen with different puzzle completions
 
 ### 4.4 Game UI Enhancements
 
