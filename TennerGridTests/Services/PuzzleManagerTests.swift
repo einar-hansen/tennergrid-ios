@@ -1,5 +1,5 @@
-@testable import TennerGrid
 import XCTest
+@testable import TennerGrid
 
 @MainActor
 final class PuzzleManagerTests: XCTestCase {

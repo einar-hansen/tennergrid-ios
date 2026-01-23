@@ -13,7 +13,8 @@ enum TestFixtures {
         for bundle in bundles {
             if let url = bundle.url(forResource: "BundledPuzzles", withExtension: "json"),
                let data = try? Data(contentsOf: url),
-               let response = try? JSONDecoder().decode(PuzzleResponse.self, from: data) {
+               let response = try? JSONDecoder().decode(PuzzleResponse.self, from: data)
+            {
                 return response.data.flatMap { $0 }
             }
         }

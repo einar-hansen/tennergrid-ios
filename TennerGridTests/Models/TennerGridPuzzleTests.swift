@@ -1,7 +1,7 @@
 import Foundation
-@testable import TennerGrid
 import Testing
 import XCTest
+@testable import TennerGrid
 
 struct TennerGridPuzzleTests {
     // MARK: - Test Helpers

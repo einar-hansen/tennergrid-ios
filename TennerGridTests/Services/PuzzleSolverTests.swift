@@ -1,5 +1,5 @@
-@testable import TennerGrid
 import XCTest
+@testable import TennerGrid
 
 final class PuzzleSolverTests: XCTestCase {
     var solver: PuzzleSolver!

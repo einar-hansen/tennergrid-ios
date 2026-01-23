@@ -54,7 +54,8 @@ struct ValidationService {
         let adjacentPositions = position.adjacentPositions(maxRows: puzzle.rows, maxColumns: puzzle.columns)
         for adjacentPos in adjacentPositions {
             if let adjacentValue = grid[adjacentPos.row][adjacentPos.column],
-               adjacentValue == value {
+               adjacentValue == value
+            {
                 conflicts.append(adjacentPos)
             }
         }
@@ -63,7 +64,8 @@ struct ValidationService {
         let rowPositions = position.rowPositions(maxColumns: puzzle.columns)
         for rowPos in rowPositions {
             if let rowValue = grid[rowPos.row][rowPos.column],
-               rowValue == value {
+               rowValue == value
+            {
                 conflicts.append(rowPos)
             }
         }
@@ -154,7 +156,8 @@ struct ValidationService {
 
         for adjacentPos in adjacentPositions {
             if let adjacentValue = grid[adjacentPos.row][adjacentPos.column],
-               adjacentValue == value {
+               adjacentValue == value
+            {
                 return true
             }
         }
@@ -173,7 +176,8 @@ struct ValidationService {
 
         for rowPos in rowPositions {
             if let rowValue = grid[rowPos.row][rowPos.column],
-               rowValue == value {
+               rowValue == value
+            {
                 return true
             }
         }

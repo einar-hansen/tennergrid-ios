@@ -1,5 +1,5 @@
-@testable import TennerGrid
 import XCTest
+@testable import TennerGrid
 
 final class ValidationServiceTests: XCTestCase {
     var service: ValidationService!

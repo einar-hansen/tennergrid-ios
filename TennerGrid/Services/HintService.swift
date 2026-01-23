@@ -79,7 +79,8 @@ struct HintService {
         // Strategy 1: If a cell is selected and empty, show possible values
         if let selectedPosition = gameState.selectedCell,
            gameState.isEmpty(at: selectedPosition),
-           gameState.isEditable(at: selectedPosition) {
+           gameState.isEditable(at: selectedPosition)
+        {
             let possibleValues = getPossibleValues(for: selectedPosition, in: gameState)
             return .possibleValues(position: selectedPosition, values: possibleValues)
         }

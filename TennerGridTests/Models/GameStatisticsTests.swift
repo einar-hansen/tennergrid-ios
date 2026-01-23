@@ -1,6 +1,6 @@
 import Foundation
-@testable import TennerGrid
 import Testing
+@testable import TennerGrid
 
 struct GameStatisticsTests {
     // MARK: - Initialization Tests

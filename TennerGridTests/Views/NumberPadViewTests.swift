@@ -1,6 +1,6 @@
 import SwiftUI
-@testable import TennerGrid
 import XCTest
+@testable import TennerGrid
 
 /// Tests for NumberPadView component with various interactions
 /// Uses pre-built fixtures instead of generating puzzles for fast execution
