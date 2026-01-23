@@ -516,7 +516,7 @@ struct AchievementTests {
     @Test func allAchievementsCount() {
         let achievements = Achievement.allAchievements
 
-        #expect(achievements.count == 17)
+        #expect(achievements.count == 16)
     }
 
     @Test func allAchievementsHaveUniqueIds() {

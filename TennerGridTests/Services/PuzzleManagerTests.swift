@@ -315,11 +315,21 @@ final class PuzzleManagerTests: XCTestCase {
     // MARK: - Helper Methods
 
     private func createTestPuzzle() -> TennerGridPuzzle {
-        // Load a puzzle from the bundle instead of hardcoding
-        guard let puzzle = BundledPuzzleService.shared.firstPuzzle(difficulty: .easy, rows: 5) else {
+        // Load a puzzle from the bundle as template
+        guard let template = BundledPuzzleService.shared.firstPuzzle(difficulty: .easy, rows: 5) else {
             fatalError("Failed to load test puzzle from bundle")
         }
-        return puzzle
+        // Create a new puzzle with a unique ID to avoid test conflicts
+        return TennerGridPuzzle(
+            id: UUID(),
+            columns: template.columns,
+            rows: template.rows,
+            difficulty: template.difficulty,
+            targetSums: template.targetSums,
+            initialGrid: template.initialGrid,
+            solution: template.solution,
+            createdAt: template.createdAt
+        )
     }
 }
 
@@ -398,10 +408,20 @@ final class SavedGameTests: XCTestCase {
     // MARK: - Helper Methods
 
     nonisolated private func createTestPuzzle() -> TennerGridPuzzle {
-        // Load a puzzle from the bundle instead of hardcoding
-        guard let puzzle = BundledPuzzleService.shared.firstPuzzle(difficulty: .easy, rows: 5) else {
+        // Load a puzzle from the bundle as template
+        guard let template = BundledPuzzleService.shared.firstPuzzle(difficulty: .easy, rows: 5) else {
             fatalError("Failed to load test puzzle from bundle")
         }
-        return puzzle
+        // Create a new puzzle with a unique ID to avoid test conflicts
+        return TennerGridPuzzle(
+            id: UUID(),
+            columns: template.columns,
+            rows: template.rows,
+            difficulty: template.difficulty,
+            targetSums: template.targetSums,
+            initialGrid: template.initialGrid,
+            solution: template.solution,
+            createdAt: template.createdAt
+        )
     }
 }

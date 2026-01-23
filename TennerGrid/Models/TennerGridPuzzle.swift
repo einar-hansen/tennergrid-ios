@@ -8,7 +8,7 @@
 import Foundation
 
 /// Represents a complete Tenner Grid puzzle with initial state and solution
-struct TennerGridPuzzle: Equatable, Codable, Identifiable {
+struct TennerGridPuzzle: Codable, Identifiable {
     /// Unique identifier for the puzzle
     let id: UUID
 
@@ -171,6 +171,15 @@ extension TennerGridPuzzle {
     /// - Returns: True if the cell is pre-filled
     func isPrefilled(at position: CellPosition) -> Bool {
         initialValue(at: position) != nil
+    }
+}
+
+// MARK: - Equatable
+
+extension TennerGridPuzzle: Equatable {
+    /// Puzzles are equal if they have the same ID
+    static func == (lhs: TennerGridPuzzle, rhs: TennerGridPuzzle) -> Bool {
+        lhs.id == rhs.id
     }
 }
 

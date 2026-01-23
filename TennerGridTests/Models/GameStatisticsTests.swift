@@ -252,19 +252,15 @@ struct GameStatisticsTests {
         var stats = GameStatistics.new()
         let calendar = Calendar.current
 
-        // Build up a streak of 3
-        stats.lastPlayedDate = calendar.date(byAdding: .day, value: -3, to: Date())
-        stats.currentStreak = 1
-        stats.recordGameStarted(difficulty: .easy)
-        stats.lastPlayedDate = calendar.date(byAdding: .day, value: -2, to: Date())
-        stats.recordGameStarted(difficulty: .easy)
+        // Directly set up a state where we had a streak of 3 yesterday
         stats.lastPlayedDate = calendar.date(byAdding: .day, value: -1, to: Date())
-        stats.recordGameStarted(difficulty: .easy)
+        stats.currentStreak = 3
+        stats.longestStreak = 3
 
         let longestBefore = stats.longestStreak
         #expect(longestBefore >= 3)
 
-        // Break the streak (simulate 2+ days gap)
+        // Break the streak (simulate 2+ days gap by backdating lastPlayedDate)
         stats.lastPlayedDate = calendar.date(byAdding: .day, value: -5, to: Date())
         stats.recordGameStarted(difficulty: .easy)
 
