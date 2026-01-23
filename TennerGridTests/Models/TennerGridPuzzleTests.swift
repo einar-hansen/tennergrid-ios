@@ -13,64 +13,21 @@ import XCTest
 struct TennerGridPuzzleTests {
     // MARK: - Test Helpers
 
-    /// Creates a valid 10x5 puzzle that passes validation
+    /// Creates a valid 10x5 puzzle that passes validation (with unique ID)
     private func createValidPuzzle() -> TennerGridPuzzle {
-        let solution = [
-            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9],
-            [9, 8, 7, 6, 5, 4, 3, 2, 1, 0],
-            [1, 2, 3, 4, 5, 6, 7, 8, 9, 0],
-            [8, 9, 0, 1, 2, 3, 4, 5, 6, 7],
-            [2, 3, 4, 5, 6, 7, 8, 9, 0, 1],
-        ]
-
-        let initialGrid: [[Int?]] = [
-            [0, nil, nil, nil, 4, 5, nil, nil, nil, 9],
-            [nil, 8, nil, nil, nil, nil, nil, nil, 1, nil],
-            [nil, nil, 3, nil, nil, nil, nil, 8, nil, nil],
-            [nil, nil, nil, 1, nil, nil, 4, nil, nil, nil],
-            [2, nil, nil, nil, nil, nil, nil, nil, nil, 1],
-        ]
-
-        // Column sums: 0+9+1+8+2=20, 1+8+2+9+3=23, etc.
-        let targetSums = [20, 23, 16, 19, 22, 25, 28, 31, 24, 17]
-
+        guard let template = BundledPuzzleService.shared.firstPuzzle(difficulty: .medium, rows: 5) else {
+            fatalError("Failed to load test puzzle from bundle")
+        }
+        // Return puzzle with unique ID to allow equality testing
         return TennerGridPuzzle(
-            columns: 10,
-            rows: 5,
-            difficulty: .medium,
-            targetSums: targetSums,
-            initialGrid: initialGrid,
-            solution: solution
-        )
-    }
-
-    /// Creates a simple test puzzle for basic property tests (doesn't need to pass isValid)
-    private func createTestPuzzle() -> TennerGridPuzzle {
-        let solution = [
-            [0, 1, 2, 3, 4],
-            [5, 6, 7, 8, 9],
-            [1, 2, 3, 4, 5],
-            [6, 7, 8, 9, 0],
-            [2, 3, 4, 5, 6],
-        ]
-
-        let initialGrid: [[Int?]] = [
-            [0, nil, nil, nil, 4],
-            [nil, 6, nil, nil, nil],
-            [nil, nil, 3, nil, nil],
-            [nil, nil, nil, 9, nil],
-            [2, nil, nil, nil, 6],
-        ]
-
-        let targetSums = [14, 19, 24, 29, 24]
-
-        return TennerGridPuzzle(
-            columns: 5,
-            rows: 5,
-            difficulty: .medium,
-            targetSums: targetSums,
-            initialGrid: initialGrid,
-            solution: solution
+            id: UUID(),
+            columns: template.columns,
+            rows: template.rows,
+            difficulty: template.difficulty,
+            targetSums: template.targetSums,
+            initialGrid: template.initialGrid,
+            solution: template.solution,
+            createdAt: template.createdAt
         )
     }
 
@@ -152,9 +109,10 @@ struct TennerGridPuzzleTests {
 
     @Test func testPrefilledCount() {
         let puzzle = createValidPuzzle()
-        // Count non-nil values in initialGrid: 4+2+2+2+2 = 12
-        let expectedCount = 12
+        // Count non-nil values in initialGrid dynamically
+        let expectedCount = puzzle.initialGrid.flatMap { $0 }.compactMap { $0 }.count
         #expect(puzzle.prefilledCount == expectedCount)
+        #expect(puzzle.prefilledCount > 0) // Should have some prefilled cells
     }
 
     @Test func prefilledCountEmpty() {
@@ -187,13 +145,14 @@ struct TennerGridPuzzleTests {
     @Test func testEmptyCellCount() {
         let puzzle = createValidPuzzle()
         #expect(puzzle.emptyCellCount == puzzle.totalCells - puzzle.prefilledCount)
-        #expect(puzzle.emptyCellCount == 38) // 50 - 12
+        #expect(puzzle.emptyCellCount > 0) // Should have some empty cells to fill
     }
 
     @Test func testPrefilledPercentage() {
         let puzzle = createValidPuzzle()
-        let expectedPercentage = Double(12) / Double(50)
+        let expectedPercentage = Double(puzzle.prefilledCount) / Double(puzzle.totalCells)
         #expect(puzzle.prefilledPercentage == expectedPercentage)
+        #expect(puzzle.prefilledPercentage > 0 && puzzle.prefilledPercentage < 1)
     }
 
     @Test func prefilledPercentageEmpty() {
@@ -420,10 +379,29 @@ struct TennerGridPuzzleTests {
     @Test func testInitialValue() {
         let puzzle = createValidPuzzle()
 
-        #expect(puzzle.initialValue(at: CellPosition(row: 0, column: 0)) == 0)
-        #expect(puzzle.initialValue(at: CellPosition(row: 0, column: 1)) == nil)
-        #expect(puzzle.initialValue(at: CellPosition(row: 1, column: 1)) == 8)
-        #expect(puzzle.initialValue(at: CellPosition(row: 4, column: 9)) == 1)
+        // Find a prefilled cell and an empty cell dynamically
+        var prefilledPosition: CellPosition?
+        var emptyPosition: CellPosition?
+
+        for row in 0 ..< puzzle.rows {
+            for col in 0 ..< puzzle.columns {
+                let pos = CellPosition(row: row, column: col)
+                if puzzle.initialGrid[row][col] != nil && prefilledPosition == nil {
+                    prefilledPosition = pos
+                } else if puzzle.initialGrid[row][col] == nil && emptyPosition == nil {
+                    emptyPosition = pos
+                }
+            }
+        }
+
+        // Prefilled cell should return its value
+        if let pos = prefilledPosition {
+            #expect(puzzle.initialValue(at: pos) == puzzle.initialGrid[pos.row][pos.column])
+        }
+        // Empty cell should return nil
+        if let pos = emptyPosition {
+            #expect(puzzle.initialValue(at: pos) == nil)
+        }
     }
 
     @Test func initialValueOutOfBounds() {
@@ -438,10 +416,13 @@ struct TennerGridPuzzleTests {
     @Test func testSolutionValue() {
         let puzzle = createValidPuzzle()
 
-        #expect(puzzle.solutionValue(at: CellPosition(row: 0, column: 0)) == 0)
-        #expect(puzzle.solutionValue(at: CellPosition(row: 0, column: 1)) == 1)
-        #expect(puzzle.solutionValue(at: CellPosition(row: 1, column: 1)) == 8)
-        #expect(puzzle.solutionValue(at: CellPosition(row: 4, column: 4)) == 6)
+        // Check that solution values match the solution array
+        for row in 0 ..< puzzle.rows {
+            for col in 0 ..< puzzle.columns {
+                let pos = CellPosition(row: row, column: col)
+                #expect(puzzle.solutionValue(at: pos) == puzzle.solution[row][col])
+            }
+        }
     }
 
     @Test func solutionValueOutOfBounds() {
@@ -470,10 +451,14 @@ struct TennerGridPuzzleTests {
     @Test func testIsPrefilled() {
         let puzzle = createValidPuzzle()
 
-        #expect(puzzle.isPrefilled(at: CellPosition(row: 0, column: 0)))
-        #expect(!puzzle.isPrefilled(at: CellPosition(row: 0, column: 1)))
-        #expect(puzzle.isPrefilled(at: CellPosition(row: 1, column: 1)))
-        #expect(!puzzle.isPrefilled(at: CellPosition(row: 1, column: 0)))
+        // Check that isPrefilled matches whether initialGrid has a value
+        for row in 0 ..< puzzle.rows {
+            for col in 0 ..< puzzle.columns {
+                let pos = CellPosition(row: row, column: col)
+                let expected = puzzle.initialGrid[row][col] != nil
+                #expect(puzzle.isPrefilled(at: pos) == expected)
+            }
+        }
     }
 
     // MARK: - Equatable Tests
@@ -517,9 +502,9 @@ struct TennerGridPuzzleTests {
         let description = puzzle.description
 
         #expect(description.contains("TennerGridPuzzle"))
-        #expect(description.contains("10x5"))
-        #expect(description.contains("Medium"))
-        #expect(description.contains("12/50")) // prefilledCount/totalCells
+        #expect(description.contains("\(puzzle.columns)x\(puzzle.rows)"))
+        #expect(description.contains(puzzle.difficulty.displayName))
+        #expect(description.contains("\(puzzle.prefilledCount)/\(puzzle.totalCells)"))
     }
 
     // MARK: - Codable Tests
