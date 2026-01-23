@@ -12,6 +12,12 @@ struct HomeView: View {
     /// Callback when user wants to continue a saved game
     var onContinueGame: ((SavedGame) -> Void)?
 
+    /// Callback when user wants to start a new game with a selected difficulty
+    var onNewGame: ((Difficulty) -> Void)?
+
+    /// State to control difficulty selection sheet presentation
+    @State private var showingDifficultySelection = false
+
     // MARK: - Body
 
     var body: some View {
@@ -30,12 +36,25 @@ struct HomeView: View {
                     continueGameCard(for: savedGame)
                         .padding(.horizontal, 24)
                         .padding(.bottom, 20)
-                } else {
+                }
+
+                // New Game button - always visible
+                newGameButton
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 20)
+
+                // Welcome message only when no saved game
+                if mostRecentSavedGame == nil {
                     welcomeMessage
                         .padding(.bottom, 20)
                 }
 
                 Spacer()
+            }
+        }
+        .sheet(isPresented: $showingDifficultySelection) {
+            DifficultySelectionView { difficulty in
+                onNewGame?(difficulty)
             }
         }
     }
@@ -119,6 +138,39 @@ struct HomeView: View {
         Text("The Ultimate Number Puzzle")
             .font(.system(size: 16, weight: .medium, design: .rounded))
             .foregroundColor(.secondary)
+    }
+
+    /// New Game button
+    private var newGameButton: some View {
+        Button {
+            showingDifficultySelection = true
+        } label: {
+            HStack {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 20, weight: .semibold))
+
+                Text("New Game")
+                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+            }
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 16)
+            .background(newGameButtonGradient)
+            .cornerRadius(16)
+            .shadow(color: .blue.opacity(0.3), radius: 8, x: 0, y: 4)
+        }
+    }
+
+    /// Gradient for new game button
+    private var newGameButtonGradient: some View {
+        LinearGradient(
+            colors: [
+                Color.blue,
+                Color.blue.opacity(0.8),
+            ],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
     }
 
     /// Welcome message at the bottom

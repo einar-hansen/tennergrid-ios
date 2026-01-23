@@ -202,7 +202,7 @@
 
 - [x] Create `HomeView` with app branding and title
 - [x] Add "Continue Game" card if game is in progress
-- [ ] Add "New Game" button that shows difficulty selection
+- [x] Add "New Game" button that shows difficulty selection
 - [ ] Add "Daily Challenge" card with countdown timer
 - [ ] Test navigation from home to game screen
 
