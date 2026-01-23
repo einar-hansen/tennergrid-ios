@@ -188,7 +188,7 @@
 - [x] Implement intelligent number pad disabling based on column remaining sum
     - Calculate remaining sum needed for each column (target - current sum)
     - Disable numbers in number pad that exceed column's remaining sum
-- [ ] Add visual highlighting for neighbor cells when a cell is selected
+- [x] Add visual highlighting for neighbor cells when a cell is selected
     - Apply darker/lighter color overlay to all 8 adjacent cells (including diagonals)
     - Update cell selection visual feedback to show constraint helpers
     - Test neighbor highlighting with different cell positions (corners, edges, center)
