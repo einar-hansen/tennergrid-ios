@@ -1,6 +1,7 @@
 import SwiftUI
 
 /// A view displaying a number pad with buttons for digits 0-9
+// swiftlint:disable:next swiftui_view_body
 struct NumberPadView: View {
     // MARK: - Properties
 
@@ -17,19 +18,19 @@ struct NumberPadView: View {
 
     var body: some View {
         VStack(spacing: spacing) {
-            // First row: 1-5
+            // First row: 0-4
             HStack(spacing: spacing) {
-                ForEach(1 ... 5, id: \.self) { number in
+                numberButton(for: 0)
+                ForEach(1 ... 4, id: \.self) { number in
                     numberButton(for: number)
                 }
             }
 
-            // Second row: 6-9, 0
+            // Second row: 5-9
             HStack(spacing: spacing) {
-                ForEach(6 ... 9, id: \.self) { number in
+                ForEach(5 ... 9, id: \.self) { number in
                     numberButton(for: number)
                 }
-                numberButton(for: 0)
             }
         }
         .padding(.horizontal)
@@ -112,8 +113,7 @@ struct NumberPadView: View {
 
         // Don't show conflicts if cell already has this value
         if let currentValue = viewModel.value(at: selected),
-           currentValue == number
-        {
+           currentValue == number {
             return 0
         }
 
@@ -150,8 +150,7 @@ struct NumberPadView: View {
 
         // Check if this number would be invalid
         if !viewModel.notesMode,
-           !viewModel.canPlaceValue(number, at: selected)
-        {
+           !viewModel.canPlaceValue(number, at: selected) {
             return Color.red.opacity(0.1)
         }
 
@@ -174,8 +173,7 @@ struct NumberPadView: View {
 
         // Check if this number would be invalid
         if !viewModel.notesMode,
-           !viewModel.canPlaceValue(number, at: selected)
-        {
+           !viewModel.canPlaceValue(number, at: selected) {
             return Color.red.opacity(0.5)
         }
 
@@ -198,8 +196,7 @@ struct NumberPadView: View {
 
         // Check if this number would be invalid (dim the text)
         if !viewModel.notesMode,
-           !viewModel.canPlaceValue(number, at: selected)
-        {
+           !viewModel.canPlaceValue(number, at: selected) {
             return .red.opacity(0.6)
         }
 
@@ -226,8 +223,7 @@ struct NumberPadView: View {
 
         // Don't disable if cell already has this value
         if let currentValue = viewModel.value(at: selected),
-           currentValue == number
-        {
+           currentValue == number {
             return false
         }
 
