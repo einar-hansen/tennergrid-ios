@@ -15,6 +15,9 @@ struct HomeView: View {
     /// Callback when user wants to start a new game with a selected difficulty
     var onNewGame: ((Difficulty) -> Void)?
 
+    /// Callback when user wants to start a custom game with specific difficulty and row count
+    var onCustomGame: ((Difficulty, Int) -> Void)?
+
     /// Callback when user wants to play the daily challenge
     var onDailyChallenge: (() -> Void)?
 
@@ -67,9 +70,14 @@ struct HomeView: View {
             }
         }
         .sheet(isPresented: $showingDifficultySelection) {
-            DifficultySelectionView { difficulty in
-                onNewGame?(difficulty)
-            }
+            DifficultySelectionView(
+                onSelect: { difficulty in
+                    onNewGame?(difficulty)
+                },
+                onCustomGame: { difficulty, rows in
+                    onCustomGame?(difficulty, rows)
+                }
+            )
         }
         .onAppear {
             startTimer()
