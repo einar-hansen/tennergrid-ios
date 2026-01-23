@@ -53,6 +53,7 @@ struct CellView: View {
             }
         }
         .frame(width: cellSize, height: cellSize)
+        .fixedSize()
         .contentShape(Rectangle())
         .onTapGesture {
             onTap()
@@ -75,18 +76,18 @@ struct CellView: View {
                 }
             }
         }
-        .padding(4)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .frame(width: cellSize - 8, height: cellSize - 8)
     }
 
     /// Individual pencil mark cell
     /// - Parameter number: The number (1-9) to display
     /// - Returns: View for the pencil mark
     private func pencilMarkCell(for number: Int) -> some View {
-        Text(cell.pencilMarks.contains(number) ? String(number) : "")
+        let gridCellSize = (cellSize - 8 - 4) / 3 // (cellSize - padding - spacing) / 3 rows/cols
+        return Text(cell.pencilMarks.contains(number) ? String(number) : "")
             .font(.system(size: pencilMarkFontSize, weight: .light, design: .rounded))
             .foregroundColor(.secondary)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(width: gridCellSize, height: gridCellSize)
     }
 
     // MARK: - Styling
