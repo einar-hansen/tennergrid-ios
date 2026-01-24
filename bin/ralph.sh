@@ -235,7 +235,7 @@ PROMPT
     log_info "Found $UNCOMPLETED_COUNT uncompleted task(s)."
 
     AGENT_PROMPT=$(cat <<PROMPT
-You are working through a task list for an iOS/Swift project, one task at a time.
+You are working through a task list for an iOS/Swift project, one incomplete sub section of tasks at a time.
 
 Current tasks file ($TASKS_FILE):
 \`\`\`markdown
