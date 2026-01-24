@@ -335,6 +335,9 @@ final class GameViewModel: ObservableObject {
 
                 errorMessage = nil
 
+                // Provide haptic feedback for number entry
+                HapticManager.shared.mediumImpact()
+
                 // Update conflicts
                 updateConflicts()
 
