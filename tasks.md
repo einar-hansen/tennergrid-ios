@@ -301,10 +301,10 @@
 
 ### 8.2 Statistics Manager
 
-- [ ] [COMPLEX] Create `StatisticsManager` service with methods to record game completion
-- [ ] Add method to update streaks
-- [ ] [COMPLEX] Add method to calculate averages and trends
-- [ ] Persist statistics to UserDefaults or local file
+- [x] [COMPLEX] Create `StatisticsManager` service with methods to record game completion
+- [x] Add method to update streaks
+- [x] [COMPLEX] Add method to calculate averages and trends
+- [x] Persist statistics to UserDefaults or local file
 - [ ] Write unit tests for statistics calculations
 
 ### 8.3 Achievements System
