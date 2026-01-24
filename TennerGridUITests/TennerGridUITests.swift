@@ -504,7 +504,7 @@ final class TennerGridUITests: XCTestCase {
         XCTAssertTrue(app.state == .runningForeground, "App should still be running in foreground")
 
         // Check that content is still visible (more lenient check)
-        let hasVisibleContent = app.buttons.count > 0 || app.staticTexts.count > 0 || app.images.count > 0
+        let hasVisibleContent = app.buttons.count > 0 || !app.staticTexts.isEmpty || !app.images.isEmpty
         XCTAssertTrue(hasVisibleContent, "UI should have visible content after theme change")
     }
 
@@ -564,7 +564,7 @@ final class TennerGridUITests: XCTestCase {
         // This is a smoke test to ensure accessibility isn't completely broken
 
         // Check for any accessible buttons (there should be many)
-        XCTAssertTrue(app.buttons.count > 0, "App should have accessible buttons")
+        XCTAssertTrue(!app.buttons.isEmpty, "App should have accessible buttons")
 
         // Check for tab bar (core navigation)
         let hasTabBar = app.tabBars.count > 0
@@ -658,7 +658,7 @@ final class TennerGridUITests: XCTestCase {
 
         // Verify timer is accessible (should have label showing time)
         let timerElements = app.staticTexts.matching(NSPredicate(format: "label MATCHES %@", "\\d{2}:\\d{2}"))
-        XCTAssertTrue(timerElements.count > 0, "Timer should be accessible and display time")
+        XCTAssertTrue(!timerElements.isEmpty, "Timer should be accessible and display time")
 
         // Test Grid Accessibility
         let grid = app.otherElements["GameGrid"]
@@ -893,7 +893,7 @@ final class TennerGridUITests: XCTestCase {
 
         // Verify settings toggles have accessibility labels
         let switches = app.switches
-        XCTAssertTrue(switches.count > 0, "Settings should contain accessible toggle switches")
+        XCTAssertTrue(!switches.isEmpty, "Settings should contain accessible toggle switches")
 
         // Each switch should have a label
         for index in 0 ..< min(switches.count, 10) {
