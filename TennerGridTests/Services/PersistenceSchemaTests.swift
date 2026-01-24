@@ -301,7 +301,7 @@ final class PersistenceSchemaTests: XCTestCase {
         XCTAssertThrowsError(
             try PersistenceSchema.Migration.migrate(fromVersion: 2, toVersion: 1, data: testData)
         ) { error in
-            guard case PersistenceSchema.MigrationError.invalidVersions(let from, let to) = error else {
+            guard case let PersistenceSchema.MigrationError.invalidVersions(from, to) = error else {
                 XCTFail("Expected invalidVersions error")
                 return
             }
