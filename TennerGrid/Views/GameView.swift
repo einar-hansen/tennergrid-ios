@@ -50,10 +50,15 @@ struct GameView: View {
             gameContent
                 .blur(radius: viewModel.gameState.isPaused ? 10 : 0)
                 .disabled(viewModel.gameState.isPaused)
+                .animation(.easeInOut(duration: 0.25), value: viewModel.gameState.isPaused)
 
             // Pause overlay
             if viewModel.gameState.isPaused {
                 pauseOverlay
+                    .transition(.asymmetric(
+                        insertion: .opacity.combined(with: .scale(scale: 0.95)),
+                        removal: .opacity.combined(with: .scale(scale: 0.95))
+                    ))
             }
 
             // Achievement unlock notifications
@@ -64,19 +69,25 @@ struct GameView: View {
                 )
             )
         }
+        .animation(.easeInOut(duration: 0.25), value: viewModel.gameState.isPaused)
         .modifier(KeyboardSupportModifier(viewModel: viewModel, isGameFocused: $isGameFocused))
         .onChange(of: viewModel.gameState.isCompleted) { isCompleted in
             if isCompleted {
                 Task { @MainActor in
+                    try? await Task.sleep(nanoseconds: 300_000_000) // 300ms delay for completion animation
                     showingWinScreen = true
                 }
             }
         }
         .sheet(isPresented: $showingSettings) {
             settingsPlaceholder
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
         }
         .sheet(isPresented: $showingWinScreen) {
             winScreenPlaceholder
+                .presentationDetents([.large])
+                .interactiveDismissDisabled()
         }
         .modifier(ScenePhaseModifier(scenePhase: scenePhase, viewModel: viewModel))
     }

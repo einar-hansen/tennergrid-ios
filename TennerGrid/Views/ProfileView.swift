@@ -27,6 +27,8 @@ struct ProfileView: View {
         }
         .sheet(isPresented: $showingRemoveAds) {
             removeAdsPlaceholder
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
         }
         .alert("Restore Purchases", isPresented: $showingRestorePurchase) {
             Button("OK") {

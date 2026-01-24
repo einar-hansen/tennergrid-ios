@@ -27,20 +27,31 @@ struct ContentView: View {
     // MARK: - Body
 
     var body: some View {
-        Group {
+        ZStack {
             if let viewModel = gameViewModel {
                 // Show game view when a game is active
                 GameView(viewModel: viewModel)
                     .onQuit(handleQuitGame)
                     .onNewGame(handleNewGameRequest)
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing).combined(with: .opacity),
+                        removal: .move(edge: .trailing).combined(with: .opacity)
+                    ))
+                    .zIndex(1)
             } else {
                 // Show home view when no game is active
                 HomeView(puzzleManager: puzzleManager)
                     .onContinueGame(handleContinueGame)
                     .onNewGame(handleStartNewGame)
                     .onDailyChallenge(handleDailyChallenge)
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .leading).combined(with: .opacity),
+                        removal: .move(edge: .leading).combined(with: .opacity)
+                    ))
+                    .zIndex(0)
             }
         }
+        .animation(.easeInOut(duration: 0.3), value: gameViewModel != nil)
         .sheet(isPresented: $showingDifficultySelection) {
             DifficultySelectionView(
                 onSelect: { difficulty in
@@ -52,6 +63,8 @@ struct ContentView: View {
                     showingDifficultySelection = false
                 }
             )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
         }
         .onChange(of: showingDifficultySelection) { isShowing in
             // Start new game after sheet is fully dismissed

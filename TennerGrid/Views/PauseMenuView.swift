@@ -31,6 +31,9 @@ struct PauseMenuView: View {
     /// Whether to show the quit confirmation alert
     @State private var showingQuitConfirmation = false
 
+    /// Animation state for menu appearance
+    @State private var isAnimated = false
+
     // MARK: - Body
 
     var body: some View {
@@ -64,6 +67,8 @@ struct PauseMenuView: View {
             menuHeader
                 .padding(.top, 24)
                 .padding(.bottom, 32)
+                .opacity(isAnimated ? 1 : 0)
+                .offset(y: isAnimated ? 0 : -20)
 
             menuButtons
                 .padding(.horizontal, 32)
@@ -75,6 +80,13 @@ struct PauseMenuView: View {
                 .shadow(color: .black.opacity(0.3), radius: 20, x: 0, y: 10)
         )
         .padding(.horizontal, 40)
+        .scaleEffect(isAnimated ? 1 : 0.9)
+        .opacity(isAnimated ? 1 : 0)
+        .onAppear {
+            withAnimation(.spring(response: 0.4, dampingFraction: 0.75)) {
+                isAnimated = true
+            }
+        }
     }
 
     /// The header section with pause icon and title
@@ -98,6 +110,9 @@ struct PauseMenuView: View {
                 color: .blue,
                 action: onResume
             )
+            .opacity(isAnimated ? 1 : 0)
+            .offset(y: isAnimated ? 0 : 20)
+            .animation(.spring(response: 0.4, dampingFraction: 0.75).delay(0.1), value: isAnimated)
 
             menuButton(
                 title: "Restart",
@@ -105,6 +120,9 @@ struct PauseMenuView: View {
                 color: .orange,
                 action: { showingRestartConfirmation = true }
             )
+            .opacity(isAnimated ? 1 : 0)
+            .offset(y: isAnimated ? 0 : 20)
+            .animation(.spring(response: 0.4, dampingFraction: 0.75).delay(0.15), value: isAnimated)
 
             menuButton(
                 title: "New Game",
@@ -112,6 +130,9 @@ struct PauseMenuView: View {
                 color: .green,
                 action: { showingNewGameConfirmation = true }
             )
+            .opacity(isAnimated ? 1 : 0)
+            .offset(y: isAnimated ? 0 : 20)
+            .animation(.spring(response: 0.4, dampingFraction: 0.75).delay(0.2), value: isAnimated)
 
             menuButton(
                 title: "Settings",
@@ -119,6 +140,9 @@ struct PauseMenuView: View {
                 color: .gray,
                 action: handleSettings
             )
+            .opacity(isAnimated ? 1 : 0)
+            .offset(y: isAnimated ? 0 : 20)
+            .animation(.spring(response: 0.4, dampingFraction: 0.75).delay(0.25), value: isAnimated)
 
             menuButton(
                 title: "Quit",
@@ -126,6 +150,9 @@ struct PauseMenuView: View {
                 color: .red,
                 action: { showingQuitConfirmation = true }
             )
+            .opacity(isAnimated ? 1 : 0)
+            .offset(y: isAnimated ? 0 : 20)
+            .animation(.spring(response: 0.4, dampingFraction: 0.75).delay(0.3), value: isAnimated)
         }
     }
 
@@ -166,7 +193,16 @@ struct PauseMenuView: View {
                     .fill(color.gradient)
             )
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ScaleButtonStyle())
+    }
+
+    /// Custom button style with scale animation on press
+    struct ScaleButtonStyle: ButtonStyle {
+        func makeBody(configuration: Configuration) -> some View {
+            configuration.label
+                .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+                .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
+        }
     }
 
     // MARK: - Alert Actions

@@ -78,6 +78,8 @@ struct HomeView: View {
                     onCustomGame?(difficulty, rows)
                 }
             )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
         }
         .onAppear {
             startTimer()
@@ -207,6 +209,7 @@ struct HomeView: View {
             .cornerRadius(16)
             .shadow(color: .blue.opacity(0.3), radius: 8, x: 0, y: 4)
         }
+        .buttonStyle(ScaleButtonStyle())
     }
 
     /// Gradient for new game button
@@ -250,7 +253,7 @@ struct HomeView: View {
             .padding(20)
             .background(cardBackground)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ScaleButtonStyle())
     }
 
     /// Card background with rounded rectangle and shadow
@@ -414,7 +417,7 @@ struct HomeView: View {
             .padding(20)
             .background(cardBackground)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(ScaleButtonStyle())
     }
 
     /// Header section for daily challenge card
@@ -542,6 +545,17 @@ struct HomeView: View {
     private func stopTimer() {
         timer?.invalidate()
         timer = nil
+    }
+}
+
+// MARK: - Button Styles
+
+/// Custom button style with scale animation on press
+private struct ScaleButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.96 : 1.0)
+            .animation(.easeInOut(duration: 0.15), value: configuration.isPressed)
     }
 }
 
