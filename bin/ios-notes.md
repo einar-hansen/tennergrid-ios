@@ -13,3 +13,11 @@ Dont run the UI tests with code.
 
 
 Probably better to ralph in the beginning for logic, and claude it regularly when working with the UI
+
+
+https://sudoku.one/fobidoshi
+https://sudoku.one/renban
+
+Easy = 55%
+Medium = 45%
+Hard = 35%

@@ -62,21 +62,25 @@ struct CellView: View {
 
     // MARK: - Subviews
 
-    /// View displaying pencil marks in a 3x3 grid
+    /// View displaying pencil marks in a 2x5 grid (matching number pad layout)
     private var pencilMarksView: some View {
         let padding: CGFloat = 6
         let availableSize = cellSize - (padding * 2)
-        let gridCellSize = availableSize / 3
+        let gridCellWidth = availableSize / 5 // 5 columns
+        let gridCellHeight = availableSize / 2 // 2 rows
 
         return VStack(spacing: 0) {
-            ForEach(0 ..< 3) { row in
-                HStack(spacing: 0) {
-                    ForEach(0 ..< 3) { col in
-                        let number = row * 3 + col + 1
-                        if number <= 9 {
-                            pencilMarkCell(for: number, size: gridCellSize)
-                        }
-                    }
+            // First row: 0-4
+            HStack(spacing: 0) {
+                pencilMarkCell(for: 0, width: gridCellWidth, height: gridCellHeight)
+                ForEach(1 ... 4, id: \.self) { number in
+                    pencilMarkCell(for: number, width: gridCellWidth, height: gridCellHeight)
+                }
+            }
+            // Second row: 5-9
+            HStack(spacing: 0) {
+                ForEach(5 ... 9, id: \.self) { number in
+                    pencilMarkCell(for: number, width: gridCellWidth, height: gridCellHeight)
                 }
             }
         }
@@ -86,14 +90,15 @@ struct CellView: View {
 
     /// Individual pencil mark cell
     /// - Parameters:
-    ///   - number: The number (1-9) to display
-    ///   - size: The size of each grid cell
+    ///   - number: The number (0-9) to display
+    ///   - width: The width of the grid cell
+    ///   - height: The height of the grid cell
     /// - Returns: View for the pencil mark
-    private func pencilMarkCell(for number: Int, size: CGFloat) -> some View {
+    private func pencilMarkCell(for number: Int, width: CGFloat, height: CGFloat) -> some View {
         Text(cell.pencilMarks.contains(number) ? String(number) : "")
             .font(.system(size: pencilMarkFontSize, weight: .light, design: .rounded))
             .foregroundColor(.secondary)
-            .frame(width: size, height: size)
+            .frame(width: width, height: height)
             .minimumScaleFactor(0.5)
     }
 
@@ -259,7 +264,7 @@ struct CellView_Previews: PreviewProvider {
                 position: CellPosition(row: 0, column: 0),
                 value: nil,
                 isInitial: false,
-                pencilMarks: [1, 3, 5, 7, 9]
+                pencilMarks: [0, 1, 3, 5, 7, 9]
             ),
             cellSize: 50,
             onTap: {}

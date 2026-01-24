@@ -113,7 +113,8 @@ struct NumberPadView: View {
 
         // Don't show conflicts if cell already has this value
         if let currentValue = viewModel.value(at: selected),
-           currentValue == number {
+           currentValue == number
+        {
             return 0
         }
 
@@ -150,7 +151,8 @@ struct NumberPadView: View {
 
         // Check if this number would be invalid
         if !viewModel.notesMode,
-           !viewModel.canPlaceValue(number, at: selected) {
+           !viewModel.canPlaceValue(number, at: selected)
+        {
             return Color.red.opacity(0.1)
         }
 
@@ -173,7 +175,8 @@ struct NumberPadView: View {
 
         // Check if this number would be invalid
         if !viewModel.notesMode,
-           !viewModel.canPlaceValue(number, at: selected) {
+           !viewModel.canPlaceValue(number, at: selected)
+        {
             return Color.red.opacity(0.5)
         }
 
@@ -196,7 +199,8 @@ struct NumberPadView: View {
 
         // Check if this number would be invalid (dim the text)
         if !viewModel.notesMode,
-           !viewModel.canPlaceValue(number, at: selected) {
+           !viewModel.canPlaceValue(number, at: selected)
+        {
             return .red.opacity(0.6)
         }
 
@@ -223,7 +227,8 @@ struct NumberPadView: View {
 
         // Don't disable if cell already has this value
         if let currentValue = viewModel.value(at: selected),
-           currentValue == number {
+           currentValue == number
+        {
             return false
         }
 
