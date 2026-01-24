@@ -294,13 +294,13 @@ struct CellView: View {
     /// Accessibility hint providing context
     private var accessibilityHint: String {
         if cell.isInitial {
-            return "This cell is pre-filled and cannot be changed"
+            "This cell is pre-filled and cannot be changed"
         } else if cell.hasError {
-            return "This cell has an error. Double tap to select and enter a different number"
+            "This cell has an error. Double tap to select and enter a different number"
         } else if cell.isSelected {
-            return "Selected. Use number pad to enter a value"
+            "Selected. Use number pad to enter a value"
         } else {
-            return "Double tap to select this cell"
+            "Double tap to select this cell"
         }
     }
 

@@ -504,7 +504,7 @@ final class TennerGridUITests: XCTestCase {
         XCTAssertTrue(app.state == .runningForeground, "App should still be running in foreground")
 
         // Check that content is still visible (more lenient check)
-        let hasVisibleContent = app.buttons.count > 0 || app.staticTexts.count > 0 || app.images.count > 0
+        let hasVisibleContent = app.buttons.count > 0 || !app.staticTexts.isEmpty || !app.images.isEmpty
         XCTAssertTrue(hasVisibleContent, "UI should have visible content after theme change")
     }
 

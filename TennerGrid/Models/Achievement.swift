@@ -397,7 +397,7 @@ extension Achievement {
                 title: "Centurion",
                 achievementDescription: "Complete 100 puzzles",
                 category: .games,
-                iconName: "100.circle.fill",
+                iconName: "star.circle.fill",
                 targetValue: 100,
                 points: 100
             ),

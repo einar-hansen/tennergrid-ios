@@ -317,13 +317,13 @@ struct WinScreenView: View {
     private func winScreenButtonHint(for title: String) -> String {
         switch title {
         case "New Game":
-            return "Double tap to start a new puzzle with the same difficulty"
+            "Double tap to start a new puzzle with the same difficulty"
         case "Change Difficulty":
-            return "Double tap to select a different difficulty level"
+            "Double tap to select a different difficulty level"
         case "Home":
-            return "Double tap to return to the home screen"
+            "Double tap to return to the home screen"
         default:
-            return "Double tap to activate"
+            "Double tap to activate"
         }
     }
 
