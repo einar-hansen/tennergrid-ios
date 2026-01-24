@@ -80,63 +80,11 @@ struct TabBarView: View {
 
     /// Profile/Me tab with settings, stats, and achievements
     private var profileTab: some View {
-        ProfilePlaceholderView()
+        ProfileView()
             .tabItem {
                 Label(Tab.profile.title, systemImage: Tab.profile.icon)
             }
             .tag(Tab.profile)
-    }
-}
-
-// MARK: - Placeholder Views
-
-/// Placeholder view for Profile/Me tab (to be implemented in Phase 5.5)
-// swiftlint:disable:next swiftui_view_body
-private struct ProfilePlaceholderView: View {
-    var body: some View {
-        NavigationStack {
-            VStack(spacing: 20) {
-                iconView
-
-                titleView
-
-                subtitleView
-
-                descriptionView
-            }
-            .navigationTitle("Me")
-        }
-    }
-
-    private var iconView: some View {
-        Image(systemName: "person.circle.fill")
-            .font(.system(size: 64))
-            .foregroundStyle(
-                LinearGradient(
-                    colors: [.blue, .green],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-    }
-
-    private var titleView: some View {
-        Text("Profile")
-            .font(.system(size: 28, weight: .bold, design: .rounded))
-    }
-
-    private var subtitleView: some View {
-        Text("Coming Soon")
-            .font(.system(size: 16, weight: .medium))
-            .foregroundColor(.secondary)
-    }
-
-    private var descriptionView: some View {
-        Text("View your statistics, achievements, and customize settings!")
-            .font(.system(size: 14))
-            .foregroundColor(.secondary)
-            .multilineTextAlignment(.center)
-            .padding(.horizontal, 40)
     }
 }
 
