@@ -403,7 +403,7 @@
 
 - [x] Optimize GridView layout for iPad screen sizes
 - [x] Create horizontal layout for landscape orientation
-- [ ] Adjust spacing and sizing for larger screens
+- [x] Adjust spacing and sizing for larger screens
 - [ ] Test on iPad Mini, iPad Air, iPad Pro
 - [ ] Ensure all tap targets are appropriately sized
 
