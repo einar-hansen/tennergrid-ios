@@ -390,7 +390,7 @@
 ### 10.5 Accessibility
 
 - [x] Add VoiceOver labels to all interactive elements
-- [ ] Test complete game flow with VoiceOver enabled
+- [x] Test complete game flow with VoiceOver enabled
 - [ ] Support Dynamic Type (scalable fonts)
 - [ ] Test with largest accessibility text sizes
 - [ ] Add high contrast support for color-blind users
