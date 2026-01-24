@@ -244,11 +244,11 @@
 
 ### 6.1 Settings View
 
-- [ ] Create `SettingsView` with game settings section
-- [ ] Add toggles: auto-check errors, show timer, highlight same numbers, haptic feedback, sound effects
-- [ ] Add appearance section with light/dark/auto theme selector
-- [ ] Add notification section with daily reminder toggle
-- [ ] Wire all settings to UserDefaults persistence
+- [x] Create `SettingsView` with game settings section
+- [x] Add toggles: auto-check errors, show timer, highlight same numbers, haptic feedback, sound effects
+- [x] Add appearance section with light/dark/auto theme selector
+- [x] Add notification section with daily reminder toggle
+- [x] Wire all settings to UserDefaults persistence
 
 ### 6.2 User Settings Model
 
