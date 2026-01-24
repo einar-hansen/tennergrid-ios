@@ -369,7 +369,7 @@
 - [x] Add haptics for cell selection (light impact)
 - [x] Add haptics for number entry (medium impact)
 - [x] Add haptics for errors (notification warning)
-- [ ] Add haptics for puzzle completion (notification success)
+- [x] Add haptics for puzzle completion (notification success)
 
 ### 10.3 Sound Effects
 
