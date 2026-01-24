@@ -141,39 +141,59 @@ import SwiftUI
 // MARK: - Grid View Tests
 
 #Preview("GridView - 3 Row Easy - Default") {
-    let viewModel = GameViewModel(puzzle: PreviewPuzzles.easy3Row)
-    viewModel.selectCell(at: CellPosition(row: 1, column: 4))
-
-    return GridView(viewModel: viewModel)
-        .padding()
-        .testDynamicTypeSize(.large)
+    struct PreviewWrapper: View {
+        @State private var zoomScale: CGFloat = 1.0
+        var body: some View {
+            let viewModel = GameViewModel(puzzle: PreviewPuzzles.easy3Row)
+            viewModel.selectCell(at: CellPosition(row: 1, column: 4))
+            return GridView(viewModel: viewModel, zoomScale: $zoomScale)
+                .padding()
+                .testDynamicTypeSize(.large)
+        }
+    }
+    return PreviewWrapper()
 }
 
 #Preview("GridView - 3 Row Easy - Maximum Size") {
-    let viewModel = GameViewModel(puzzle: PreviewPuzzles.easy3Row)
-    viewModel.selectCell(at: CellPosition(row: 1, column: 4))
-
-    return GridView(viewModel: viewModel)
-        .padding()
-        .testDynamicTypeSize(.accessibility5)
+    struct PreviewWrapper: View {
+        @State private var zoomScale: CGFloat = 1.0
+        var body: some View {
+            let viewModel = GameViewModel(puzzle: PreviewPuzzles.easy3Row)
+            viewModel.selectCell(at: CellPosition(row: 1, column: 4))
+            return GridView(viewModel: viewModel, zoomScale: $zoomScale)
+                .padding()
+                .testDynamicTypeSize(.accessibility5)
+        }
+    }
+    return PreviewWrapper()
 }
 
 #Preview("GridView - 5 Row Medium - Default") {
-    let viewModel = GameViewModel(puzzle: PreviewPuzzles.medium5Row)
-    viewModel.selectCell(at: CellPosition(row: 2, column: 3))
-
-    return GridView(viewModel: viewModel)
-        .padding()
-        .testDynamicTypeSize(.large)
+    struct PreviewWrapper: View {
+        @State private var zoomScale: CGFloat = 1.0
+        var body: some View {
+            let viewModel = GameViewModel(puzzle: PreviewPuzzles.medium5Row)
+            viewModel.selectCell(at: CellPosition(row: 2, column: 3))
+            return GridView(viewModel: viewModel, zoomScale: $zoomScale)
+                .padding()
+                .testDynamicTypeSize(.large)
+        }
+    }
+    return PreviewWrapper()
 }
 
 #Preview("GridView - 5 Row Medium - Maximum Size") {
-    let viewModel = GameViewModel(puzzle: PreviewPuzzles.medium5Row)
-    viewModel.selectCell(at: CellPosition(row: 2, column: 3))
-
-    return GridView(viewModel: viewModel)
-        .padding()
-        .testDynamicTypeSize(.accessibility5)
+    struct PreviewWrapper: View {
+        @State private var zoomScale: CGFloat = 1.0
+        var body: some View {
+            let viewModel = GameViewModel(puzzle: PreviewPuzzles.medium5Row)
+            viewModel.selectCell(at: CellPosition(row: 2, column: 3))
+            return GridView(viewModel: viewModel, zoomScale: $zoomScale)
+                .padding()
+                .testDynamicTypeSize(.accessibility5)
+        }
+    }
+    return PreviewWrapper()
 }
 
 // MARK: - Cell View Individual Tests

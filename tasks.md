@@ -451,12 +451,12 @@
 - [x] Adjust spacing and sizing for larger screens
 - [ ] Test on iPad Mini, iPad Air, iPad Pro
 - [x] Ensure all tap targets are appropriately sized
-- [ ] Add zoom in/out functionality
+- [x] Add zoom in/out functionality
   - Implement pinch-to-zoom gesture for touchscreen devices (iPhone/iPad)
-  - Add zoom in/out buttons for non-touchscreen devices (macOS)
+  - Add zoom in/out buttons (ZoomControlView) for all devices
   - Allow grid to scale up to 2x and down to 0.5x
   - Persist zoom level in UserDefaults
-  - Ensure number pad and toolbar remain accessible at all zoom levels
+  - Ensure number pad and toolbar remain accessible at all zoom levels (zoom only affects grid)
   - Test zoom on both iPhone and iPad in portrait/landscape
 
 ### 11.2 Multitasking Support

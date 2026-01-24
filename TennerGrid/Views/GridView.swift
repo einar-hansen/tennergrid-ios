@@ -7,6 +7,14 @@ struct GridView: View {
     /// The current game state
     @ObservedObject var viewModel: GameViewModel
 
+    // MARK: - Zoom Properties
+
+    /// Binding to the current zoom scale
+    @Binding var zoomScale: CGFloat
+
+    /// Temporary zoom scale during pinch gesture
+    @State private var gestureZoomScale: CGFloat = 1.0
+
     // MARK: - Environment
 
     /// Size class to detect iPad vs iPhone
@@ -41,14 +49,18 @@ struct GridView: View {
 
     var body: some View {
         GeometryReader { geometry in
-            VStack(spacing: rowSpacing) {
-                // Main grid
-                gridContent(availableWidth: geometry.size.width - (gridPadding * 2))
+            ScrollView([.horizontal, .vertical], showsIndicators: true) {
+                VStack(spacing: rowSpacing) {
+                    // Main grid
+                    gridContent(availableWidth: geometry.size.width - (gridPadding * 2))
 
-                // Column sums
-                columnSumsView(availableWidth: geometry.size.width - (gridPadding * 2))
+                    // Column sums
+                    columnSumsView(availableWidth: geometry.size.width - (gridPadding * 2))
+                }
+                .padding(gridPadding)
+                .scaleEffect(zoomScale * gestureZoomScale)
+                .gesture(zoomGesture)
             }
-            .padding(gridPadding)
         }
     }
 
@@ -205,6 +217,28 @@ struct GridView: View {
         }
     }
 
+    // MARK: - Zoom Gesture
+
+    /// Pinch-to-zoom gesture for touchscreen devices
+    private var zoomGesture: some Gesture {
+        MagnificationGesture()
+            .onChanged { value in
+                gestureZoomScale = value
+            }
+            .onEnded { value in
+                // Calculate final zoom level
+                let newZoom = zoomScale * value
+                // Clamp between 0.5x and 2.0x
+                let clampedZoom = min(max(newZoom, 0.5), 2.0)
+
+                // Apply the zoom
+                withAnimation(.easeOut(duration: 0.2)) {
+                    zoomScale = clampedZoom
+                    gestureZoomScale = 1.0
+                }
+            }
+    }
+
     // MARK: - Accessibility
 
     /// Accessibility value for column sum cell
@@ -239,18 +273,42 @@ struct GridView: View {
 // MARK: - Previews
 
 #Preview("10x3 Grid") {
-    GridView(viewModel: GameViewModel(puzzle: PreviewPuzzles.easy3Row))
+    struct PreviewWrapper: View {
+        @State private var zoomScale: CGFloat = 1.0
+        var body: some View {
+            GridView(viewModel: GameViewModel(puzzle: PreviewPuzzles.easy3Row), zoomScale: $zoomScale)
+        }
+    }
+    return PreviewWrapper()
 }
 
 #Preview("10x5 Grid") {
-    GridView(viewModel: GameViewModel(puzzle: PreviewPuzzles.easy5Row))
+    struct PreviewWrapper: View {
+        @State private var zoomScale: CGFloat = 1.0
+        var body: some View {
+            GridView(viewModel: GameViewModel(puzzle: PreviewPuzzles.easy5Row), zoomScale: $zoomScale)
+        }
+    }
+    return PreviewWrapper()
 }
 
 #Preview("10x7 Grid") {
-    GridView(viewModel: GameViewModel(puzzle: PreviewPuzzles.hard7Row))
+    struct PreviewWrapper: View {
+        @State private var zoomScale: CGFloat = 1.0
+        var body: some View {
+            GridView(viewModel: GameViewModel(puzzle: PreviewPuzzles.hard7Row), zoomScale: $zoomScale)
+        }
+    }
+    return PreviewWrapper()
 }
 
 #Preview("Dark Mode") {
-    GridView(viewModel: GameViewModel(puzzle: PreviewPuzzles.medium5Row))
-        .preferredColorScheme(.dark)
+    struct PreviewWrapper: View {
+        @State private var zoomScale: CGFloat = 1.0
+        var body: some View {
+            GridView(viewModel: GameViewModel(puzzle: PreviewPuzzles.medium5Row), zoomScale: $zoomScale)
+                .preferredColorScheme(.dark)
+        }
+    }
+    return PreviewWrapper()
 }

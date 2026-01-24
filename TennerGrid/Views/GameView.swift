@@ -26,6 +26,12 @@ struct GameView: View {
     /// Focus state for keyboard input
     @FocusState private var isGameFocused: Bool
 
+    /// Persisted zoom level for grid (0.5x to 2.0x)
+    @AppStorage("gridZoomLevel") private var persistedZoomLevel: Double = 1.0
+
+    /// Current zoom scale for grid
+    @State private var gridZoomScale: CGFloat = 1.0
+
     /// Callback when user quits the game (for navigation to home)
     var onQuit: (() -> Void)?
 
@@ -84,9 +90,30 @@ struct GameView: View {
                     set: { _ in }
                 )
             )
+
+            // Zoom controls (bottom-trailing corner)
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    ZoomControlView(
+                        onZoomIn: handleZoomIn,
+                        onZoomOut: handleZoomOut,
+                        onResetZoom: handleResetZoom,
+                        currentZoom: gridZoomScale
+                    )
+                    .padding(.trailing, isIPad ? 24 : 16)
+                    .padding(.bottom, isIPad ? 24 : 16)
+                }
+            }
+            .opacity(viewModel.gameState.isPaused ? 0 : 1)
         }
         .animation(.easeInOut(duration: 0.25), value: viewModel.gameState.isPaused)
         .modifier(KeyboardSupportModifier(viewModel: viewModel, isGameFocused: $isGameFocused))
+        .onAppear {
+            // Initialize zoom from persisted value
+            gridZoomScale = CGFloat(persistedZoomLevel)
+        }
         .onChange(of: viewModel.gameState.isCompleted) { isCompleted in
             if isCompleted {
                 Task { @MainActor in
@@ -136,7 +163,7 @@ struct GameView: View {
             Spacer()
 
             // Main puzzle grid
-            GridView(viewModel: viewModel)
+            GridView(viewModel: viewModel, zoomScale: $gridZoomScale)
 
             Spacer()
 
@@ -163,7 +190,7 @@ struct GameView: View {
                 )
 
                 // Main puzzle grid
-                GridView(viewModel: viewModel)
+                GridView(viewModel: viewModel, zoomScale: $gridZoomScale)
             }
             .frame(maxWidth: .infinity)
 
@@ -278,6 +305,34 @@ struct GameView: View {
     /// Triggers navigation back to home
     private func handleQuit() {
         onQuit?()
+    }
+
+    // MARK: - Zoom Controls
+
+    /// Zoom in the grid by 0.25x
+    private func handleZoomIn() {
+        let newZoom = min(gridZoomScale + 0.25, 2.0)
+        withAnimation(.easeOut(duration: 0.2)) {
+            gridZoomScale = newZoom
+        }
+        persistedZoomLevel = Double(newZoom)
+    }
+
+    /// Zoom out the grid by 0.25x
+    private func handleZoomOut() {
+        let newZoom = max(gridZoomScale - 0.25, 0.5)
+        withAnimation(.easeOut(duration: 0.2)) {
+            gridZoomScale = newZoom
+        }
+        persistedZoomLevel = Double(newZoom)
+    }
+
+    /// Reset zoom to 1.0x
+    private func handleResetZoom() {
+        withAnimation(.easeOut(duration: 0.2)) {
+            gridZoomScale = 1.0
+        }
+        persistedZoomLevel = 1.0
     }
 }
 
