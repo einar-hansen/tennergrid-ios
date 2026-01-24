@@ -119,6 +119,7 @@ final class GameViewModel: ObservableObject {
     private func setupSettingsObservers() {
         // Observe settings changes from SettingsManager
         SettingsManager.shared.$settings
+            .receive(on: DispatchQueue.main)
             .sink { [weak self] settings in
                 self?.handleSettingsChange(settings)
             }
