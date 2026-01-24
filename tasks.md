@@ -368,7 +368,7 @@
 - [x] Create `HapticManager` service with feedback methods
 - [x] Add haptics for cell selection (light impact)
 - [x] Add haptics for number entry (medium impact)
-- [ ] Add haptics for errors (notification warning)
+- [x] Add haptics for errors (notification warning)
 - [ ] Add haptics for puzzle completion (notification success)
 
 ### 10.3 Sound Effects

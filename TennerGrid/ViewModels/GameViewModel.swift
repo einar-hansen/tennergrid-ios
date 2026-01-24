@@ -270,18 +270,21 @@ final class GameViewModel: ObservableObject {
         // Validate value range
         guard value >= 0, value <= 9 else {
             errorMessage = "Invalid number: must be 0-9"
+            HapticManager.shared.warning()
             return
         }
 
         // Check if a cell is selected
         guard let position = selectedPosition else {
             errorMessage = "No cell selected"
+            HapticManager.shared.warning()
             return
         }
 
         // Check if cell is editable
         guard gameState.isEditable(at: position) else {
             errorMessage = "Cannot modify pre-filled cells"
+            HapticManager.shared.warning()
             return
         }
 
@@ -351,6 +354,9 @@ final class GameViewModel: ObservableObject {
                 gameState.recordError()
                 errorMessage = "Invalid placement: violates game rules"
 
+                // Provide haptic feedback for error
+                HapticManager.shared.warning()
+
                 // Show conflicts
                 let conflicts = validationService.detectConflicts(
                     at: position,
@@ -370,11 +376,13 @@ final class GameViewModel: ObservableObject {
     func clearSelectedCell() {
         guard let position = selectedPosition else {
             errorMessage = "No cell selected"
+            HapticManager.shared.warning()
             return
         }
 
         guard gameState.isEditable(at: position) else {
             errorMessage = "Cannot modify pre-filled cells"
+            HapticManager.shared.warning()
             return
         }
 
@@ -424,21 +432,25 @@ final class GameViewModel: ObservableObject {
     func addPencilMark(_ mark: Int) {
         guard let position = selectedPosition else {
             errorMessage = "No cell selected"
+            HapticManager.shared.warning()
             return
         }
 
         guard mark >= 0, mark <= 9 else {
             errorMessage = "Invalid mark: must be 0-9"
+            HapticManager.shared.warning()
             return
         }
 
         guard gameState.isEditable(at: position) else {
             errorMessage = "Cannot modify pre-filled cells"
+            HapticManager.shared.warning()
             return
         }
 
         guard gameState.isEmpty(at: position) else {
             errorMessage = "Cannot add marks to filled cells"
+            HapticManager.shared.warning()
             return
         }
 
@@ -495,21 +507,25 @@ final class GameViewModel: ObservableObject {
     func togglePencilMark(_ mark: Int) {
         guard let position = selectedPosition else {
             errorMessage = "No cell selected"
+            HapticManager.shared.warning()
             return
         }
 
         guard mark >= 0, mark <= 9 else {
             errorMessage = "Invalid mark: must be 0-9"
+            HapticManager.shared.warning()
             return
         }
 
         guard gameState.isEditable(at: position) else {
             errorMessage = "Cannot modify pre-filled cells"
+            HapticManager.shared.warning()
             return
         }
 
         guard gameState.isEmpty(at: position) else {
             errorMessage = "Cannot add marks to filled cells"
+            HapticManager.shared.warning()
             return
         }
 
@@ -536,11 +552,13 @@ final class GameViewModel: ObservableObject {
     func clearPencilMarks() {
         guard let position = selectedPosition else {
             errorMessage = "No cell selected"
+            HapticManager.shared.warning()
             return
         }
 
         guard gameState.isEditable(at: position) else {
             errorMessage = "Cannot modify pre-filled cells"
+            HapticManager.shared.warning()
             return
         }
 
@@ -658,12 +676,14 @@ final class GameViewModel: ObservableObject {
         // Don't provide hints if game is completed
         guard !gameState.isCompleted else {
             errorMessage = "Game is already completed"
+            HapticManager.shared.warning()
             return
         }
 
         // Get a hint from the hint service
         guard let hint = hintService.provideHint(for: gameState) else {
             errorMessage = "No hint available"
+            HapticManager.shared.warning()
             return
         }
 
@@ -904,6 +924,7 @@ final class GameViewModel: ObservableObject {
         // Check if there's anything to undo
         guard !undoStack.isEmpty else {
             errorMessage = "Nothing to undo"
+            HapticManager.shared.warning()
             return
         }
 
@@ -931,6 +952,7 @@ final class GameViewModel: ObservableObject {
         // Check if there's anything to redo
         guard !redoStack.isEmpty else {
             errorMessage = "Nothing to redo"
+            HapticManager.shared.warning()
             return
         }
 
