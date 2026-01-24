@@ -18,12 +18,16 @@ final class StatisticsManager: ObservableObject {
     /// Key for storing statistics in UserDefaults
     private let statisticsKey = "com.tennergrid.gameStatistics"
 
+    /// UserDefaults instance for persistence (allows injection for testing)
+    private let userDefaults: UserDefaults
+
     // MARK: - Initialization
 
     /// Private initializer to enforce singleton pattern
-    private init() {
+    private init(userDefaults: UserDefaults = .standard) {
+        self.userDefaults = userDefaults
         // Load statistics from UserDefaults or create new
-        self.statistics = StatisticsManager.loadStatistics() ?? GameStatistics()
+        self.statistics = StatisticsManager.loadStatistics(from: userDefaults) ?? GameStatistics()
     }
 
     // MARK: - Public Methods
@@ -203,7 +207,7 @@ final class StatisticsManager: ObservableObject {
         do {
             let encoder = JSONEncoder()
             let data = try encoder.encode(statistics)
-            UserDefaults.standard.set(data, forKey: statisticsKey)
+            userDefaults.set(data, forKey: statisticsKey)
         } catch {
             // swiftlint:disable:next no_print
             print("Failed to save statistics: \(error.localizedDescription)")
@@ -211,9 +215,10 @@ final class StatisticsManager: ObservableObject {
     }
 
     /// Loads statistics from UserDefaults
+    /// - Parameter userDefaults: UserDefaults instance to load from
     /// - Returns: GameStatistics if found and decoded successfully, nil otherwise
-    private static func loadStatistics() -> GameStatistics? {
-        guard let data = UserDefaults.standard.data(forKey: "com.tennergrid.gameStatistics") else {
+    private static func loadStatistics(from userDefaults: UserDefaults) -> GameStatistics? {
+        guard let data = userDefaults.data(forKey: "com.tennergrid.gameStatistics") else {
             return nil
         }
 
@@ -255,3 +260,38 @@ extension StatisticsManager {
         }
     }
 }
+
+// MARK: - Testing Support
+
+#if DEBUG
+    extension StatisticsManager {
+        /// Creates a test instance with custom UserDefaults
+        /// - Parameter userDefaults: Custom UserDefaults for testing
+        /// - Returns: New StatisticsManager instance for testing
+        static func test(userDefaults: UserDefaults) -> StatisticsManager {
+            StatisticsManager(userDefaults: userDefaults)
+        }
+
+        /// Records a game completion for testing
+        /// - Parameter gameState: Game state to record
+        func recordCompletion(gameState: GameState) {
+            statistics.recordGameCompleted(
+                difficulty: gameState.puzzle.difficulty,
+                time: gameState.elapsedTime,
+                hintsUsed: gameState.hintsUsed,
+                errors: gameState.errorCount
+            )
+            saveStatistics()
+        }
+
+        /// Updates the streak for testing
+        /// - Parameter newStreak: New streak value to set
+        func updateStreak(newStreak: Int) {
+            statistics.currentStreak = newStreak
+            if newStreak > statistics.longestStreak {
+                statistics.longestStreak = newStreak
+            }
+            saveStatistics()
+        }
+    }
+#endif

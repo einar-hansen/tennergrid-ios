@@ -14,16 +14,22 @@ final class AchievementManager: ObservableObject {
     /// Key for storing achievements in UserDefaults
     private let achievementsKey = "com.tennergrid.achievements"
 
+    /// UserDefaults instance for persistence (allows injection for testing)
+    private let userDefaults: UserDefaults
+
     /// Statistics manager for checking achievement conditions
     private let statisticsManager: StatisticsManager
 
     // MARK: - Initialization
 
     /// Private initializer to enforce singleton pattern
-    /// - Parameter statisticsManager: Statistics manager to use (defaults to shared instance)
-    private init(statisticsManager: StatisticsManager = .shared) {
+    /// - Parameters:
+    ///   - statisticsManager: Statistics manager to use (defaults to shared instance)
+    ///   - userDefaults: UserDefaults instance for persistence (defaults to standard)
+    private init(statisticsManager: StatisticsManager = .shared, userDefaults: UserDefaults = .standard) {
         self.statisticsManager = statisticsManager
-        self.achievements = AchievementManager.loadAchievements()
+        self.userDefaults = userDefaults
+        self.achievements = AchievementManager.loadAchievements(from: userDefaults)
     }
 
     // MARK: - Public Methods
@@ -223,7 +229,7 @@ final class AchievementManager: ObservableObject {
         do {
             let encoder = JSONEncoder()
             let data = try encoder.encode(achievements)
-            UserDefaults.standard.set(data, forKey: achievementsKey)
+            userDefaults.set(data, forKey: achievementsKey)
         } catch {
             // swiftlint:disable:next no_print
             print("Failed to save achievements: \(error.localizedDescription)")
@@ -231,9 +237,10 @@ final class AchievementManager: ObservableObject {
     }
 
     /// Loads achievements from UserDefaults
+    /// - Parameter userDefaults: UserDefaults instance to load from
     /// - Returns: Array of achievements, either loaded or default
-    private static func loadAchievements() -> [Achievement] {
-        guard let data = UserDefaults.standard.data(forKey: "com.tennergrid.achievements") else {
+    private static func loadAchievements(from userDefaults: UserDefaults) -> [Achievement] {
+        guard let data = userDefaults.data(forKey: "com.tennergrid.achievements") else {
             return Achievement.allAchievements
         }
 
@@ -266,11 +273,13 @@ final class AchievementManager: ObservableObject {
 
 #if DEBUG
     extension AchievementManager {
-        /// Creates a test instance with custom statistics manager
-        /// - Parameter statisticsManager: Custom statistics manager for testing
+        /// Creates a test instance with custom statistics manager and UserDefaults
+        /// - Parameters:
+        ///   - statisticsManager: Custom statistics manager for testing
+        ///   - userDefaults: Custom UserDefaults for testing
         /// - Returns: New AchievementManager instance
-        static func test(statisticsManager: StatisticsManager) -> AchievementManager {
-            AchievementManager(statisticsManager: statisticsManager)
+        static func test(statisticsManager: StatisticsManager, userDefaults: UserDefaults) -> AchievementManager {
+            AchievementManager(statisticsManager: statisticsManager, userDefaults: userDefaults)
         }
 
         /// Unlocks a specific achievement for testing
