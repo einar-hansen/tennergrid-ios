@@ -229,7 +229,7 @@ struct CellView: View {
             let columns = Int(geometry.size.width / spacing)
             let rows = Int(geometry.size.height / spacing)
 
-            Canvas { context, size in
+            Canvas { context, _ in
                 for row in 0 ..< rows {
                     for col in 0 ..< columns {
                         let x = CGFloat(col) * spacing + spacing / 2
