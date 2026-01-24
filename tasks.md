@@ -232,11 +232,11 @@
 
 ### 5.5 Profile/Me View
 
-- [ ] Create `ProfileView` with sections: Awards, Statistics, Settings
-- [ ] Add navigation to How to Play, Rules, Help, About
-- [ ] Add placeholder for Remove Ads (IAP will come later)
-- [ ] Add Restore Purchase button
-- [ ] Test all navigation from Me tab
+- [x] Create `ProfileView` with sections: Awards, Statistics, Settings
+- [x] Add navigation to How to Play, Rules, Help, About
+- [x] Add placeholder for Remove Ads (IAP will come later)
+- [x] Add Restore Purchase button
+- [x] Test all navigation from Me tab
 
 ---
 
