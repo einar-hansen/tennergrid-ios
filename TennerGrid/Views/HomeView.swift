@@ -170,7 +170,7 @@ struct HomeView: View {
     /// App title
     private var appTitle: some View {
         Text("Tenner Grid")
-            .font(.system(size: 48, weight: .bold, design: .rounded))
+            .font(.appTitle)
             .foregroundStyle(
                 LinearGradient(
                     colors: [
@@ -186,7 +186,7 @@ struct HomeView: View {
     /// App tagline
     private var appTagline: some View {
         Text("The Ultimate Number Puzzle")
-            .font(.system(size: 16, weight: .medium, design: .rounded))
+            .font(.appTagline)
             .foregroundColor(.secondary)
     }
 
@@ -197,10 +197,10 @@ struct HomeView: View {
         } label: {
             HStack {
                 Image(systemName: "plus.circle.fill")
-                    .font(.system(size: 20, weight: .semibold))
+                    .font(.buttonText)
 
                 Text("New Game")
-                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .font(.largeButtonText)
             }
             .foregroundColor(.white)
             .frame(maxWidth: .infinity)
@@ -234,7 +234,7 @@ struct HomeView: View {
                 .foregroundColor(.primary)
 
             Text("More features coming soon")
-                .font(.system(size: 14, weight: .regular, design: .rounded))
+                .font(.secondaryText)
                 .foregroundColor(.secondary)
         }
         .padding(.horizontal, 32)
@@ -300,13 +300,14 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Text("Progress")
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.secondaryText)
                     .foregroundColor(.secondary)
 
                 Spacer()
 
                 Text("\(Int(savedGame.progressPercentage))%")
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.secondaryText)
+                .fontWeight(.semibold)
                     .foregroundColor(.primary)
             }
 
@@ -336,7 +337,7 @@ struct HomeView: View {
                 .foregroundColor(.secondary)
 
             Text(formattedTime)
-                .font(.system(size: 14, weight: .medium))
+                .font(.secondaryText)
                 .foregroundColor(.secondary)
         }
     }
@@ -353,7 +354,7 @@ struct HomeView: View {
                 .foregroundColor(.secondary)
 
             Text("\(rows)x\(columns)")
-                .font(.system(size: 14, weight: .medium))
+                .font(.secondaryText)
                 .foregroundColor(.secondary)
         }
     }

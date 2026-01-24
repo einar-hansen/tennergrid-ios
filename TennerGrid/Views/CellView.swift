@@ -59,7 +59,7 @@ struct CellView: View {
             if let value = cell.value {
                 // Display number with animation
                 Text(String(value))
-                    .font(.system(size: fontSize, weight: textWeight, design: .rounded))
+                    .font(cell.isInitial ? .cellNumberBold(cellSize: cellSize) : .cellNumber(cellSize: cellSize))
                     .foregroundColor(textColor)
                     .scaleEffect(scale)
                     .opacity(opacity)
@@ -199,7 +199,7 @@ struct CellView: View {
     /// - Returns: View for the pencil mark
     private func pencilMarkCell(for number: Int, width: CGFloat, height: CGFloat) -> some View {
         Text(cell.pencilMarks.contains(number) ? String(number) : "")
-            .font(.system(size: pencilMarkFontSize, weight: .light, design: .rounded))
+            .font(.pencilMark(cellSize: cellSize))
             .foregroundColor(.secondary)
             .frame(width: width, height: height)
             .minimumScaleFactor(0.5)

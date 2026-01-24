@@ -37,7 +37,7 @@ struct GameHeaderView: View {
                 .frame(width: 10, height: 10)
 
             Text(viewModel.gameState.puzzle.difficulty.displayName)
-                .font(.system(size: 14, weight: .medium))
+                .font(.difficultyLabel)
                 .foregroundColor(.secondary)
         }
         .padding(.horizontal, 10)
@@ -55,11 +55,11 @@ struct GameHeaderView: View {
     private var timerDisplay: some View {
         HStack(spacing: 4) {
             Image(systemName: "clock")
-                .font(.system(size: 14, weight: .medium))
+                .font(.secondaryText)
                 .foregroundColor(timerColor)
 
             Text(viewModel.formattedTime)
-                .font(.system(size: 18, weight: .semibold, design: .monospaced))
+                .font(.timerText)
                 .foregroundColor(timerColor)
         }
         .accessibilityElement(children: .combine)

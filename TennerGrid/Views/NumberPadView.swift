@@ -58,7 +58,8 @@ struct NumberPadView: View {
 
                 // Number
                 Text(String(number))
-                    .font(.system(size: 24, weight: isSelected ? .bold : .medium, design: .rounded))
+                    .font(.numberPadButton)
+                    .fontWeight(isSelected ? .bold : .medium)
                     .foregroundColor(buttonTextColor(for: number))
 
                 // Conflict count badge
@@ -93,7 +94,7 @@ struct NumberPadView: View {
                 HStack {
                     Spacer()
                     Text("\(conflicts)")
-                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .font(.badgeText)
                         .foregroundColor(.white)
                         .frame(width: 16, height: 16)
                         .background(Circle().fill(Color.red))
