@@ -52,6 +52,14 @@ struct GameView: View {
             if viewModel.gameState.isPaused {
                 pauseOverlay
             }
+
+            // Achievement unlock notifications
+            AchievementUnlockNotificationContainer(
+                achievements: .init(
+                    get: { viewModel.newlyUnlockedAchievements },
+                    set: { _ in }
+                )
+            )
         }
         .modifier(KeyboardSupportModifier(viewModel: viewModel, isGameFocused: $isGameFocused))
         .onChange(of: viewModel.gameState.isCompleted) { isCompleted in
