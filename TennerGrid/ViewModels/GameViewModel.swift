@@ -73,6 +73,9 @@ final class GameViewModel: ObservableObject {
     /// Last time the timer was updated (for calculating elapsed intervals)
     private var lastTimerUpdate: Date?
 
+    /// Cancellables for Combine subscriptions
+    private var cancellables = Set<AnyCancellable>()
+
     // MARK: - Initialization
 
     /// Creates a new GameViewModel with the given game state
@@ -82,6 +85,9 @@ final class GameViewModel: ObservableObject {
         selectedPosition = gameState.selectedCell
         notesMode = gameState.notesMode
         elapsedTime = gameState.elapsedTime
+
+        // Set up settings observers
+        setupSettingsObservers()
 
         // Start timer if game is not paused or completed
         if !gameState.isPaused, !gameState.isCompleted {
@@ -98,6 +104,61 @@ final class GameViewModel: ObservableObject {
 
     deinit {
         timer?.invalidate()
+    }
+
+    // MARK: - Settings Observers
+
+    /// Sets up observers for settings changes from SettingsManager
+    /// This ensures the ViewModel stays in sync with user preferences
+    private func setupSettingsObservers() {
+        // Observe settings changes from SettingsManager
+        SettingsManager.shared.$settings
+            .sink { [weak self] settings in
+                self?.handleSettingsChange(settings)
+            }
+            .store(in: &cancellables)
+    }
+
+    /// Handles changes to user settings
+    /// - Parameter settings: The updated settings
+    private func handleSettingsChange(_ settings: UserSettings) {
+        // Update auto-check errors
+        // When this changes, we need to update conflict display
+        // Note: We update UserDefaults to keep @AppStorage in sync
+        if autoCheckErrors != settings.autoCheckErrors {
+            UserDefaults.standard.set(settings.autoCheckErrors, forKey: "autoCheckErrors")
+            if settings.autoCheckErrors {
+                // Re-check for conflicts if auto-check is now enabled
+                updateConflicts()
+            } else {
+                // Clear conflicts if auto-check is now disabled
+                conflictingPositions.removeAll()
+            }
+        }
+
+        // Update show timer setting
+        // The UI will respond to this change automatically via @AppStorage
+        if showTimer != settings.showTimer {
+            UserDefaults.standard.set(settings.showTimer, forKey: "showTimer")
+        }
+
+        // Update highlight same numbers
+        // This affects the cell highlighting logic
+        if highlightSameNumbers != settings.highlightSameNumbers {
+            UserDefaults.standard.set(settings.highlightSameNumbers, forKey: "highlightSameNumbers")
+            // Trigger a refresh of cached positions to update highlighting
+            updateCachedPositions(for: selectedPosition)
+        }
+
+        // Update haptic feedback setting
+        if hapticFeedback != settings.hapticFeedback {
+            UserDefaults.standard.set(settings.hapticFeedback, forKey: "hapticFeedback")
+        }
+
+        // Update sound effects setting
+        if soundEffects != settings.soundEffects {
+            UserDefaults.standard.set(settings.soundEffects, forKey: "soundEffects")
+        }
     }
 
     // MARK: - Cell Selection
@@ -480,7 +541,14 @@ final class GameViewModel: ObservableObject {
     // MARK: - Validation
 
     /// Updates the set of conflicting positions based on current grid state
+    /// Only displays conflicts if auto-check errors setting is enabled
     private func updateConflicts() {
+        // Only show conflicts if auto-check is enabled
+        guard autoCheckErrors else {
+            conflictingPositions.removeAll()
+            return
+        }
+
         var allConflicts = Set<CellPosition>()
 
         for row in 0 ..< gameState.puzzle.rows {
@@ -985,11 +1053,15 @@ final class GameViewModel: ObservableObject {
     }
 
     /// Determines if a cell should be marked as "same number" (matching the selected cell's value)
+    /// Only applies highlighting if the highlightSameNumbers setting is enabled
     /// - Parameters:
     ///   - position: The position to check
     ///   - value: The value at this position
     /// - Returns: True if the cell has the same value as the selected cell
     private func shouldMarkAsSameNumber(position: CellPosition, value: Int?) -> Bool {
+        // Only highlight same numbers if setting is enabled
+        guard highlightSameNumbers else { return false }
+
         guard let selected = selectedPosition,
               let selectedValue = gameState.currentGrid[selected.row][selected.column],
               let currentValue = value,

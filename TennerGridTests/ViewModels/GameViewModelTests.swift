@@ -44,6 +44,16 @@ final class GameViewModelTests: XCTestCase {
     override func tearDown() {
         viewModel = nil
         puzzle = nil
+
+        // Reset settings to defaults for other tests
+        var settings = UserSettings.default
+        settings.autoCheckErrors = true
+        settings.showTimer = true
+        settings.highlightSameNumbers = true
+        settings.hapticFeedback = true
+        settings.soundEffects = true
+        SettingsManager.shared.updateSettings(settings)
+
         super.tearDown()
     }
 
@@ -2777,5 +2787,237 @@ final class GameViewModelTests: XCTestCase {
         for number in 8 ... 9 {
             XCTAssertTrue(viewModel.wouldExceedColumnSum(number, at: position))
         }
+    }
+
+    // MARK: - Settings Observer Tests
+
+    /// Tests that autoCheckErrors setting observer updates conflicts
+    func testSettingsObserver_AutoCheckErrors_EnablesConflictDisplay() {
+        // Create an invalid placement to generate conflicts
+        let position = CellPosition(row: 0, column: 1)
+        viewModel.selectCell(at: position)
+
+        // Try to enter 2 (conflicts with pre-filled 2 at (0,0))
+        viewModel.enterNumber(2)
+
+        // Should have conflicts
+        XCTAssertFalse(viewModel.conflictingPositions.isEmpty, "Should have conflicts when autoCheckErrors is on")
+
+        // Disable autoCheckErrors via SettingsManager
+        var settings = SettingsManager.shared.settings
+        settings.autoCheckErrors = false
+        SettingsManager.shared.updateSettings(settings)
+
+        // Wait briefly for the observer to fire
+        let expectation = XCTestExpectation(description: "Settings observer should update")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
+
+        // Conflicts should be cleared
+        XCTAssertTrue(viewModel.conflictingPositions.isEmpty, "Conflicts should be cleared when autoCheckErrors is off")
+        XCTAssertFalse(viewModel.autoCheckErrors)
+    }
+
+    /// Tests that autoCheckErrors setting observer re-enables conflict detection
+    func testSettingsObserver_AutoCheckErrors_ReEnablesConflictDetection() {
+        // Disable autoCheckErrors initially
+        var settings = SettingsManager.shared.settings
+        settings.autoCheckErrors = false
+        SettingsManager.shared.updateSettings(settings)
+
+        // Wait briefly for the observer to fire
+        var expectation = XCTestExpectation(description: "Settings observer should update")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
+
+        // Place a valid number
+        let position = CellPosition(row: 0, column: 1)
+        viewModel.selectCell(at: position)
+        viewModel.enterNumber(7)
+
+        // Should have no conflicts
+        XCTAssertTrue(viewModel.conflictingPositions.isEmpty)
+
+        // Re-enable autoCheckErrors
+        settings.autoCheckErrors = true
+        SettingsManager.shared.updateSettings(settings)
+
+        // Wait for observer
+        expectation = XCTestExpectation(description: "Settings observer should update")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
+
+        // Should re-check for conflicts (but won't find any since 7 is valid)
+        XCTAssertTrue(viewModel.autoCheckErrors)
+    }
+
+    /// Tests that highlightSameNumbers setting observer updates highlighting
+    func testSettingsObserver_HighlightSameNumbers_UpdatesHighlighting() {
+        // Place the same number in two cells
+        let position1 = CellPosition(row: 0, column: 1)
+        let position2 = CellPosition(row: 2, column: 4)
+
+        viewModel.selectCell(at: position1)
+        viewModel.enterNumber(3)
+
+        viewModel.selectCell(at: position2)
+        viewModel.enterNumber(3)
+
+        // Select first cell and check second is highlighted as same number
+        viewModel.selectCell(at: position1)
+        XCTAssertTrue(viewModel.cell(at: position2).isSameNumber)
+
+        // Disable highlightSameNumbers via SettingsManager
+        var settings = SettingsManager.shared.settings
+        settings.highlightSameNumbers = false
+        SettingsManager.shared.updateSettings(settings)
+
+        // Wait for observer
+        let expectation = XCTestExpectation(description: "Settings observer should update")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
+
+        // Trigger a refresh by changing selection
+        viewModel.selectCell(at: nil)
+        viewModel.selectCell(at: position1)
+
+        // Should no longer highlight same numbers
+        XCTAssertFalse(viewModel.highlightSameNumbers)
+        XCTAssertFalse(viewModel.cell(at: position2).isSameNumber)
+    }
+
+    /// Tests that showTimer setting observer syncs correctly
+    func testSettingsObserver_ShowTimer_SyncsWithViewModel() {
+        // Initial value should be true (default)
+        XCTAssertTrue(viewModel.showTimer)
+
+        // Update via SettingsManager
+        var settings = SettingsManager.shared.settings
+        settings.showTimer = false
+        SettingsManager.shared.updateSettings(settings)
+
+        // Wait for observer
+        let expectation = XCTestExpectation(description: "Settings observer should update")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
+
+        // ViewModel should sync
+        XCTAssertFalse(viewModel.showTimer)
+    }
+
+    /// Tests that hapticFeedback setting observer syncs correctly
+    func testSettingsObserver_HapticFeedback_SyncsWithViewModel() {
+        // Initial value should be true (default)
+        XCTAssertTrue(viewModel.hapticFeedback)
+
+        // Update via SettingsManager
+        var settings = SettingsManager.shared.settings
+        settings.hapticFeedback = false
+        SettingsManager.shared.updateSettings(settings)
+
+        // Wait for observer
+        let expectation = XCTestExpectation(description: "Settings observer should update")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
+
+        // ViewModel should sync
+        XCTAssertFalse(viewModel.hapticFeedback)
+    }
+
+    /// Tests that soundEffects setting observer syncs correctly
+    func testSettingsObserver_SoundEffects_SyncsWithViewModel() {
+        // Initial value should be true (default)
+        XCTAssertTrue(viewModel.soundEffects)
+
+        // Update via SettingsManager
+        var settings = SettingsManager.shared.settings
+        settings.soundEffects = false
+        SettingsManager.shared.updateSettings(settings)
+
+        // Wait for observer
+        let expectation = XCTestExpectation(description: "Settings observer should update")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
+
+        // ViewModel should sync
+        XCTAssertFalse(viewModel.soundEffects)
+    }
+
+    /// Tests that multiple settings changes are handled correctly
+    func testSettingsObserver_MultipleChanges_AllSync() {
+        // Update multiple settings at once
+        var settings = SettingsManager.shared.settings
+        settings.autoCheckErrors = false
+        settings.showTimer = false
+        settings.highlightSameNumbers = false
+        settings.hapticFeedback = false
+        settings.soundEffects = false
+        SettingsManager.shared.updateSettings(settings)
+
+        // Wait for observer
+        let expectation = XCTestExpectation(description: "Settings observer should update")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
+
+        // All should be synced
+        XCTAssertFalse(viewModel.autoCheckErrors)
+        XCTAssertFalse(viewModel.showTimer)
+        XCTAssertFalse(viewModel.highlightSameNumbers)
+        XCTAssertFalse(viewModel.hapticFeedback)
+        XCTAssertFalse(viewModel.soundEffects)
+
+        // Conflicts should be cleared
+        XCTAssertTrue(viewModel.conflictingPositions.isEmpty)
+    }
+
+    /// Tests that settings persist across ViewModel instances
+    func testSettingsObserver_PersistsAcrossViewModels() {
+        // Update settings
+        var settings = SettingsManager.shared.settings
+        settings.autoCheckErrors = false
+        settings.highlightSameNumbers = false
+        SettingsManager.shared.updateSettings(settings)
+
+        // Wait for observer on first view model
+        var expectation = XCTestExpectation(description: "Settings observer should update")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
+
+        // Create a new ViewModel
+        let newViewModel = GameViewModel(puzzle: puzzle)
+
+        // Wait for observer on new view model
+        expectation = XCTestExpectation(description: "Settings observer should update")
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            expectation.fulfill()
+        }
+        wait(for: [expectation], timeout: 1.0)
+
+        // New ViewModel should have the updated settings
+        XCTAssertFalse(newViewModel.autoCheckErrors)
+        XCTAssertFalse(newViewModel.highlightSameNumbers)
+
+        // Reset settings for other tests
+        settings.autoCheckErrors = true
+        settings.highlightSameNumbers = true
+        SettingsManager.shared.updateSettings(settings)
     }
 }
