@@ -281,11 +281,11 @@
 ### 7.3 First Launch Tutorial
 
 - [x] Create `OnboardingView` with 3-5 page carousel
-- [ ] Page 1: Welcome and game overview
-- [ ] Page 2: Basic rules with visuals
-- [ ] Page 3: How to play (controls)
-- [ ] Add "Skip" and "Get Started" buttons
-- [ ] Show only on first launch (use UserDefaults flag)
+- [x] Page 1: Welcome and game overview
+- [x] Page 2: Basic rules with visuals
+- [x] Page 3: How to play (controls)
+- [x] Add "Skip" and "Get Started" buttons
+- [x] Show only on first launch (use UserDefaults flag)
 
 ---
 
