@@ -21,6 +21,9 @@ struct ContentView: View {
     /// Custom game configuration (difficulty and rows)
     @State private var customGameConfig: (difficulty: Difficulty, rows: Int)?
 
+    /// Flag to track if we've attempted to load a saved game
+    @State private var hasAttemptedToLoadSavedGame = false
+
     // MARK: - Body
 
     var body: some View {
@@ -64,6 +67,10 @@ struct ContentView: View {
                     startNewGame(with: difficulty)
                 }
             }
+        }
+        .onAppear {
+            // Load saved game on first appearance
+            loadSavedGameIfPresent()
         }
     }
 
@@ -123,6 +130,47 @@ struct ContentView: View {
             return
         }
         gameViewModel = GameViewModel(puzzle: puzzle)
+    }
+
+    // MARK: - Saved Game Loading
+
+    /// Attempts to load a saved game from disk on app launch
+    /// Only runs once per app session to avoid interfering with user navigation
+    private func loadSavedGameIfPresent() {
+        // Only attempt to load once
+        guard !hasAttemptedToLoadSavedGame else { return }
+        hasAttemptedToLoadSavedGame = true
+
+        // Don't load if user is already in a game
+        guard gameViewModel == nil else { return }
+
+        // Try to load saved game from PersistenceManager
+        do {
+            if let savedGameState = try PersistenceManager.shared.loadGame() {
+                // Only restore if the game is not completed
+                guard !savedGameState.isCompleted else {
+                    // Clean up completed game
+                    try? PersistenceManager.shared.deleteSavedGame()
+                    return
+                }
+
+                // Restore the game
+                gameViewModel = GameViewModel(gameState: savedGameState)
+            }
+        } catch {
+            // If loading fails, silently continue - the user can still start a new game
+            // Log error for debugging in debug builds only
+            #if DEBUG
+                NSLog("Failed to load saved game: \(error)")
+            #endif
+
+            // If the data is corrupted, delete it to prevent future errors
+            if let persistenceError = error as? PersistenceError,
+               case .corruptedData = persistenceError
+            {
+                try? PersistenceManager.shared.deleteSavedGame()
+            }
+        }
     }
 }
 
