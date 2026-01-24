@@ -21,6 +21,9 @@ struct CellView: View {
     /// Opacity for number entry animation
     @State private var opacity: Double = 1.0
 
+    /// Horizontal offset for error shake animation
+    @State private var shakeOffset: CGFloat = 0
+
     // MARK: - Constants
 
     private let borderWidth: CGFloat = 1
@@ -65,6 +68,7 @@ struct CellView: View {
         .frame(width: cellSize, height: cellSize)
         .fixedSize()
         .contentShape(Rectangle())
+        .offset(x: shakeOffset, y: 0)
         .onTapGesture {
             onTap()
         }
@@ -72,6 +76,12 @@ struct CellView: View {
             // Only animate when a number is entered (not when cleared or for initial values)
             if newValue != nil, !cell.isInitial {
                 playNumberEntryAnimation()
+            }
+        }
+        .onChange(of: cell.hasError) { hasError in
+            // Trigger shake animation when an error occurs
+            if hasError {
+                playErrorShakeAnimation()
             }
         }
     }
@@ -88,6 +98,42 @@ struct CellView: View {
         withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
             scale = 1.0
             opacity = 1.0
+        }
+    }
+
+    /// Plays the error shake animation (horizontal shake)
+    private func playErrorShakeAnimation() {
+        // Reset shake offset
+        shakeOffset = 0
+
+        // Create a sequence of shake movements
+        let shakeDistance: CGFloat = 8
+        let shakeDuration = 0.08
+
+        // Shake right
+        withAnimation(.easeInOut(duration: shakeDuration)) {
+            shakeOffset = shakeDistance
+        }
+
+        // Shake left (after first shake completes)
+        DispatchQueue.main.asyncAfter(deadline: .now() + shakeDuration) {
+            withAnimation(.easeInOut(duration: shakeDuration)) {
+                shakeOffset = -shakeDistance
+            }
+        }
+
+        // Shake right again
+        DispatchQueue.main.asyncAfter(deadline: .now() + shakeDuration * 2) {
+            withAnimation(.easeInOut(duration: shakeDuration)) {
+                shakeOffset = shakeDistance / 2
+            }
+        }
+
+        // Return to center
+        DispatchQueue.main.asyncAfter(deadline: .now() + shakeDuration * 3) {
+            withAnimation(.easeInOut(duration: shakeDuration)) {
+                shakeOffset = 0
+            }
         }
     }
 
