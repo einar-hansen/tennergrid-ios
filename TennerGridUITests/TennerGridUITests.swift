@@ -504,7 +504,7 @@ final class TennerGridUITests: XCTestCase {
         XCTAssertTrue(app.state == .runningForeground, "App should still be running in foreground")
 
         // Check that content is still visible (more lenient check)
-        let hasVisibleContent = app.buttons.count > 0 || app.staticTexts.count > 0 || app.images.count > 0
+        let hasVisibleContent = app.buttons.count > 0 || !app.staticTexts.isEmpty || !app.images.isEmpty
         XCTAssertTrue(hasVisibleContent, "UI should have visible content after theme change")
     }
 
@@ -555,8 +555,8 @@ final class TennerGridUITests: XCTestCase {
 
         // Wait for any element to appear, confirming the app launched
         let appLaunched = app.buttons.firstMatch.waitForExistence(timeout: 20) ||
-                         app.staticTexts.firstMatch.waitForExistence(timeout: 5) ||
-                         app.tabBars.firstMatch.waitForExistence(timeout: 5)
+            app.staticTexts.firstMatch.waitForExistence(timeout: 5) ||
+            app.tabBars.firstMatch.waitForExistence(timeout: 5)
 
         XCTAssertTrue(appLaunched, "App should launch successfully and display UI elements")
 
@@ -564,7 +564,7 @@ final class TennerGridUITests: XCTestCase {
         // This is a smoke test to ensure accessibility isn't completely broken
 
         // Check for any accessible buttons (there should be many)
-        XCTAssertTrue(app.buttons.count > 0, "App should have accessible buttons")
+        XCTAssertTrue(!app.buttons.isEmpty, "App should have accessible buttons")
 
         // Check for tab bar (core navigation)
         let hasTabBar = app.tabBars.count > 0
@@ -658,7 +658,7 @@ final class TennerGridUITests: XCTestCase {
 
         // Verify timer is accessible (should have label showing time)
         let timerElements = app.staticTexts.matching(NSPredicate(format: "label MATCHES %@", "\\d{2}:\\d{2}"))
-        XCTAssertTrue(timerElements.count > 0, "Timer should be accessible and display time")
+        XCTAssertTrue(!timerElements.isEmpty, "Timer should be accessible and display time")
 
         // Test Grid Accessibility
         let grid = app.otherElements["GameGrid"]
@@ -711,14 +711,14 @@ final class TennerGridUITests: XCTestCase {
 
         // Try to find an empty, editable cell
         var selectedCell: XCUIElement?
-        let maxCellsToCheck = min(cellCount, 30)  // Increased from 20 to 30
+        let maxCellsToCheck = min(cellCount, 30) // Increased from 20 to 30
 
-        for index in 0..<maxCellsToCheck {
+        for index in 0 ..< maxCellsToCheck {
             let cell = cells.element(boundBy: index)
-            if cell.exists && cell.isHittable {
+            if cell.exists, cell.isHittable {
                 // Check if cell is not pre-filled (pre-filled cells have "Pre-filled" in value)
                 if let value = cell.value as? String {
-                    if !value.contains("Pre-filled") && !value.contains("pre-filled") {
+                    if !value.contains("Pre-filled"), !value.contains("pre-filled") {
                         selectedCell = cell
                         break
                     }
@@ -893,10 +893,10 @@ final class TennerGridUITests: XCTestCase {
 
         // Verify settings toggles have accessibility labels
         let switches = app.switches
-        XCTAssertTrue(switches.count > 0, "Settings should contain accessible toggle switches")
+        XCTAssertTrue(!switches.isEmpty, "Settings should contain accessible toggle switches")
 
         // Each switch should have a label
-        for index in 0..<min(switches.count, 10) {
+        for index in 0 ..< min(switches.count, 10) {
             // Limit to first 10 switches
             let toggle = switches.allElementsBoundByIndex[index]
             if toggle.exists {
@@ -917,7 +917,7 @@ final class TennerGridUITests: XCTestCase {
         let themeButtons = app.buttons.matching(
             NSPredicate(format: "label CONTAINS 'Light' OR label CONTAINS 'Dark' OR label CONTAINS 'System'")
         )
-        for index in 0..<themeButtons.count {
+        for index in 0 ..< themeButtons.count {
             let themeButton = themeButtons.allElementsBoundByIndex[index]
             if themeButton.exists {
                 XCTAssertNotNil(themeButton.label, "Theme button should have accessibility label")
