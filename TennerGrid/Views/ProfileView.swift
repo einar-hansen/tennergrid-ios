@@ -60,7 +60,7 @@ struct ProfileView: View {
     private var statisticsSection: some View {
         Section {
             NavigationLink {
-                statisticsPlaceholder
+                StatisticsView()
             } label: {
                 HStack(spacing: 12) {
                     sectionIcon("chart.bar.fill", color: .blue)
