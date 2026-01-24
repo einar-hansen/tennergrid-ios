@@ -366,7 +366,7 @@
 ### 10.2 Haptic Feedback
 
 - [x] Create `HapticManager` service with feedback methods
-- [ ] Add haptics for cell selection (light impact)
+- [x] Add haptics for cell selection (light impact)
 - [ ] Add haptics for number entry (medium impact)
 - [ ] Add haptics for errors (notification warning)
 - [ ] Add haptics for puzzle completion (notification success)
