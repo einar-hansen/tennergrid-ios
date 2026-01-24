@@ -56,7 +56,7 @@ struct PauseMenuView: View {
 
     /// Semi-transparent background with blur
     private var backgroundBlur: some View {
-        Color.black.opacity(0.5)
+        Color.themeOverlayBackground
             .ignoresSafeArea()
             .blur(radius: 2)
     }
@@ -243,7 +243,7 @@ struct PauseMenuView: View {
 #Preview("Pause Menu") {
     ZStack {
         // Mock game background
-        Color.gray.opacity(0.3)
+        Color.themeBackground
             .ignoresSafeArea()
 
         PauseMenuView(
@@ -258,7 +258,7 @@ struct PauseMenuView: View {
 
 #Preview("Pause Menu - Dark Mode") {
     ZStack {
-        Color.black
+        Color.themeBackground
             .ignoresSafeArea()
 
         PauseMenuView(

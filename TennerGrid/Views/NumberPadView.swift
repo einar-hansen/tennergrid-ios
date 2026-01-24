@@ -140,7 +140,7 @@ struct NumberPadView: View {
     /// - Returns: The background color
     private func buttonBackgroundColor(for number: Int) -> Color {
         guard let selected = viewModel.selectedPosition else {
-            return Color.gray.opacity(0.1)
+            return Color.themeButtonSecondary
         }
 
         // Highlight if this is the currently selected cell's value
@@ -156,7 +156,7 @@ struct NumberPadView: View {
             return Color.red.opacity(0.1)
         }
 
-        return Color.gray.opacity(0.1)
+        return Color.themeButtonSecondary
     }
 
     /// Border color for a number button
@@ -164,7 +164,7 @@ struct NumberPadView: View {
     /// - Returns: The border color
     private func buttonBorderColor(for number: Int) -> Color {
         guard let selected = viewModel.selectedPosition else {
-            return Color.gray.opacity(0.3)
+            return Color.themeBorderColor
         }
 
         // Highlight if this is the currently selected cell's value
@@ -180,7 +180,7 @@ struct NumberPadView: View {
             return Color.red.opacity(0.5)
         }
 
-        return Color.gray.opacity(0.3)
+        return Color.themeBorderColor
     }
 
     /// Text color for a number button

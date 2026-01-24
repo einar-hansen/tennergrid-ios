@@ -165,7 +165,7 @@ struct GridView: View {
         } else if isComplete, !isValid {
             Color.red.opacity(0.1)
         } else {
-            Color.gray.opacity(0.05)
+            Color.themeTertiaryBackground
         }
     }
 }

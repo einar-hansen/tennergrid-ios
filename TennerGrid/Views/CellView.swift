@@ -221,8 +221,8 @@ struct CellView: View {
             // Highlighted state: subtle blue tint for related cells (e.g., same row/column)
             Color.blue.opacity(0.08)
         } else if cell.isInitial {
-            // Initial/pre-filled state: light gray to distinguish from user entries
-            Color.gray.opacity(0.1)
+            // Initial/pre-filled state: subtle background to distinguish from user entries
+            Color.themeCellInitialBackground
         } else {
             // Empty/default state: clear background
             Color.clear
@@ -238,8 +238,8 @@ struct CellView: View {
             // Selected state: blue border
             .blue
         } else {
-            // Default state: subtle gray border
-            Color.gray.opacity(0.3)
+            // Default state: subtle border
+            Color.themeBorderColor
         }
     }
 

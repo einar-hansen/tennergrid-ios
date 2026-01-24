@@ -44,7 +44,7 @@ struct GameHeaderView: View {
         .padding(.vertical, 6)
         .background(
             Capsule()
-                .fill(Color.gray.opacity(0.1))
+                .fill(Color.themeButtonSecondary)
         )
     }
 
@@ -78,7 +78,7 @@ struct GameHeaderView: View {
                 .frame(width: 36, height: 36)
                 .background(
                     Circle()
-                        .fill(Color.gray.opacity(0.1))
+                        .fill(Color.themeButtonSecondary)
                 )
         }
         .buttonStyle(.plain)
@@ -96,7 +96,7 @@ struct GameHeaderView: View {
                 .frame(width: 36, height: 36)
                 .background(
                     Circle()
-                        .fill(Color.gray.opacity(0.1))
+                        .fill(Color.themeButtonSecondary)
                 )
         }
         .buttonStyle(.plain)

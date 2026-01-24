@@ -169,7 +169,7 @@ private struct ToolbarButton: View {
             .padding(.vertical, 1)
             .background(
                 Capsule()
-                    .fill(isActive ? Color.blue.opacity(0.15) : Color.gray.opacity(0.15))
+                    .fill(isActive ? Color.blue.opacity(0.15) : Color.themeButtonSecondary)
             )
     }
 
