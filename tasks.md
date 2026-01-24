@@ -348,7 +348,7 @@
 - [x] Implement auto-save in GameViewModel when app backgrounds
 - [x] Add save on significant game state changes
 - [x] Load saved game on app launch if present
-- [ ] Test save/load by force-quitting app
+- [x] Test save/load by force-quitting app
 - [ ] Handle corrupted save files gracefully
 
 ---
