@@ -24,6 +24,9 @@ struct CellView: View {
     /// Horizontal offset for error shake animation
     @State private var shakeOffset: CGFloat = 0
 
+    /// Scale factor for selection bounce animation
+    @State private var selectionScale: CGFloat = 1.0
+
     // MARK: - Constants
 
     private let borderWidth: CGFloat = 1
@@ -68,6 +71,7 @@ struct CellView: View {
         .frame(width: cellSize, height: cellSize)
         .fixedSize()
         .contentShape(Rectangle())
+        .scaleEffect(selectionScale)
         .offset(x: shakeOffset, y: 0)
         .onTapGesture {
             onTap()
@@ -82,6 +86,12 @@ struct CellView: View {
             // Trigger shake animation when an error occurs
             if hasError {
                 playErrorShakeAnimation()
+            }
+        }
+        .onChange(of: cell.isSelected) { isSelected in
+            // Trigger bounce animation when cell is selected
+            if isSelected {
+                playSelectionBounceAnimation()
             }
         }
     }
@@ -134,6 +144,17 @@ struct CellView: View {
             withAnimation(.easeInOut(duration: shakeDuration)) {
                 shakeOffset = 0
             }
+        }
+    }
+
+    /// Plays the selection bounce animation (scale effect with spring)
+    private func playSelectionBounceAnimation() {
+        // Start with slightly larger scale
+        selectionScale = 1.15
+
+        // Bounce back to normal with spring animation
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.5)) {
+            selectionScale = 1.0
         }
     }
 
