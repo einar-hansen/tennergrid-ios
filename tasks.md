@@ -383,7 +383,7 @@
 
 - [x] Define dark mode color palette in Assets
 - [x] Test all screens in dark mode
-- [ ] Ensure sufficient contrast for accessibility
+- [x] Ensure sufficient contrast for accessibility
 - [ ] Fix any color/visibility issues
 - [ ] Test dynamic switching between light/dark
 
