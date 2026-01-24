@@ -21,3 +21,4 @@ https://sudoku.one/renban
 Easy = 55%
 Medium = 45%
 Hard = 35%
+Extreme = 25%
