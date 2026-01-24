@@ -104,7 +104,7 @@ struct DynamicTypeSizeComparison<Content: View>: View {
                     .font(.headline)
                     .padding(.horizontal)
 
-                ForEach(Array(sizes.enumerated()), id: \.offset) { index, size in
+                ForEach(Array(sizes.enumerated()), id: \.offset) { _, size in
                     VStack(alignment: .leading, spacing: 8) {
                         Text(sizeLabel(for: size))
                             .font(.caption)
