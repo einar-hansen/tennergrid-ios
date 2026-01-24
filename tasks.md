@@ -360,7 +360,7 @@
 - [x] Add number entry animation (scale + fade in)
 - [x] Add error shake animation for invalid moves
 - [x] Add cell selection bounce animation
-- [ ] Add smooth transitions between screens
+- [x] Add smooth transitions between screens
 - [ ] Add win celebration confetti or particle effect
 
 ### 10.2 Haptic Feedback
