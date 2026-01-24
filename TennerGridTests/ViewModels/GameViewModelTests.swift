@@ -13,6 +13,15 @@ final class GameViewModelTests: XCTestCase {
     override func setUp() {
         super.setUp()
 
+        // Reset settings to defaults before each test to ensure consistent state
+        var settings = UserSettings.default
+        settings.autoCheckErrors = true
+        settings.showTimer = true
+        settings.highlightSameNumbers = true
+        settings.hapticFeedback = true
+        settings.soundEffects = true
+        SettingsManager.shared.updateSettings(settings)
+
         // Use the static easy puzzle from TestFixtures (known to be valid)
         // This puzzle has 10 columns (required for Tenner Grid) and 3 rows
         //

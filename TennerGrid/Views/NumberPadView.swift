@@ -75,6 +75,7 @@ struct NumberPadView: View {
         }
         .buttonStyle(.plain)
         .disabled(isNumberDisabled(for: number))
+        .accessibilityIdentifier("NumberButton_\(number)")
         .accessibilityLabel("Number \(number)")
         .accessibilityValue(numberAccessibilityValue(for: number))
         .accessibilityHint(numberAccessibilityHint(for: number))
