@@ -349,7 +349,7 @@
 - [x] Add save on significant game state changes
 - [x] Load saved game on app launch if present
 - [x] Test save/load by force-quitting app
-- [ ] Handle corrupted save files gracefully
+- [x] Handle corrupted save files gracefully
 
 ---
 
