@@ -357,7 +357,7 @@
 
 ### 10.1 Animations
 
-- [ ] Add number entry animation (scale + fade in)
+- [x] Add number entry animation (scale + fade in)
 - [ ] Add error shake animation for invalid moves
 - [ ] Add cell selection bounce animation
 - [ ] Add smooth transitions between screens
