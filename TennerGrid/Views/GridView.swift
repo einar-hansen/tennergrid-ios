@@ -1,19 +1,41 @@
 import SwiftUI
 
 /// A view displaying the complete Tenner Grid puzzle
-// swiftlint:disable:next swiftui_view_body
 struct GridView: View {
     // MARK: - Properties
 
     /// The current game state
     @ObservedObject var viewModel: GameViewModel
 
+    // MARK: - Environment
+
+    /// Size class to detect iPad vs iPhone
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
+    @Environment(\.verticalSizeClass) private var verticalSizeClass
+
     // MARK: - Constants
 
-    private let rowSpacing: CGFloat = 2
+    /// Row spacing - slightly larger on iPad for better visual separation
+    private var rowSpacing: CGFloat {
+        isIPad ? 3 : 2
+    }
+
     private let columnSpacing: CGFloat = 0
-    private let columnSumHeight: CGFloat = 40
-    private let gridPadding: CGFloat = 16
+
+    /// Column sum display height - larger on iPad for better readability
+    private var columnSumHeight: CGFloat {
+        isIPad ? 50 : 40
+    }
+
+    /// Grid padding - larger on iPad to make better use of screen space
+    private var gridPadding: CGFloat {
+        isIPad ? 24 : 16
+    }
+
+    /// Check if running on iPad based on size classes
+    private var isIPad: Bool {
+        horizontalSizeClass == .regular && verticalSizeClass == .regular
+    }
 
     // MARK: - Body
 
@@ -75,17 +97,17 @@ struct GridView: View {
         let isComplete = viewModel.isColumnComplete(column)
         let isValid = currentSum == targetSum
 
-        return VStack(spacing: 4) {
+        return VStack(spacing: isIPad ? 6 : 4) {
             // Current sum (if any values filled)
             if currentSum > 0 {
                 Text(String(currentSum))
-                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                    .font(.system(size: isIPad ? 18 : 14, weight: .medium, design: .rounded))
                     .foregroundColor(sumColor(isComplete: isComplete, isValid: isValid))
             }
 
             // Target sum
             Text(String(targetSum))
-                .font(.system(size: 18, weight: .bold, design: .rounded))
+                .font(.system(size: isIPad ? 24 : 18, weight: .bold, design: .rounded))
                 .foregroundColor(.primary)
         }
         .frame(width: cellSize)
@@ -122,8 +144,12 @@ struct GridView: View {
         let totalSpacing = columnSpacing * CGFloat(columnCount - 1)
         let cellSize = (availableWidth - totalSpacing) / CGFloat(columnCount)
 
-        // Return the calculated size, with a minimum of 30 and maximum of 60
-        return min(max(cellSize, 30), 60)
+        // iPad gets larger cells for better visibility and easier tapping
+        let minSize: CGFloat = isIPad ? 40 : 30
+        let maxSize: CGFloat = isIPad ? 85 : 60
+
+        // Return the calculated size, clamped to device-appropriate bounds
+        return min(max(cellSize, minSize), maxSize)
     }
 
     /// Total number of cells in the grid
