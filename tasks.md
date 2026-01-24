@@ -345,7 +345,7 @@
 
 ### 9.3 Auto-Save
 
-- [ ] Implement auto-save in GameViewModel when app backgrounds
+- [x] Implement auto-save in GameViewModel when app backgrounds
 - [ ] Add save on significant game state changes
 - [ ] Load saved game on app launch if present
 - [ ] Test save/load by force-quitting app

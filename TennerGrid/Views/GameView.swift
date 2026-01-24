@@ -7,6 +7,9 @@ struct GameView: View {
     /// The view model managing game state
     @StateObject private var viewModel: GameViewModel
 
+    /// Scene phase for detecting app backgrounding
+    @Environment(\.scenePhase) private var scenePhase
+
     /// Whether the pause menu is showing
     @State private var showingPauseMenu = false
 
@@ -75,6 +78,7 @@ struct GameView: View {
         .sheet(isPresented: $showingWinScreen) {
             winScreenPlaceholder
         }
+        .modifier(ScenePhaseModifier(scenePhase: scenePhase, viewModel: viewModel))
     }
 
     // MARK: - Subviews
@@ -259,6 +263,44 @@ struct GameView: View {
     /// Triggers navigation back to home
     private func handleQuit() {
         onQuit?()
+    }
+}
+
+// MARK: - Scene Phase Modifier
+
+/// A view modifier that handles app backgrounding/foregrounding
+private struct ScenePhaseModifier: ViewModifier {
+    let scenePhase: ScenePhase
+    @ObservedObject var viewModel: GameViewModel
+
+    @State private var previousPhase: ScenePhase = .active
+
+    func body(content: Content) -> some View {
+        content
+            .onChange(of: scenePhase) { _ in
+                handleScenePhaseChange()
+            }
+    }
+
+    /// Handles changes in scene phase (app backgrounding/foregrounding)
+    private func handleScenePhaseChange() {
+        switch scenePhase {
+        case .background:
+            // App is going to background - pause and save
+            viewModel.handleAppBackground()
+            previousPhase = .background
+        case .active:
+            // App is becoming active - resume if needed
+            if previousPhase == .background {
+                viewModel.handleAppForeground()
+            }
+            previousPhase = .active
+        case .inactive:
+            // App is inactive (e.g., during transition) - do nothing
+            previousPhase = .inactive
+        @unknown default:
+            break
+        }
     }
 }
 

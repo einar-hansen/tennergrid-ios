@@ -79,6 +79,9 @@ final class GameViewModel: ObservableObject {
     /// Cancellables for Combine subscriptions
     private var cancellables = Set<AnyCancellable>()
 
+    /// Auto-save enabled flag (can be disabled for testing)
+    private(set) var autoSaveEnabled: Bool = true
+
     // MARK: - Initialization
 
     /// Creates a new GameViewModel with the given game state
@@ -1207,6 +1210,60 @@ final class GameViewModel: ObservableObject {
         if !newState.isPaused, !newState.isCompleted {
             startTimer()
         }
+    }
+
+    // MARK: - Auto-Save
+
+    /// Saves the current game state to disk
+    /// Called automatically when the app backgrounds
+    func saveGame() {
+        guard autoSaveEnabled else { return }
+
+        // Don't save if game hasn't been started (no progress made)
+        guard gameState.filledCellCount > 0 || gameState.elapsedTime > 0 else {
+            return
+        }
+
+        // Don't save if game is already completed
+        guard !gameState.isCompleted else {
+            return
+        }
+
+        do {
+            try PersistenceManager.shared.saveGame(gameState)
+        } catch {
+            // Log error but don't crash - auto-save failures should be graceful
+            print("Failed to auto-save game: \(error)")
+        }
+    }
+
+    /// Handles app backgrounding - pauses timer and saves game
+    func handleAppBackground() {
+        // Pause the timer when app goes to background
+        if isTimerRunning {
+            pauseTimer()
+        }
+
+        // Save the game state
+        saveGame()
+    }
+
+    /// Handles app foregrounding - resumes timer if game was active
+    func handleAppForeground() {
+        // Resume timer if game is not paused and not completed
+        if !gameState.isPaused, !gameState.isCompleted {
+            startTimer()
+        }
+    }
+
+    /// Disables auto-save (for testing purposes)
+    func disableAutoSave() {
+        autoSaveEnabled = false
+    }
+
+    /// Enables auto-save
+    func enableAutoSave() {
+        autoSaveEnabled = true
     }
 }
 
