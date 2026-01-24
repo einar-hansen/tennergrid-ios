@@ -18,7 +18,19 @@ Probably better to ralph in the beginning for logic, and claude it regularly whe
 https://sudoku.one/fobidoshi
 https://sudoku.one/renban
 
-Easy = 55%
-Medium = 45%
-Hard = 35%
-Extreme = 25%
+
+Update difficulties to: Easy = 55%, Medium = 45%, Hard = 35% and Extreme = 25%. The backend/API is already updates. The 
+
+When I input a value tat is in the notes of the row, then remove the number from the note.
+
+Ability to zoom in (make table larger). 
+
+If we hide invalid options, then they should be hidden for notes as well.
+
+If we have notes, then make the number input cell in another color to show what we think they are
+
+The timer when playing game must stop when we gontonanother app or to the homescreen. Now it is pausing when the app reopens. 
+
+Wire up settings when in rhe game, and when paused
+
+make sure daily challenge works 

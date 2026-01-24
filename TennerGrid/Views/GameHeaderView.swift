@@ -1,6 +1,7 @@
 import SwiftUI
 
 /// A header view displaying game information: timer, difficulty, and control buttons
+// swiftlint:disable:next swiftui_view_body
 struct GameHeaderView: View {
     // MARK: - Properties
 
@@ -88,6 +89,7 @@ struct GameHeaderView: View {
                 )
         }
         .buttonStyle(.plain)
+        .minimumTapTarget() // Ensures 44x44 minimum for accessibility
         .disabled(viewModel.gameState.isCompleted)
         .opacity(viewModel.gameState.isCompleted ? 0.4 : 1.0)
         .accessibilityLabel(viewModel.gameState.isPaused ? "Resume game" : "Pause game")
@@ -106,6 +108,7 @@ struct GameHeaderView: View {
                 )
         }
         .buttonStyle(.plain)
+        .minimumTapTarget() // Ensures 44x44 minimum for accessibility
         .accessibilityLabel("Settings")
     }
 
