@@ -101,22 +101,22 @@ final class AchievementManagerTests: XCTestCase {
     // FIXME: Test disabled - failing with no error message. Needs investigation.
     // swiftlint:disable:next commented_out_code
     /*
-    func testCheckAchievements_FirstGameCompleted_UnlocksFirstGame() {
-        // Given
-        let puzzle = createTestPuzzle()
-        var gameState = GameState(puzzle: puzzle)
-        gameState.isCompleted = true
-        mockStatistics.recordCompletion(gameState: gameState)
+     func testCheckAchievements_FirstGameCompleted_UnlocksFirstGame() {
+         // Given
+         let puzzle = createTestPuzzle()
+         var gameState = GameState(puzzle: puzzle)
+         gameState.isCompleted = true
+         mockStatistics.recordCompletion(gameState: gameState)
 
-        // When
-        let newlyUnlocked = sut.checkAchievements(gameState: gameState)
+         // When
+         let newlyUnlocked = sut.checkAchievements(gameState: gameState)
 
-        // Then
-        XCTAssertEqual(newlyUnlocked.count, 1)
-        XCTAssertEqual(newlyUnlocked.first?.id, "first_game")
-        XCTAssertTrue(sut.achievement(withId: "first_game")?.isUnlocked ?? false)
-    }
-    */
+         // Then
+         XCTAssertEqual(newlyUnlocked.count, 1)
+         XCTAssertEqual(newlyUnlocked.first?.id, "first_game")
+         XCTAssertTrue(sut.achievement(withId: "first_game")?.isUnlocked ?? false)
+     }
+     */
 
     func testCheckAchievements_NoGamesCompleted_NoUnlocks() {
         // When
@@ -427,96 +427,97 @@ final class AchievementManagerTests: XCTestCase {
     }
 
     // MARK: - Persistence Tests
+
     // FIXME: Persistence tests disabled due to malloc error when creating multiple AchievementManager instances
     // Error: "malloc: *** error for object 0x26254e740: pointer being freed was not allocated"
     // This appears to be related to UserDefaults suite initialization. Needs investigation.
 
     // swiftlint:disable:next commented_out_code
     /*
-    func testPersistence_SavesUnlockedAchievements() {
-        // Given
-        completeGames(count: 1, difficulty: .easy)
-        sut.checkAchievements()
+     func testPersistence_SavesUnlockedAchievements() {
+         // Given
+         completeGames(count: 1, difficulty: .easy)
+         sut.checkAchievements()
 
-        // Verify the achievement is unlocked in the current instance
-        XCTAssertTrue(sut.achievement(withId: "first_game")?.isUnlocked == true, "Achievement should be unlocked before reload")
+         // Verify the achievement is unlocked in the current instance
+         XCTAssertTrue(sut.achievement(withId: "first_game")?.isUnlocked == true, "Achievement should be unlocked before reload")
 
-        // When - Create new instance to force reload
-        let newStatsManager = StatisticsManager.test(userDefaults: testUserDefaults)
-        let newManager = AchievementManager.test(statisticsManager: newStatsManager, userDefaults: testUserDefaults)
+         // When - Create new instance to force reload
+         let newStatsManager = StatisticsManager.test(userDefaults: testUserDefaults)
+         let newManager = AchievementManager.test(statisticsManager: newStatsManager, userDefaults: testUserDefaults)
 
-        // Then
-        let achievement = newManager.achievement(withId: "first_game")
-        XCTAssertNotNil(achievement, "Achievement should exist")
-        XCTAssertTrue(achievement?.isUnlocked == true, "Achievement should still be unlocked after reload")
-    }
+         // Then
+         let achievement = newManager.achievement(withId: "first_game")
+         XCTAssertNotNil(achievement, "Achievement should exist")
+         XCTAssertTrue(achievement?.isUnlocked == true, "Achievement should still be unlocked after reload")
+     }
 
-    func testPersistence_SavesProgress() {
-        // Given
-        sut.updateProgress(achievementId: "games_10", currentValue: 5)
+     func testPersistence_SavesProgress() {
+         // Given
+         sut.updateProgress(achievementId: "games_10", currentValue: 5)
 
-        // When - Create new instance to force reload
-        let newStatsManager = StatisticsManager.test(userDefaults: testUserDefaults)
-        let newManager = AchievementManager.test(statisticsManager: newStatsManager, userDefaults: testUserDefaults)
+         // When - Create new instance to force reload
+         let newStatsManager = StatisticsManager.test(userDefaults: testUserDefaults)
+         let newManager = AchievementManager.test(statisticsManager: newStatsManager, userDefaults: testUserDefaults)
 
-        // Then
-        let achievement = newManager.achievement(withId: "games_10")
-        XCTAssertNotNil(achievement)
-        XCTAssertEqual(achievement?.progress ?? 0.0, 0.5, accuracy: 0.01)
-    }
+         // Then
+         let achievement = newManager.achievement(withId: "games_10")
+         XCTAssertNotNil(achievement)
+         XCTAssertEqual(achievement?.progress ?? 0.0, 0.5, accuracy: 0.01)
+     }
 
-    func testPersistence_SavesUnlockDate() {
-        // Given
-        completeGames(count: 1, difficulty: .easy)
-        sut.checkAchievements()
-        let originalDate = sut.achievement(withId: "first_game")?.unlockedAt
+     func testPersistence_SavesUnlockDate() {
+         // Given
+         completeGames(count: 1, difficulty: .easy)
+         sut.checkAchievements()
+         let originalDate = sut.achievement(withId: "first_game")?.unlockedAt
 
-        // When - Create new instance to force reload
-        let newStatsManager = StatisticsManager.test(userDefaults: testUserDefaults)
-        let newManager = AchievementManager.test(statisticsManager: newStatsManager, userDefaults: testUserDefaults)
+         // When - Create new instance to force reload
+         let newStatsManager = StatisticsManager.test(userDefaults: testUserDefaults)
+         let newManager = AchievementManager.test(statisticsManager: newStatsManager, userDefaults: testUserDefaults)
 
-        // Then
-        let loadedDate = newManager.achievement(withId: "first_game")?.unlockedAt
-        XCTAssertNotNil(loadedDate)
-        XCTAssertNotNil(originalDate)
-        XCTAssertEqual(
-            originalDate?.timeIntervalSince1970 ?? 0.0,
-            loadedDate?.timeIntervalSince1970 ?? 0.0,
-            accuracy: 1.0
-        )
-    }
+         // Then
+         let loadedDate = newManager.achievement(withId: "first_game")?.unlockedAt
+         XCTAssertNotNil(loadedDate)
+         XCTAssertNotNil(originalDate)
+         XCTAssertEqual(
+             originalDate?.timeIntervalSince1970 ?? 0.0,
+             loadedDate?.timeIntervalSince1970 ?? 0.0,
+             accuracy: 1.0
+         )
+     }
 
-    func testPersistence_MergesNewAchievements() {
-        // Given - Save current achievements
-        completeGames(count: 1, difficulty: .easy)
-        sut.checkAchievements()
+     func testPersistence_MergesNewAchievements() {
+         // Given - Save current achievements
+         completeGames(count: 1, difficulty: .easy)
+         sut.checkAchievements()
 
-        // Simulate app update with new achievements by reloading
-        let newStatsManager = StatisticsManager.test(userDefaults: testUserDefaults)
-        let newManager = AchievementManager.test(statisticsManager: newStatsManager, userDefaults: testUserDefaults)
+         // Simulate app update with new achievements by reloading
+         let newStatsManager = StatisticsManager.test(userDefaults: testUserDefaults)
+         let newManager = AchievementManager.test(statisticsManager: newStatsManager, userDefaults: testUserDefaults)
 
-        // Then - Should have all current achievements plus any new ones
-        XCTAssertEqual(newManager.achievements.count, Achievement.allAchievements.count)
-        XCTAssertTrue(newManager.achievement(withId: "first_game")?.isUnlocked ?? false)
-    }
+         // Then - Should have all current achievements plus any new ones
+         XCTAssertEqual(newManager.achievements.count, Achievement.allAchievements.count)
+         XCTAssertTrue(newManager.achievement(withId: "first_game")?.isUnlocked ?? false)
+     }
 
-    func testResetAllAchievements_ResetsAndPersists() {
-        // Given
-        completeGames(count: 1, difficulty: .easy)
-        sut.checkAchievements()
+     func testResetAllAchievements_ResetsAndPersists() {
+         // Given
+         completeGames(count: 1, difficulty: .easy)
+         sut.checkAchievements()
 
-        // When
-        sut.resetAllAchievements()
+         // When
+         sut.resetAllAchievements()
 
-        // Then
-        XCTAssertTrue(sut.unlockedAchievements().isEmpty)
+         // Then
+         XCTAssertTrue(sut.unlockedAchievements().isEmpty)
 
-        // Verify persistence
-        let newStatsManager = StatisticsManager.test(userDefaults: testUserDefaults)
-        let newManager = AchievementManager.test(statisticsManager: newStatsManager, userDefaults: testUserDefaults)
-        XCTAssertTrue(newManager.unlockedAchievements().isEmpty)
-    }
-    */
+         // Verify persistence
+         let newStatsManager = StatisticsManager.test(userDefaults: testUserDefaults)
+         let newManager = AchievementManager.test(statisticsManager: newStatsManager, userDefaults: testUserDefaults)
+         XCTAssertTrue(newManager.unlockedAchievements().isEmpty)
+     }
+     */
 
     // MARK: - Edge Cases
 

@@ -107,7 +107,8 @@ extension Achievement: Codable {
         targetValue = try container.decode(Int.self, forKey: .targetValue)
 
         // Handle migration: currentValue might not exist in old saved data
-        currentValue = (try container.decodeIfPresent(Int.self, forKey: .currentValue)) ?? Int(progress * Double(targetValue))
+        currentValue = try (container.decodeIfPresent(Int.self, forKey: .currentValue)) ??
+            Int(progress * Double(targetValue))
         isHidden = try container.decode(Bool.self, forKey: .isHidden)
         points = try container.decode(Int.self, forKey: .points)
     }
