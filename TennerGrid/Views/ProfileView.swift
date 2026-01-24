@@ -115,7 +115,7 @@ struct ProfileView: View {
 
     private var rulesLink: some View {
         NavigationLink {
-            rulesPlaceholder
+            RulesView()
         } label: {
             HStack(spacing: 12) {
                 sectionIcon("list.bullet.rectangle.fill", color: .orange)
