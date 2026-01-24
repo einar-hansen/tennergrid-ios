@@ -317,10 +317,10 @@
 
 ### 8.4 Achievements View
 
-- [ ] Create `AchievementsView` with grid of achievement cards
-- [ ] Show locked achievements as grayed out
-- [ ] Show unlocked achievements with icon and date
-- [ ] Add progress bars for progressive achievements
+- [x] Create `AchievementsView` with grid of achievement cards
+- [x] Show locked achievements as grayed out
+- [x] Show unlocked achievements with icon and date
+- [x] Add progress bars for progressive achievements
 - [ ] Add unlock notification/animation
 
 ---
