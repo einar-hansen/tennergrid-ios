@@ -22,6 +22,13 @@ final class GameViewModelTests: XCTestCase {
         settings.soundEffects = true
         SettingsManager.shared.updateSettings(settings)
 
+        // Also set UserDefaults directly to ensure @AppStorage properties pick up values immediately
+        UserDefaults.standard.set(true, forKey: "highlightSameNumbers")
+        UserDefaults.standard.set(true, forKey: "autoCheckErrors")
+        UserDefaults.standard.set(true, forKey: "showTimer")
+        UserDefaults.standard.set(true, forKey: "hapticFeedback")
+        UserDefaults.standard.set(true, forKey: "soundEffects")
+
         // Use the static easy puzzle from TestFixtures (known to be valid)
         // This puzzle has 10 columns (required for Tenner Grid) and 3 rows
         //
@@ -62,6 +69,13 @@ final class GameViewModelTests: XCTestCase {
         settings.hapticFeedback = true
         settings.soundEffects = true
         SettingsManager.shared.updateSettings(settings)
+
+        // Also set UserDefaults directly to ensure cleanup
+        UserDefaults.standard.set(true, forKey: "highlightSameNumbers")
+        UserDefaults.standard.set(true, forKey: "autoCheckErrors")
+        UserDefaults.standard.set(true, forKey: "showTimer")
+        UserDefaults.standard.set(true, forKey: "hapticFeedback")
+        UserDefaults.standard.set(true, forKey: "soundEffects")
 
         super.tearDown()
     }
