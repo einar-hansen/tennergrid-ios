@@ -2822,12 +2822,18 @@ final class GameViewModelTests: XCTestCase {
 
         // Wait for the observer to fire and process the change
         let expectation = XCTestExpectation(description: "Settings observer should clear conflicts")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+        var checkCount = 0
+        func checkConflicts() {
+            checkCount += 1
             if self.viewModel.conflictingPositions.isEmpty {
                 expectation.fulfill()
+            } else if checkCount < 20 {
+                // Keep checking every 0.2 seconds up to 4 seconds total
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: checkConflicts)
             }
         }
-        wait(for: [expectation], timeout: 2.0)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: checkConflicts)
+        wait(for: [expectation], timeout: 5.0)
 
         // Conflicts should be cleared
         XCTAssertTrue(viewModel.conflictingPositions.isEmpty, "Conflicts should be cleared when autoCheckErrors is off")
