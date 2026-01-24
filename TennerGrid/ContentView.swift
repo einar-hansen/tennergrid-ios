@@ -136,6 +136,7 @@ struct ContentView: View {
 
     /// Attempts to load a saved game from disk on app launch
     /// Only runs once per app session to avoid interfering with user navigation
+    /// Uses safe loading that automatically handles corrupted save files
     private func loadSavedGameIfPresent() {
         // Only attempt to load once
         guard !hasAttemptedToLoadSavedGame else { return }
@@ -144,32 +145,17 @@ struct ContentView: View {
         // Don't load if user is already in a game
         guard gameViewModel == nil else { return }
 
-        // Try to load saved game from PersistenceManager
-        do {
-            if let savedGameState = try PersistenceManager.shared.loadGame() {
-                // Only restore if the game is not completed
-                guard !savedGameState.isCompleted else {
-                    // Clean up completed game
-                    try? PersistenceManager.shared.deleteSavedGame()
-                    return
-                }
-
-                // Restore the game
-                gameViewModel = GameViewModel(gameState: savedGameState)
-            }
-        } catch {
-            // If loading fails, silently continue - the user can still start a new game
-            // Log error for debugging in debug builds only
-            #if DEBUG
-                NSLog("Failed to load saved game: \(error)")
-            #endif
-
-            // If the data is corrupted, delete it to prevent future errors
-            if let persistenceError = error as? PersistenceError,
-               case .corruptedData = persistenceError
-            {
+        // Try to load saved game using safe method (handles corruption automatically)
+        if let savedGameState = PersistenceManager.shared.loadGameSafely() {
+            // Only restore if the game is not completed
+            guard !savedGameState.isCompleted else {
+                // Clean up completed game
                 try? PersistenceManager.shared.deleteSavedGame()
+                return
             }
+
+            // Restore the game
+            gameViewModel = GameViewModel(gameState: savedGameState)
         }
     }
 }

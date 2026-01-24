@@ -3,6 +3,7 @@ import XCTest
 
 /// Tests for PersistenceManager focusing on save/load functionality
 /// including force-quit and app restart scenarios
+// swiftlint:disable:next type_body_length
 final class PersistenceManagerTests: XCTestCase {
     // MARK: - Properties
 
@@ -413,6 +414,212 @@ final class PersistenceManagerTests: XCTestCase {
                 XCTFail("Expected decodingFailed error, got \(error)")
             }
         }
+    }
+
+    func testSafeLoadHandlesCorruptedJSON() throws {
+        // Given: A corrupted save file with invalid JSON
+        let corruptedData = Data("This is not valid JSON".utf8)
+        try corruptedData.write(to: PersistenceSchema.FilePath.savedGame)
+
+        // Verify file exists before loading
+        XCTAssertTrue(persistenceManager.hasSavedGame())
+
+        // When: We use safe loading
+        let result = persistenceManager.loadGameSafely()
+
+        // Then: Should return nil and delete the corrupted file
+        XCTAssertNil(result, "Should return nil for corrupted data")
+        XCTAssertFalse(persistenceManager.hasSavedGame(), "Corrupted file should be deleted")
+    }
+
+    func testSafeLoadHandlesEmptyFile() throws {
+        // Given: An empty save file
+        let emptyData = Data()
+        try emptyData.write(to: PersistenceSchema.FilePath.savedGame)
+
+        // Verify file exists
+        XCTAssertTrue(persistenceManager.hasSavedGame())
+
+        // When: We use safe loading
+        let result = persistenceManager.loadGameSafely()
+
+        // Then: Should return nil and delete the corrupted file
+        XCTAssertNil(result, "Should return nil for empty file")
+        XCTAssertFalse(persistenceManager.hasSavedGame(), "Empty file should be deleted")
+    }
+
+    func testSafeLoadHandlesTruncatedJSON() throws {
+        // Given: A truncated JSON file (incomplete)
+        let truncatedJSON = """
+        {"gameState":{"puzzle":{"id":"test","rows":3
+        """
+        let truncatedData = Data(truncatedJSON.utf8)
+        try truncatedData.write(to: PersistenceSchema.FilePath.savedGame)
+
+        // Verify file exists
+        XCTAssertTrue(persistenceManager.hasSavedGame())
+
+        // When: We use safe loading
+        let result = persistenceManager.loadGameSafely()
+
+        // Then: Should return nil and delete the corrupted file
+        XCTAssertNil(result, "Should return nil for truncated JSON")
+        XCTAssertFalse(persistenceManager.hasSavedGame(), "Truncated file should be deleted")
+    }
+
+    func testSafeLoadHandlesIncompatibleSchema() throws {
+        // Given: A JSON file with incompatible schema (old version)
+        let incompatibleJSON = """
+        {"oldField":"value","anotherOldField":123}
+        """
+        let incompatibleData = Data(incompatibleJSON.utf8)
+        try incompatibleData.write(to: PersistenceSchema.FilePath.savedGame)
+
+        // Verify file exists
+        XCTAssertTrue(persistenceManager.hasSavedGame())
+
+        // When: We use safe loading
+        let result = persistenceManager.loadGameSafely()
+
+        // Then: Should return nil and delete the incompatible file
+        XCTAssertNil(result, "Should return nil for incompatible schema")
+        XCTAssertFalse(persistenceManager.hasSavedGame(), "Incompatible file should be deleted")
+    }
+
+    func testSafeLoadHandlesValidData() throws {
+        // Given: A valid saved game
+        let puzzle = TestFixtures.easyPuzzle
+        var gameState = GameState(puzzle: puzzle)
+        gameState.setValue(5, at: CellPosition(row: 0, column: 0))
+        gameState.elapsedTime = 120.0
+        try persistenceManager.saveGame(gameState)
+
+        // When: We use safe loading
+        let result = persistenceManager.loadGameSafely()
+
+        // Then: Should return the game state successfully
+        XCTAssertNotNil(result, "Should return game state for valid data")
+        XCTAssertTrue(persistenceManager.hasSavedGame(), "Valid file should not be deleted")
+        XCTAssertEqual(result?.puzzle.id, gameState.puzzle.id)
+        XCTAssertEqual(result?.value(at: CellPosition(row: 0, column: 0)), 5)
+    }
+
+    func testSafeLoadHandlesNonExistentFile() {
+        // Given: No saved game exists
+        XCTAssertFalse(persistenceManager.hasSavedGame())
+
+        // When: We use safe loading
+        let result = persistenceManager.loadGameSafely()
+
+        // Then: Should return nil without errors
+        XCTAssertNil(result, "Should return nil when no file exists")
+        XCTAssertFalse(persistenceManager.hasSavedGame())
+    }
+
+    func testSafeLoadStatisticsHandlesCorruption() throws {
+        // Given: Corrupted statistics file
+        let corruptedData = Data("Invalid statistics data".utf8)
+        try corruptedData.write(to: PersistenceSchema.FilePath.statistics)
+
+        // When: We use safe loading
+        let result = persistenceManager.loadStatisticsSafely()
+
+        // Then: Should return default statistics and delete corrupted file
+        XCTAssertEqual(result.gamesPlayed, 0, "Should return default statistics")
+        XCTAssertEqual(result.gamesCompleted, 0, "Should return default statistics")
+    }
+
+    func testSafeLoadAchievementsHandlesCorruption() throws {
+        // Given: Corrupted achievements file
+        let corruptedData = Data("Invalid achievements data".utf8)
+        try corruptedData.write(to: PersistenceSchema.FilePath.achievements)
+
+        // When: We use safe loading
+        let result = persistenceManager.loadAchievementsSafely()
+
+        // Then: Should return default achievements and delete corrupted file
+        XCTAssertFalse(result.isEmpty, "Should return default achievements")
+        XCTAssertEqual(result.count, Achievement.allAchievements.count)
+    }
+
+    func testSafeLoadSettingsHandlesCorruption() throws {
+        // Given: Corrupted settings file
+        let corruptedData = Data("Invalid settings data".utf8)
+        try corruptedData.write(to: PersistenceSchema.FilePath.settings)
+
+        // When: We use safe loading
+        let result = persistenceManager.loadSettingsSafely()
+
+        // Then: Should return default settings and delete corrupted file
+        XCTAssertTrue(result.autoCheckErrors, "Should return default settings")
+        XCTAssertTrue(result.showTimer, "Should return default settings")
+    }
+
+    func testSafeLoadAllHandlesPartialCorruption() throws {
+        // Given: Some files are valid, some are corrupted
+        // Valid game state
+        let puzzle = TestFixtures.easyPuzzle
+        let gameState = GameState(puzzle: puzzle)
+        try persistenceManager.saveGame(gameState)
+
+        // Valid statistics
+        var statistics = GameStatistics()
+        statistics.recordGameStarted(difficulty: .easy)
+        try persistenceManager.saveStatistics(statistics)
+
+        // Corrupted achievements
+        let corruptedData = Data("Invalid".utf8)
+        try corruptedData.write(to: PersistenceSchema.FilePath.achievements)
+
+        // Corrupted settings
+        try corruptedData.write(to: PersistenceSchema.FilePath.settings)
+
+        // When: We use safe bulk loading
+        let appData = persistenceManager.loadAllSafely()
+
+        // Then: Valid data should be loaded, corrupted data should use defaults
+        XCTAssertNotNil(appData.gameState, "Valid game state should load")
+        XCTAssertEqual(appData.statistics.gamesPlayed, 1, "Valid statistics should load")
+        XCTAssertFalse(appData.achievements.isEmpty, "Should return default achievements")
+        XCTAssertTrue(appData.settings.autoCheckErrors, "Should return default settings")
+    }
+
+    func testSafeLoadAllWithNoData() {
+        // Given: No saved data exists
+        XCTAssertFalse(persistenceManager.hasSavedGame())
+
+        // When: We use safe bulk loading
+        let appData = persistenceManager.loadAllSafely()
+
+        // Then: Should return all defaults without errors
+        XCTAssertNil(appData.gameState)
+        XCTAssertEqual(appData.statistics.gamesPlayed, 0)
+        XCTAssertFalse(appData.achievements.isEmpty)
+        XCTAssertTrue(appData.settings.autoCheckErrors)
+    }
+
+    func testRecoveryFromMultipleCorruptedFiles() throws {
+        // Given: All files are corrupted
+        let corruptedData = Data("Corrupted".utf8)
+        try corruptedData.write(to: PersistenceSchema.FilePath.savedGame)
+        try corruptedData.write(to: PersistenceSchema.FilePath.statistics)
+        try corruptedData.write(to: PersistenceSchema.FilePath.achievements)
+        try corruptedData.write(to: PersistenceSchema.FilePath.settings)
+
+        // When: We attempt to load each piece of data safely
+        let gameState = persistenceManager.loadGameSafely()
+        let statistics = persistenceManager.loadStatisticsSafely()
+        let achievements = persistenceManager.loadAchievementsSafely()
+        let settings = persistenceManager.loadSettingsSafely()
+
+        // Then: All should return defaults and app should be usable
+        XCTAssertNil(gameState, "Corrupted game should return nil")
+        XCTAssertEqual(statistics.gamesPlayed, 0, "Should return default statistics")
+        XCTAssertFalse(achievements.isEmpty, "Should return default achievements")
+        XCTAssertTrue(settings.autoCheckErrors, "Should return default settings")
+
+        // Verify corrupted files were deleted
+        XCTAssertFalse(persistenceManager.hasSavedGame(), "Corrupted game file should be deleted")
     }
 
     // MARK: - Integration Test: Complete App Lifecycle

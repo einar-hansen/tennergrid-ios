@@ -2,6 +2,7 @@ import Foundation
 
 /// Service responsible for persisting and loading app data to/from disk
 /// Uses JSON files with Codable for data serialization
+// swiftlint:disable:next type_body_length
 final class PersistenceManager {
     // MARK: - Singleton
 
@@ -63,6 +64,45 @@ final class PersistenceManager {
         return data.gameState
     }
 
+    /// Safely loads the saved game state with automatic recovery from corruption
+    /// This method catches all errors and deletes corrupted files automatically
+    /// - Returns: The saved game state, or nil if no save exists or if data is corrupted
+    func loadGameSafely() -> GameState? {
+        do {
+            return try loadGame()
+        } catch let error as PersistenceError {
+            // Check if this is a corruption-related error that should trigger cleanup
+            let shouldDeleteCorruptedFile = switch error {
+            case .decodingFailed, .corruptedData:
+                true
+            default:
+                false
+            }
+
+            if shouldDeleteCorruptedFile {
+                // Delete the corrupted file to prevent future errors
+                try? deleteSavedGame()
+
+                #if DEBUG
+                    NSLog("Deleted corrupted saved game file: \(error.localizedDescription)")
+                #endif
+            } else {
+                // Log non-corruption errors but don't delete the file
+                #if DEBUG
+                    NSLog("Failed to load saved game (not corruption): \(error.localizedDescription)")
+                #endif
+            }
+
+            return nil
+        } catch {
+            // Handle unexpected errors
+            #if DEBUG
+                NSLog("Unexpected error loading saved game: \(error.localizedDescription)")
+            #endif
+            return nil
+        }
+    }
+
     /// Deletes the saved game from disk
     /// - Throws: PersistenceError if deletion fails
     func deleteSavedGame() throws {
@@ -97,6 +137,35 @@ final class PersistenceManager {
         return data.statistics
     }
 
+    /// Safely loads statistics with automatic recovery from corruption
+    /// - Returns: The saved statistics, or new empty statistics if load fails
+    func loadStatisticsSafely() -> GameStatistics {
+        do {
+            return try loadStatistics()
+        } catch let error as PersistenceError {
+            let shouldDeleteCorruptedFile = switch error {
+            case .decodingFailed, .corruptedData:
+                true
+            default:
+                false
+            }
+
+            if shouldDeleteCorruptedFile {
+                try? deleteStatistics()
+                #if DEBUG
+                    NSLog("Deleted corrupted statistics file: \(error.localizedDescription)")
+                #endif
+            }
+
+            return GameStatistics()
+        } catch {
+            #if DEBUG
+                NSLog("Unexpected error loading statistics: \(error.localizedDescription)")
+            #endif
+            return GameStatistics()
+        }
+    }
+
     /// Deletes all statistics data
     /// - Throws: PersistenceError if deletion fails
     func deleteStatistics() throws {
@@ -125,6 +194,35 @@ final class PersistenceManager {
         return data.achievements
     }
 
+    /// Safely loads achievements with automatic recovery from corruption
+    /// - Returns: The saved achievements, or default achievements if load fails
+    func loadAchievementsSafely() -> [Achievement] {
+        do {
+            return try loadAchievements()
+        } catch let error as PersistenceError {
+            let shouldDeleteCorruptedFile = switch error {
+            case .decodingFailed, .corruptedData:
+                true
+            default:
+                false
+            }
+
+            if shouldDeleteCorruptedFile {
+                try? deleteAchievements()
+                #if DEBUG
+                    NSLog("Deleted corrupted achievements file: \(error.localizedDescription)")
+                #endif
+            }
+
+            return Achievement.allAchievements
+        } catch {
+            #if DEBUG
+                NSLog("Unexpected error loading achievements: \(error.localizedDescription)")
+            #endif
+            return Achievement.allAchievements
+        }
+    }
+
     /// Deletes all achievements data
     /// - Throws: PersistenceError if deletion fails
     func deleteAchievements() throws {
@@ -151,6 +249,35 @@ final class PersistenceManager {
 
         let data: PersistenceSchema.SettingsData = try load(from: PersistenceSchema.FilePath.settings)
         return data.settings
+    }
+
+    /// Safely loads settings with automatic recovery from corruption
+    /// - Returns: The saved settings, or default settings if load fails
+    func loadSettingsSafely() -> UserSettings {
+        do {
+            return try loadSettings()
+        } catch let error as PersistenceError {
+            let shouldDeleteCorruptedFile = switch error {
+            case .decodingFailed, .corruptedData:
+                true
+            default:
+                false
+            }
+
+            if shouldDeleteCorruptedFile {
+                try? deleteSettings()
+                #if DEBUG
+                    NSLog("Deleted corrupted settings file: \(error.localizedDescription)")
+                #endif
+            }
+
+            return UserSettings()
+        } catch {
+            #if DEBUG
+                NSLog("Unexpected error loading settings: \(error.localizedDescription)")
+            #endif
+            return UserSettings()
+        }
     }
 
     /// Deletes all settings data
@@ -194,12 +321,22 @@ final class PersistenceManager {
             // Read data from file
             let jsonData = try Data(contentsOf: url)
 
+            // Basic corruption check: verify it's valid JSON
+            // This catches empty files, truncated files, or non-JSON data
+            guard !jsonData.isEmpty else {
+                throw PersistenceError.corruptedData(url: url)
+            }
+
             // Decode JSON
             let data = try decoder.decode(T.self, from: jsonData)
 
             return data
         } catch let error as DecodingError {
+            // Decoding failures indicate corrupted or incompatible data
             throw PersistenceError.decodingFailed(error)
+        } catch let error as PersistenceError {
+            // Re-throw our own errors as-is
+            throw error
         } catch let error as NSError where error.domain == NSCocoaErrorDomain {
             throw PersistenceError.readFailed(url: url, underlyingError: error)
         } catch {
@@ -267,6 +404,23 @@ final class PersistenceManager {
         let statistics = try loadStatistics()
         let achievements = try loadAchievements()
         let settings = try loadSettings()
+
+        return AppData(
+            gameState: gameState,
+            statistics: statistics,
+            achievements: achievements,
+            settings: settings
+        )
+    }
+
+    /// Safely loads all app data with automatic recovery from corruption
+    /// This method never throws and returns sensible defaults for any corrupted data
+    /// - Returns: AppData struct containing all loaded data (with defaults for corrupted files)
+    func loadAllSafely() -> AppData {
+        let gameState = loadGameSafely()
+        let statistics = loadStatisticsSafely()
+        let achievements = loadAchievementsSafely()
+        let settings = loadSettingsSafely()
 
         return AppData(
             gameState: gameState,
