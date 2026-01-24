@@ -311,7 +311,7 @@
 
 - [x] Define achievement list with 10-15 achievements
 - [x] Create `AchievementManager` service to check conditions
-- [ ] Implement achievement unlock logic
+- [x] Implement achievement unlock logic
 - [ ] Add persistence for achievement status
 - [ ] Write unit tests for achievement logic
 
