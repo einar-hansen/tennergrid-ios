@@ -43,7 +43,7 @@ struct ProfileView: View {
     private var awardsSection: some View {
         Section {
             NavigationLink {
-                achievementsPlaceholder
+                AchievementsView()
             } label: {
                 HStack(spacing: 12) {
                     sectionIcon("trophy.fill", color: .yellow)
