@@ -337,11 +337,11 @@
 
 ### 9.2 Persistence Manager
 
-- [ ] [COMPLEX] Create `PersistenceManager` service with save/load methods
-- [ ] Implement saveGame and loadGame methods
-- [ ] Implement saveStatistics and loadStatistics
-- [ ] Implement saveAchievements and loadAchievements
-- [ ] Add error handling for file I/O failures
+- [x] [COMPLEX] Create `PersistenceManager` service with save/load methods
+- [x] Implement saveGame and loadGame methods
+- [x] Implement saveStatistics and loadStatistics
+- [x] Implement saveAchievements and loadAchievements
+- [x] Add error handling for file I/O failures
 
 ### 9.3 Auto-Save
 
