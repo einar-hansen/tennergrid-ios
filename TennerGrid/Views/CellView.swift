@@ -13,6 +13,14 @@ struct CellView: View {
     /// Action to perform when the cell is tapped
     let onTap: () -> Void
 
+    // MARK: - Animation State
+
+    /// Scale factor for number entry animation
+    @State private var scale: CGFloat = 1.0
+
+    /// Opacity for number entry animation
+    @State private var opacity: Double = 1.0
+
     // MARK: - Constants
 
     private let borderWidth: CGFloat = 1
@@ -43,10 +51,12 @@ struct CellView: View {
 
             // Content
             if let value = cell.value {
-                // Display number
+                // Display number with animation
                 Text(String(value))
                     .font(.system(size: fontSize, weight: textWeight, design: .rounded))
                     .foregroundColor(textColor)
+                    .scaleEffect(scale)
+                    .opacity(opacity)
             } else if cell.hasPencilMarks {
                 // Display pencil marks in 3x3 grid
                 pencilMarksView
@@ -57,6 +67,27 @@ struct CellView: View {
         .contentShape(Rectangle())
         .onTapGesture {
             onTap()
+        }
+        .onChange(of: cell.value) { newValue in
+            // Only animate when a number is entered (not when cleared or for initial values)
+            if newValue != nil, !cell.isInitial {
+                playNumberEntryAnimation()
+            }
+        }
+    }
+
+    // MARK: - Animation Methods
+
+    /// Plays the number entry animation (scale + fade in)
+    private func playNumberEntryAnimation() {
+        // Start with smaller scale and reduced opacity
+        scale = 0.3
+        opacity = 0.0
+
+        // Animate to normal size with spring effect
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.6)) {
+            scale = 1.0
+            opacity = 1.0
         }
     }
 
