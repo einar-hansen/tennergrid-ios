@@ -393,7 +393,7 @@
 - [x] Test complete game flow with VoiceOver enabled
 - [x] Support Dynamic Type (scalable fonts)
 - [x] Test with largest accessibility text sizes
-- [ ] Add high contrast support for color-blind users
+- [x] Add high contrast support for color-blind users
 
 ---
 
