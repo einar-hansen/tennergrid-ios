@@ -6,8 +6,8 @@ import SwiftUI
 struct ContentView: View {
     // MARK: - Properties
 
-    /// Puzzle manager for creating and managing puzzles
-    @StateObject private var puzzleManager = PuzzleManager()
+    /// Puzzle manager for creating and managing puzzles (injected from parent)
+    @ObservedObject var puzzleManager: PuzzleManager
 
     /// Current game view model (nil when on home screen)
     @State private var gameViewModel: GameViewModel?
@@ -182,5 +182,5 @@ extension GameView {
 // MARK: - Previews
 
 #Preview {
-    ContentView()
+    ContentView(puzzleManager: PuzzleManager())
 }

@@ -5,19 +5,22 @@ import SwiftUI
 struct TabBarView: View {
     // MARK: - Properties
 
-    /// Currently selected tab
-    @State private var selectedTab: Tab = .main
+    /// Currently selected tab with scene-level persistence across app launches
+    @SceneStorage("selectedTab") private var selectedTab: Tab = .main
 
-    /// Puzzle manager shared across tabs
+    /// Puzzle manager shared across tabs for state preservation
     @StateObject private var puzzleManager = PuzzleManager()
 
     // MARK: - Tab Enumeration
 
     /// Available tabs in the app
-    enum Tab: Int, CaseIterable {
+    /// Conforms to RawRepresentable for SceneStorage persistence
+    enum Tab: Int, CaseIterable, Identifiable {
         case main
         case dailyChallenges
         case profile
+
+        var id: Int { rawValue }
 
         /// Display title for each tab
         var title: String {
@@ -57,8 +60,9 @@ struct TabBarView: View {
     // MARK: - Tab Views
 
     /// Main tab containing the home screen and game flow
+    /// Shares the puzzle manager to ensure state preservation across tab switches
     private var mainTab: some View {
-        ContentView()
+        ContentView(puzzleManager: puzzleManager)
             .tabItem {
                 Label(Tab.main.title, systemImage: Tab.main.icon)
             }
