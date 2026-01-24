@@ -1,5 +1,6 @@
 import Combine
 import Foundation
+import SwiftUI
 
 /// ViewModel managing the game state and user interactions
 @MainActor
@@ -26,6 +27,23 @@ final class GameViewModel: ObservableObject {
 
     /// Whether the timer is currently running
     @Published private(set) var isTimerRunning: Bool = false
+
+    // MARK: - Settings (AppStorage)
+
+    /// Automatically highlight invalid moves
+    @AppStorage("autoCheckErrors") var autoCheckErrors: Bool = true
+
+    /// Display elapsed time during gameplay
+    @AppStorage("showTimer") var showTimer: Bool = true
+
+    /// Highlight all cells with the same number
+    @AppStorage("highlightSameNumbers") var highlightSameNumbers: Bool = true
+
+    /// Vibrate on selections and actions
+    @AppStorage("hapticFeedback") var hapticFeedback: Bool = true
+
+    /// Play sounds for actions and events
+    @AppStorage("soundEffects") var soundEffects: Bool = true
 
     // MARK: - Private Properties
 
