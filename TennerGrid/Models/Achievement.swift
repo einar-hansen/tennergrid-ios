@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 /// Represents an achievement that can be unlocked by the player
-struct Achievement: Equatable, Codable, Identifiable {
+struct Achievement: Equatable, Identifiable {
     /// Unique identifier for the achievement
     let id: String
 
@@ -20,6 +20,9 @@ struct Achievement: Equatable, Codable, Identifiable {
 
     /// Date when the achievement was unlocked (nil if not unlocked)
     var unlockedAt: Date?
+
+    /// Current progress value (for progressive achievements)
+    var currentValue: Int
 
     /// Category of the achievement for grouping
     let category: AchievementCategory
@@ -65,8 +68,65 @@ struct Achievement: Equatable, Codable, Identifiable {
         self.isHidden = isHidden
         self.points = points
         progress = 0.0
+        currentValue = 0
         isUnlocked = false
         unlockedAt = nil
+    }
+}
+
+// MARK: - Codable
+
+extension Achievement: Codable {
+    enum CodingKeys: String, CodingKey {
+        case id
+        case title
+        case achievementDescription
+        case progress
+        case isUnlocked
+        case unlockedAt
+        case currentValue
+        case category
+        case iconName
+        case targetValue
+        case isHidden
+        case points
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+
+        id = try container.decode(String.self, forKey: .id)
+        title = try container.decode(String.self, forKey: .title)
+        achievementDescription = try container.decode(String.self, forKey: .achievementDescription)
+        progress = try container.decode(Double.self, forKey: .progress)
+        isUnlocked = try container.decode(Bool.self, forKey: .isUnlocked)
+        unlockedAt = try container.decodeIfPresent(Date.self, forKey: .unlockedAt)
+
+        category = try container.decode(AchievementCategory.self, forKey: .category)
+        iconName = try container.decode(String.self, forKey: .iconName)
+        targetValue = try container.decode(Int.self, forKey: .targetValue)
+
+        // Handle migration: currentValue might not exist in old saved data
+        currentValue = (try container.decodeIfPresent(Int.self, forKey: .currentValue)) ?? Int(progress * Double(targetValue))
+        isHidden = try container.decode(Bool.self, forKey: .isHidden)
+        points = try container.decode(Int.self, forKey: .points)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+
+        try container.encode(id, forKey: .id)
+        try container.encode(title, forKey: .title)
+        try container.encode(achievementDescription, forKey: .achievementDescription)
+        try container.encode(progress, forKey: .progress)
+        try container.encode(isUnlocked, forKey: .isUnlocked)
+        try container.encodeIfPresent(unlockedAt, forKey: .unlockedAt)
+        try container.encode(currentValue, forKey: .currentValue)
+        try container.encode(category, forKey: .category)
+        try container.encode(iconName, forKey: .iconName)
+        try container.encode(targetValue, forKey: .targetValue)
+        try container.encode(isHidden, forKey: .isHidden)
+        try container.encode(points, forKey: .points)
     }
 }
 
@@ -148,6 +208,7 @@ extension Achievement {
     mutating func updateProgress(currentValue: Int) -> Bool {
         guard !isUnlocked else { return false }
 
+        self.currentValue = currentValue
         progress = min(Double(currentValue) / Double(targetValue), 1.0)
 
         if progress >= 1.0, !isUnlocked {
@@ -163,6 +224,7 @@ extension Achievement {
         guard !isUnlocked else { return }
         isUnlocked = true
         progress = 1.0
+        currentValue = targetValue
         unlockedAt = Date()
     }
 
@@ -170,6 +232,7 @@ extension Achievement {
     mutating func reset() {
         isUnlocked = false
         progress = 0.0
+        currentValue = 0
         unlockedAt = nil
     }
 }
@@ -180,11 +243,6 @@ extension Achievement {
     /// Progress as a percentage (0-100)
     var progressPercentage: Int {
         Int(progress * 100)
-    }
-
-    /// Current progress value based on target
-    var currentValue: Int {
-        Int(progress * Double(targetValue))
     }
 
     /// Formatted progress string (e.g., "5/10")
