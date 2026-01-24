@@ -7,18 +7,27 @@ final class AchievementManagerTests: XCTestCase {
     // swiftlint:disable implicitly_unwrapped_optional
     var sut: AchievementManager!
     var mockStatistics: StatisticsManager!
+    var testUserDefaults: UserDefaults?
+    var testSuiteName: String!
     // swiftlint:enable implicitly_unwrapped_optional
-    let testSuiteName = "AchievementManagerTests"
 
     override func setUp() {
         super.setUp()
+        // Use a simple static suite name - parallel tests should be isolated by test instance
+        testSuiteName = "com.tennergrid.tests"
+
         // Use a custom UserDefaults suite for testing to avoid interfering with app data
         guard let defaults = UserDefaults(suiteName: testSuiteName) else {
-            XCTFail("Failed to create test UserDefaults")
+            XCTFail("Failed to create test UserDefaults with suite: \(testSuiteName ?? "nil")")
             return
         }
-        defaults.removePersistentDomain(forName: testSuiteName)
+        testUserDefaults = defaults
 
+        // Clear the persistent domain first
+        defaults.removePersistentDomain(forName: testSuiteName)
+        defaults.synchronize()
+
+        // Create fresh managers after clearing
         mockStatistics = StatisticsManager.test(userDefaults: defaults)
         sut = AchievementManager.test(statisticsManager: mockStatistics, userDefaults: defaults)
     }
@@ -27,8 +36,11 @@ final class AchievementManagerTests: XCTestCase {
         sut = nil
         mockStatistics = nil
         // Clean up test UserDefaults
-        let defaults = UserDefaults(suiteName: testSuiteName)
-        defaults?.removePersistentDomain(forName: testSuiteName)
+        if let defaults = testUserDefaults, let suite = testSuiteName {
+            defaults.removePersistentDomain(forName: suite)
+        }
+        testUserDefaults = nil
+        testSuiteName = nil
         super.tearDown()
     }
 
@@ -419,31 +431,40 @@ final class AchievementManagerTests: XCTestCase {
     // MARK: - Persistence Tests
 
     func testPersistence_SavesUnlockedAchievements() {
+        guard let defaults = testUserDefaults else {
+            XCTFail("Test UserDefaults not initialized")
+            return
+        }
+
         // Given
         completeGames(count: 1, difficulty: .easy)
         sut.checkAchievements()
 
+        // Verify the achievement is unlocked in the current instance
+        XCTAssertTrue(sut.achievement(withId: "first_game")?.isUnlocked == true, "Achievement should be unlocked before reload")
+
         // When - Create new instance to force reload
-        guard let defaults = UserDefaults(suiteName: testSuiteName) else {
-            XCTFail("Failed to create test UserDefaults")
-            return
-        }
+        defaults.synchronize()
         let newStatsManager = StatisticsManager.test(userDefaults: defaults)
         let newManager = AchievementManager.test(statisticsManager: newStatsManager, userDefaults: defaults)
 
         // Then
-        XCTAssertTrue(newManager.achievement(withId: "first_game")?.isUnlocked ?? false)
+        let achievement = newManager.achievement(withId: "first_game")
+        XCTAssertNotNil(achievement, "Achievement should exist")
+        XCTAssertTrue(achievement?.isUnlocked == true, "Achievement should still be unlocked after reload")
     }
 
     func testPersistence_SavesProgress() {
+        guard let defaults = testUserDefaults else {
+            XCTFail("Test UserDefaults not initialized")
+            return
+        }
+
         // Given
         sut.updateProgress(achievementId: "games_10", currentValue: 5)
 
         // When - Create new instance to force reload
-        guard let defaults = UserDefaults(suiteName: testSuiteName) else {
-            XCTFail("Failed to create test UserDefaults")
-            return
-        }
+        defaults.synchronize()
         let newStatsManager = StatisticsManager.test(userDefaults: defaults)
         let newManager = AchievementManager.test(statisticsManager: newStatsManager, userDefaults: defaults)
 
@@ -454,16 +475,18 @@ final class AchievementManagerTests: XCTestCase {
     }
 
     func testPersistence_SavesUnlockDate() {
+        guard let defaults = testUserDefaults else {
+            XCTFail("Test UserDefaults not initialized")
+            return
+        }
+
         // Given
         completeGames(count: 1, difficulty: .easy)
         sut.checkAchievements()
         let originalDate = sut.achievement(withId: "first_game")?.unlockedAt
 
         // When - Create new instance to force reload
-        guard let defaults = UserDefaults(suiteName: testSuiteName) else {
-            XCTFail("Failed to create test UserDefaults")
-            return
-        }
+        defaults.synchronize()
         let newStatsManager = StatisticsManager.test(userDefaults: defaults)
         let newManager = AchievementManager.test(statisticsManager: newStatsManager, userDefaults: defaults)
 
@@ -479,15 +502,17 @@ final class AchievementManagerTests: XCTestCase {
     }
 
     func testPersistence_MergesNewAchievements() {
+        guard let defaults = testUserDefaults else {
+            XCTFail("Test UserDefaults not initialized")
+            return
+        }
+
         // Given - Save current achievements
         completeGames(count: 1, difficulty: .easy)
         sut.checkAchievements()
 
         // Simulate app update with new achievements by reloading
-        guard let defaults = UserDefaults(suiteName: testSuiteName) else {
-            XCTFail("Failed to create test UserDefaults")
-            return
-        }
+        defaults.synchronize()
         let newStatsManager = StatisticsManager.test(userDefaults: defaults)
         let newManager = AchievementManager.test(statisticsManager: newStatsManager, userDefaults: defaults)
 
@@ -497,6 +522,11 @@ final class AchievementManagerTests: XCTestCase {
     }
 
     func testResetAllAchievements_ResetsAndPersists() {
+        guard let defaults = testUserDefaults else {
+            XCTFail("Test UserDefaults not initialized")
+            return
+        }
+
         // Given
         completeGames(count: 1, difficulty: .easy)
         sut.checkAchievements()
@@ -508,10 +538,7 @@ final class AchievementManagerTests: XCTestCase {
         XCTAssertTrue(sut.unlockedAchievements().isEmpty)
 
         // Verify persistence
-        guard let defaults = UserDefaults(suiteName: testSuiteName) else {
-            XCTFail("Failed to create test UserDefaults")
-            return
-        }
+        defaults.synchronize()
         let newStatsManager = StatisticsManager.test(userDefaults: defaults)
         let newManager = AchievementManager.test(statisticsManager: newStatsManager, userDefaults: defaults)
         XCTAssertTrue(newManager.unlockedAchievements().isEmpty)
