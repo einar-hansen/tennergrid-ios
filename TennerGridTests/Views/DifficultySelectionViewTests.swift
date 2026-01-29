@@ -1,6 +1,5 @@
 import SwiftUI
 import XCTest
-
 @testable import TennerGrid
 
 /// Tests for DifficultySelectionView and CustomGameConfigurationView
@@ -10,7 +9,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     // MARK: - DifficultySelectionView Tests
 
     /// Test that DifficultySelectionView can be created
-    func testDifficultySelectionViewCreation() throws {
+    func testDifficultySelectionViewCreation() {
         // Given & When
         let view = DifficultySelectionView()
 
@@ -19,7 +18,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     }
 
     /// Test that DifficultySelectionView can be created with callbacks
-    func testDifficultySelectionViewCreationWithCallbacks() throws {
+    func testDifficultySelectionViewCreationWithCallbacks() {
         // Given
         var selectedDifficulty: Difficulty?
         var customGameDifficulty: Difficulty?
@@ -44,7 +43,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     }
 
     /// Test that all difficulty levels are available
-    func testAllDifficultyLevelsAvailable() throws {
+    func testAllDifficultyLevelsAvailable() {
         // Given
         let expectedDifficulties = Difficulty.allCases
 
@@ -57,7 +56,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     }
 
     /// Test difficulty properties for Easy level
-    func testEasyDifficultyProperties() throws {
+    func testEasyDifficultyProperties() {
         // Given
         let difficulty = Difficulty.easy
 
@@ -73,7 +72,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     }
 
     /// Test difficulty properties for Medium level
-    func testMediumDifficultyProperties() throws {
+    func testMediumDifficultyProperties() {
         // Given
         let difficulty = Difficulty.medium
 
@@ -89,7 +88,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     }
 
     /// Test difficulty properties for Hard level
-    func testHardDifficultyProperties() throws {
+    func testHardDifficultyProperties() {
         // Given
         let difficulty = Difficulty.hard
 
@@ -107,7 +106,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     // MARK: - CustomGameConfigurationView Tests
 
     /// Test that CustomGameConfigurationView can be created
-    func testCustomGameConfigurationViewCreation() throws {
+    func testCustomGameConfigurationViewCreation() {
         // Given & When
         let view = CustomGameConfigurationView()
 
@@ -116,7 +115,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     }
 
     /// Test that CustomGameConfigurationView can be created with callback
-    func testCustomGameConfigurationViewCreationWithCallback() throws {
+    func testCustomGameConfigurationViewCreationWithCallback() {
         // Given
         var confirmedDifficulty: Difficulty?
         var confirmedRows: Int?
@@ -136,7 +135,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     // MARK: - Row Selection Tests
 
     /// Test row selection range is valid
-    func testRowSelectionRangeIsValid() throws {
+    func testRowSelectionRangeIsValid() {
         // Given
         let minRows = 3
         let maxRows = 10
@@ -148,7 +147,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     }
 
     /// Test that all row options are within valid range
-    func testRowOptionsWithinValidRange() throws {
+    func testRowOptionsWithinValidRange() {
         // Given
         let minRows = 3
         let maxRows = 10
@@ -167,7 +166,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     // MARK: - Column Constants Tests
 
     /// Test that Tenner Grid always uses 10 columns
-    func testTennerGridColumnConstant() throws {
+    func testTennerGridColumnConstant() {
         // Given
         let columns = Difficulty.columns
 
@@ -178,7 +177,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     // MARK: - Difficulty Selection Flow Tests
 
     /// Test difficulty selection callback is executed
-    func testDifficultySelectionCallback() throws {
+    func testDifficultySelectionCallback() {
         // Given
         var selectedDifficulty: Difficulty?
         let view = DifficultySelectionView { difficulty in
@@ -198,7 +197,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     }
 
     /// Test custom game callback is executed with difficulty and rows
-    func testCustomGameCallback() throws {
+    func testCustomGameCallback() {
         // Given
         var customDifficulty: Difficulty?
         var customRows: Int?
@@ -225,7 +224,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     // MARK: - Edge Cases
 
     /// Test minimum custom game configuration
-    func testMinimumCustomGameConfiguration() throws {
+    func testMinimumCustomGameConfiguration() {
         // Given
         var confirmedDifficulty: Difficulty?
         var confirmedRows: Int?
@@ -247,7 +246,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     }
 
     /// Test maximum custom game configuration
-    func testMaximumCustomGameConfiguration() throws {
+    func testMaximumCustomGameConfiguration() {
         // Given
         var confirmedDifficulty: Difficulty?
         var confirmedRows: Int?
@@ -271,7 +270,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     // MARK: - Difficulty Metadata Tests
 
     /// Test that all difficulties have valid metadata
-    func testDifficultyMetadataValidity() throws {
+    func testDifficultyMetadataValidity() {
         // Given
         let difficulties = Difficulty.allCases
 
@@ -301,7 +300,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     }
 
     /// Test that difficulty points increase with difficulty
-    func testDifficultyPointsProgression() throws {
+    func testDifficultyPointsProgression() {
         // Given
         let easy = Difficulty.easy
         let medium = Difficulty.medium
@@ -315,7 +314,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     }
 
     /// Test that estimated time increases with difficulty
-    func testDifficultyTimeProgression() throws {
+    func testDifficultyTimeProgression() {
         // Given
         let easy = Difficulty.easy
         let medium = Difficulty.medium
@@ -329,7 +328,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     }
 
     /// Test that prefilled percentage decreases with difficulty
-    func testDifficultyPrefilledProgression() throws {
+    func testDifficultyPrefilledProgression() {
         // Given
         let easy = Difficulty.easy
         let medium = Difficulty.medium
@@ -357,7 +356,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     // MARK: - Integration Tests
 
     /// Test complete difficulty selection flow
-    func testCompleteDifficultySelectionFlow() throws {
+    func testCompleteDifficultySelectionFlow() {
         // Given
         var selectionCompleted = false
         var selectedDifficulty: Difficulty?
@@ -381,7 +380,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     }
 
     /// Test complete custom game configuration flow
-    func testCompleteCustomGameConfigurationFlow() throws {
+    func testCompleteCustomGameConfigurationFlow() {
         // Given
         var configurationCompleted = false
         var confirmedDifficulty: Difficulty?
@@ -420,7 +419,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     // MARK: - Nil Callback Tests
 
     /// Test that view handles nil callbacks gracefully
-    func testViewHandlesNilCallbacks() throws {
+    func testViewHandlesNilCallbacks() {
         // Given & When
         let view = DifficultySelectionView(onSelect: nil, onCustomGame: nil)
 
@@ -433,7 +432,7 @@ final class DifficultySelectionViewTests: XCTestCase {
     }
 
     /// Test custom configuration view with nil callback
-    func testCustomConfigurationViewHandlesNilCallback() throws {
+    func testCustomConfigurationViewHandlesNilCallback() {
         // Given & When
         let view = CustomGameConfigurationView(onConfirm: nil)
 

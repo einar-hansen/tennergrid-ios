@@ -492,7 +492,7 @@ struct GameStatisticsTests {
         #expect(stats1.gamesCompleted == stats2.gamesCompleted)
     }
 
-    @Test func equalityAfterSameOperations() throws {
+    @Test func equalityAfterSameOperations() {
         let createdDate = Date()
         var stats1 = GameStatistics(createdAt: createdDate)
         var stats2 = GameStatistics(createdAt: createdDate)

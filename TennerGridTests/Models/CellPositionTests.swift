@@ -268,7 +268,7 @@ struct CellPositionTests {
         let encoder = JSONEncoder()
         let data = try encoder.encode(position)
 
-        let json = String(data: data, encoding: .utf8)!
+        let json = try #require(String(data: data, encoding: .utf8))
         #expect(json.contains("\"row\":2"))
         #expect(json.contains("\"column\":4"))
     }
@@ -277,7 +277,7 @@ struct CellPositionTests {
         let json = """
         {"row":3,"column":7}
         """
-        let data = json.data(using: .utf8)!
+        let data = try #require(json.data(using: .utf8))
         let decoder = JSONDecoder()
         let position = try decoder.decode(CellPosition.self, from: data)
 

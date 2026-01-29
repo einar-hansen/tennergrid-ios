@@ -1,6 +1,5 @@
 import SwiftUI
 import XCTest
-
 @testable import TennerGrid
 
 /// Tests for WinScreenView to ensure proper rendering and interaction

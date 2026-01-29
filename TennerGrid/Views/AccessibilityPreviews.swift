@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// SwiftUI previews for testing accessibility features, especially Dynamic Type with largest text sizes
-/// This file contains test previews for major views at various Dynamic Type sizes
+// SwiftUI previews for testing accessibility features, especially Dynamic Type with largest text sizes
+// This file contains test previews for major views at various Dynamic Type sizes
 
 // MARK: - Game View Accessibility Tests
 

@@ -8,7 +8,9 @@ enum Difficulty: String, Codable, CaseIterable, Identifiable {
     case hard
     case extreme
 
-    var id: String { rawValue }
+    var id: String {
+        rawValue
+    }
 
     /// Display name for the difficulty level
     var displayName: String {

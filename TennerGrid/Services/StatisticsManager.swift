@@ -64,9 +64,7 @@ final class StatisticsManager: ObservableObject {
         saveStatistics()
 
         // Check for newly unlocked achievements after updating statistics
-        let unlockedAchievements = AchievementManager.shared.checkAchievements(gameState: gameState)
-
-        return unlockedAchievements
+        return AchievementManager.shared.checkAchievements(gameState: gameState)
     }
 
     /// Updates the streak information based on today's play

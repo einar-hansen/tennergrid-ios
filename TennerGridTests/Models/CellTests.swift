@@ -377,7 +377,7 @@ struct CellTests {
 
         let encoder = JSONEncoder()
         let data = try encoder.encode(cell)
-        let json = String(data: data, encoding: .utf8)!
+        let json = try #require(String(data: data, encoding: .utf8))
 
         #expect(json.contains("\"value\":7"))
         #expect(json.contains("\"isInitial\":true"))
@@ -399,7 +399,7 @@ struct CellTests {
         """
 
         let decoder = JSONDecoder()
-        let data = json.data(using: .utf8)!
+        let data = try #require(json.data(using: .utf8))
         let cell = try decoder.decode(Cell.self, from: data)
 
         #expect(cell.position == CellPosition(row: 1, column: 2))

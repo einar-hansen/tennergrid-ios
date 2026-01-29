@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Helper views and modifiers for testing accessibility features
-/// Specifically focused on Dynamic Type testing with largest text sizes
+// Helper views and modifiers for testing accessibility features
+// Specifically focused on Dynamic Type testing with largest text sizes
 
 // MARK: - Dynamic Type Testing Environment
 

@@ -165,11 +165,17 @@ enum PreviewPuzzles {
     // MARK: - Convenience Accessors
 
     /// Default puzzle for previews (easy 5-row)
-    static var `default`: TennerGridPuzzle { easy5Row }
+    static var `default`: TennerGridPuzzle {
+        easy5Row
+    }
 
     /// Small puzzle for compact previews
-    static var small: TennerGridPuzzle { easy3Row }
+    static var small: TennerGridPuzzle {
+        easy3Row
+    }
 
     /// Large puzzle for testing layouts
-    static var large: TennerGridPuzzle { hard7Row }
+    static var large: TennerGridPuzzle {
+        hard7Row
+    }
 }

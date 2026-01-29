@@ -181,7 +181,7 @@ final class SettingsManagerTests: XCTestCase {
         XCTAssertEqual(newManager.settings, customSettings)
     }
 
-    func testAllSettingsPersist() {
+    func testAllSettingsPersist() throws {
         // Given: Manager with all settings modified
         let manager = createTestManager()
 
@@ -197,13 +197,13 @@ final class SettingsManagerTests: XCTestCase {
         // Then: All settings should persist
         let loadedSettings = loadSettings()
         XCTAssertNotNil(loadedSettings)
-        XCTAssertFalse(loadedSettings!.autoCheckErrors)
-        XCTAssertFalse(loadedSettings!.showTimer)
-        XCTAssertFalse(loadedSettings!.highlightSameNumbers)
-        XCTAssertFalse(loadedSettings!.hapticFeedback)
-        XCTAssertFalse(loadedSettings!.soundEffects)
-        XCTAssertEqual(loadedSettings!.themePreference, "light")
-        XCTAssertTrue(loadedSettings!.dailyReminder)
+        XCTAssertFalse(try XCTUnwrap(loadedSettings?.autoCheckErrors))
+        XCTAssertFalse(try XCTUnwrap(loadedSettings?.showTimer))
+        XCTAssertFalse(try XCTUnwrap(loadedSettings?.highlightSameNumbers))
+        XCTAssertFalse(try XCTUnwrap(loadedSettings?.hapticFeedback))
+        XCTAssertFalse(try XCTUnwrap(loadedSettings?.soundEffects))
+        XCTAssertEqual(loadedSettings?.themePreference, "light")
+        XCTAssertTrue(try XCTUnwrap(loadedSettings?.dailyReminder))
     }
 
     // MARK: - Edge Cases

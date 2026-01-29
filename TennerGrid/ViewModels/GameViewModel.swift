@@ -424,7 +424,7 @@ final class GameViewModel: ObservableObject {
         var affectedPositions = Set<CellPosition>()
 
         // Add all cells in the same row
-        for col in 0..<gameState.puzzle.columns {
+        for col in 0 ..< gameState.puzzle.columns {
             let rowPosition = CellPosition(row: position.row, column: col)
             if rowPosition != position {
                 affectedPositions.insert(rowPosition)
@@ -432,10 +432,10 @@ final class GameViewModel: ObservableObject {
         }
 
         // Add all neighbor cells (including diagonals)
-        for rowOffset in -1...1 {
-            for colOffset in -1...1 {
+        for rowOffset in -1 ... 1 {
+            for colOffset in -1 ... 1 {
                 // Skip the center cell (the one we just filled)
-                if rowOffset == 0 && colOffset == 0 {
+                if rowOffset == 0, colOffset == 0 {
                     continue
                 }
 
@@ -443,8 +443,9 @@ final class GameViewModel: ObservableObject {
                 let neighborCol = position.column + colOffset
 
                 // Check bounds
-                if neighborRow >= 0 && neighborRow < gameState.puzzle.rows &&
-                   neighborCol >= 0 && neighborCol < gameState.puzzle.columns {
+                if neighborRow >= 0, neighborRow < gameState.puzzle.rows,
+                   neighborCol >= 0, neighborCol < gameState.puzzle.columns
+                {
                     let neighborPosition = CellPosition(row: neighborRow, column: neighborCol)
                     affectedPositions.insert(neighborPosition)
                 }

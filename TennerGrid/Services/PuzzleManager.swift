@@ -185,7 +185,9 @@ final class PuzzleManager: ObservableObject {
 /// Represents a saved game state
 struct SavedGame: Codable, Identifiable {
     /// Unique identifier (uses puzzle ID)
-    var id: UUID { puzzle.id }
+    var id: UUID {
+        puzzle.id
+    }
 
     /// The puzzle being played
     let puzzle: TennerGridPuzzle

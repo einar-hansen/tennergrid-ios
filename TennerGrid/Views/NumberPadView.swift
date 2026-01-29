@@ -29,11 +29,11 @@ struct NumberPadView: View {
     /// Button size scales with device - larger on iPad, smaller on very compact devices
     private var buttonSize: CGFloat {
         if isIPad {
-            return 80
+            80
         } else if isVeryCompact {
-            return 52  // Smaller for iPhone SE to fit in 320pt width
+            52 // Smaller for iPhone SE to fit in 320pt width
         } else {
-            return 60
+            60
         }
     }
 
@@ -50,11 +50,11 @@ struct NumberPadView: View {
     /// Horizontal padding scales with device - tighter on very compact devices
     private var horizontalPadding: CGFloat {
         if isIPad {
-            return 16
+            16
         } else if isVeryCompact {
-            return 12  // Tighter padding for iPhone SE
+            12 // Tighter padding for iPhone SE
         } else {
-            return 16
+            16
         }
     }
 
@@ -191,7 +191,7 @@ struct NumberPadView: View {
     /// - Returns: True if this number is in the selected cell's notes
     private func isInNotes(_ number: Int) -> Bool {
         guard let selected = viewModel.selectedPosition,
-              !viewModel.notesMode  // Only highlight when in value entry mode
+              !viewModel.notesMode // Only highlight when in value entry mode
         else {
             return false
         }
@@ -210,7 +210,7 @@ struct NumberPadView: View {
 
         // Highlight if this is the currently selected cell's value (only in non-notes mode)
         // Use a filled blue background to make it stand out prominently
-        if !viewModel.notesMode && isSelectedNumber(number) {
+        if !viewModel.notesMode, isSelectedNumber(number) {
             return Color.blue
         }
 
@@ -238,7 +238,7 @@ struct NumberPadView: View {
 
         // Highlight if this is the currently selected cell's value (only in non-notes mode)
         // Use a darker blue border for the selected number
-        if !viewModel.notesMode && isSelectedNumber(number) {
+        if !viewModel.notesMode, isSelectedNumber(number) {
             return Color.blue.opacity(0.8)
         }
 
@@ -266,7 +266,7 @@ struct NumberPadView: View {
 
         // Highlight if this is the currently selected cell's value (only in non-notes mode)
         // Use white text on the filled blue background for better contrast
-        if !viewModel.notesMode && isSelectedNumber(number) {
+        if !viewModel.notesMode, isSelectedNumber(number) {
             return .white
         }
 

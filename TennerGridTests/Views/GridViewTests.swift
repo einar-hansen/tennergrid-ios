@@ -9,7 +9,7 @@ final class GridViewTests: XCTestCase {
     // MARK: - Grid Rendering Tests
 
     /// Test that GridView renders correctly with a 10-column grid
-    func testGridRendering10Columns() throws {
+    func testGridRendering10Columns() {
         // Given - Use fixture puzzle (Tenner Grid always has 10 columns)
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -24,7 +24,7 @@ final class GridViewTests: XCTestCase {
     }
 
     /// Test that GridView renders with medium difficulty puzzle
-    func testGridRenderingMediumDifficulty() throws {
+    func testGridRenderingMediumDifficulty() {
         // Given
         let puzzle = TestFixtures.mediumPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -38,7 +38,7 @@ final class GridViewTests: XCTestCase {
     }
 
     /// Test that GridView renders with hard difficulty puzzle
-    func testGridRenderingHardDifficulty() throws {
+    func testGridRenderingHardDifficulty() {
         // Given
         let puzzle = TestFixtures.hardPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -54,7 +54,7 @@ final class GridViewTests: XCTestCase {
     // MARK: - Column Sum Display Tests
 
     /// Test that column sums are displayed correctly
-    func testColumnSumsDisplay() throws {
+    func testColumnSumsDisplay() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -76,7 +76,7 @@ final class GridViewTests: XCTestCase {
     // MARK: - Cell Positioning Tests
 
     /// Test that cells are positioned correctly in the grid
-    func testCellPositioning() throws {
+    func testCellPositioning() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -99,7 +99,7 @@ final class GridViewTests: XCTestCase {
     // MARK: - Selection Tests
 
     /// Test that grid selection updates correctly
-    func testGridSelectionUpdates() throws {
+    func testGridSelectionUpdates() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -116,7 +116,7 @@ final class GridViewTests: XCTestCase {
     // MARK: - Edge Cases
 
     /// Test GridView with minimum puzzle size (10x3)
-    func testMinimumPuzzleSize() throws {
+    func testMinimumPuzzleSize() {
         // Given - 10x3 is minimum (Tenner Grid always has 10 columns, min 3 rows)
         let puzzle = TestFixtures.smallPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -131,7 +131,7 @@ final class GridViewTests: XCTestCase {
     }
 
     /// Test GridView handles empty cell display
-    func testEmptyCellDisplay() throws {
+    func testEmptyCellDisplay() {
         // Given
         let puzzle = TestFixtures.hardPuzzle // Hard has fewer pre-filled cells
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -147,7 +147,7 @@ final class GridViewTests: XCTestCase {
     // MARK: - Column Completion Tests
 
     /// Test column completion detection
-    func testColumnCompletionDetection() throws {
+    func testColumnCompletionDetection() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -159,7 +159,7 @@ final class GridViewTests: XCTestCase {
     // MARK: - Pre-filled Cell Tests
 
     /// Test that pre-filled cells are rendered correctly
-    func testPrefilledCellsRendering() throws {
+    func testPrefilledCellsRendering() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)

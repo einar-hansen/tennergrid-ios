@@ -384,7 +384,7 @@ struct GameActionTests {
 
         let encoder = JSONEncoder()
         let data = try encoder.encode(action)
-        let json = String(data: data, encoding: .utf8)!
+        let json = try #require(String(data: data, encoding: .utf8))
 
         #expect(json.contains("\"type\":\"setValue\""))
         #expect(json.contains("\"row\":2"))
@@ -405,7 +405,7 @@ struct GameActionTests {
             "timestamp": 1000000
         }
         """
-        let data = json.data(using: .utf8)!
+        let data = try #require(json.data(using: .utf8))
         let decoder = JSONDecoder()
         let action = try decoder.decode(GameAction.self, from: data)
 
@@ -424,7 +424,7 @@ struct GameActionTests {
 
         let encoder = JSONEncoder()
         let data = try encoder.encode(action)
-        let json = String(data: data, encoding: .utf8)!
+        let json = try #require(String(data: data, encoding: .utf8))
 
         #expect(json.contains("\"type\":\"setPencilMarks\""))
         #expect(json.contains("\"oldPencilMarks\""))

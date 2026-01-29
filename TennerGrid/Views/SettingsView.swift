@@ -186,7 +186,9 @@ enum ThemePreference: String, CaseIterable, Identifiable {
     case dark
     case system
 
-    var id: String { rawValue }
+    var id: String {
+        rawValue
+    }
 
     /// Display name for the theme
     var displayName: String {

@@ -706,7 +706,7 @@ final class PersistenceManagerTests: XCTestCase {
 
     // MARK: - Performance Tests
 
-    func testSavePerformance() throws {
+    func testSavePerformance() {
         // Given: A game state
         let puzzle = TestFixtures.hardPuzzle
         let gameState = GameState(puzzle: puzzle)

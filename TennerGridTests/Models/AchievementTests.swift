@@ -209,7 +209,7 @@ struct AchievementTests {
         #expect(achievement.progress == 1.0)
     }
 
-    @Test func unlockSetsFlags() {
+    @Test func unlockSetsFlags() throws {
         var achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
@@ -225,8 +225,8 @@ struct AchievementTests {
         #expect(achievement.isUnlocked)
         #expect(achievement.progress == 1.0)
         #expect(achievement.unlockedAt != nil)
-        #expect(achievement.unlockedAt! >= beforeUnlock)
-        #expect(achievement.unlockedAt! <= afterUnlock)
+        #expect(try #require(achievement.unlockedAt) >= beforeUnlock)
+        #expect(try #require(achievement.unlockedAt) <= afterUnlock)
     }
 
     @Test func unlockWhenAlreadyUnlockedDoesNothing() {
@@ -489,7 +489,7 @@ struct AchievementTests {
         #expect(achievement.formattedUnlockDate == nil)
     }
 
-    @Test func formattedUnlockDateWhenUnlocked() {
+    @Test func formattedUnlockDateWhenUnlocked() throws {
         var achievement = Achievement.oneTime(
             id: "test",
             title: "Test",
@@ -501,7 +501,7 @@ struct AchievementTests {
         achievement.unlock()
 
         #expect(achievement.formattedUnlockDate != nil)
-        #expect(!achievement.formattedUnlockDate!.isEmpty)
+        #expect(try !(#require(achievement.formattedUnlockDate?.isEmpty)))
     }
 
     // MARK: - Predefined Achievements Tests

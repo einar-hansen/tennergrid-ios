@@ -525,7 +525,7 @@ struct GameStateTests {
         #expect(state.selectedCell == nil)
     }
 
-    @Test func completeSetCompletionDate() {
+    @Test func completeSetCompletionDate() throws {
         let puzzle = createTestPuzzle()
         var state = GameState(puzzle: puzzle)
 
@@ -533,8 +533,8 @@ struct GameStateTests {
         state.complete()
         let afterCompletion = Date()
 
-        #expect(state.completedAt! >= beforeCompletion)
-        #expect(state.completedAt! <= afterCompletion)
+        #expect(try #require(state.completedAt) >= beforeCompletion)
+        #expect(try #require(state.completedAt) <= afterCompletion)
     }
 
     @Test func useHintIncrementsCount() {

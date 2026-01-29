@@ -1403,7 +1403,7 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.elapsedTime, 0, accuracy: 0.1)
     }
 
-    func testTimerDoesNotStartWhenGameIsPaused() async {
+    func testTimerDoesNotStartWhenGameIsPaused() {
         // Create a paused game state
         var pausedState = GameState(puzzle: puzzle)
         pausedState.pause()
@@ -1415,7 +1415,7 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertTrue(pausedViewModel.gameState.isPaused)
     }
 
-    func testTimerDoesNotStartWhenGameIsCompleted() async {
+    func testTimerDoesNotStartWhenGameIsCompleted() {
         // Create a completed game state
         var completedState = GameState(puzzle: puzzle)
         completedState.complete()
@@ -1531,7 +1531,7 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertEqual(formatted2, "11:00")
     }
 
-    func testTimerStopsOnCompletion() async {
+    func testTimerStopsOnCompletion() async throws {
         // Dynamically find all empty cells and their solution values
         let allEmptyCells = findAllEmptyCells()
 
@@ -1546,7 +1546,7 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertFalse(viewModel.gameState.isCompleted)
 
         // Complete the puzzle with the last cell
-        let lastCell = allEmptyCells.last!
+        let lastCell = try XCTUnwrap(allEmptyCells.last)
         viewModel.selectCell(at: lastCell.0)
         viewModel.enterNumber(lastCell.1)
 
@@ -1574,7 +1574,7 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.isTimerRunning)
     }
 
-    func testStartTimerAfterCompletion() async {
+    func testStartTimerAfterCompletion() {
         // Dynamically find all empty cells and their solution values
         let allEmptyCells = findAllEmptyCells()
 
@@ -1915,7 +1915,7 @@ final class GameViewModelTests: XCTestCase {
 
     /// Tests the complete game flow: start → play → complete
     /// This verifies that a new game can be started, played through, and completed successfully
-    func testCompleteGameFlow_StartPlayComplete() {
+    func testCompleteGameFlow_StartPlayComplete() throws {
         // PHASE 1: START - Verify initial game state
         XCTAssertFalse(viewModel.gameState.isCompleted, "Game should not be completed at start")
         XCTAssertFalse(viewModel.gameState.isPaused, "Game should not be paused at start")
@@ -1956,7 +1956,7 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertTrue(viewModel.isTimerRunning, "Timer should still be running")
 
         // PHASE 3: COMPLETE - Fill the last cell
-        let lastCell = allEmptyCells.last!
+        let lastCell = try XCTUnwrap(allEmptyCells.last)
         viewModel.selectCell(at: lastCell.0)
         viewModel.enterNumber(lastCell.1)
 

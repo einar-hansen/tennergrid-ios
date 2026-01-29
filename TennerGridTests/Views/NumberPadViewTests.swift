@@ -9,7 +9,7 @@ final class NumberPadViewTests: XCTestCase {
     // MARK: - Number Entry Tests
 
     /// Test that tapping a number button calls enterNumber on the view model
-    func testNumberButtonTapCallsEnterNumber() throws {
+    func testNumberButtonTapCallsEnterNumber() {
         // Given - Use fixture puzzle
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -28,7 +28,7 @@ final class NumberPadViewTests: XCTestCase {
     }
 
     /// Test that number pad updates when cell is selected
-    func testNumberPadUpdatesOnCellSelection() throws {
+    func testNumberPadUpdatesOnCellSelection() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -47,7 +47,7 @@ final class NumberPadViewTests: XCTestCase {
     }
 
     /// Test that number pad works correctly in notes mode
-    func testNumberPadInNotesMode() throws {
+    func testNumberPadInNotesMode() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -67,7 +67,7 @@ final class NumberPadViewTests: XCTestCase {
     }
 
     /// Test that pre-filled cells cannot be edited via number pad
-    func testPreFilledCellsCannotBeEdited() throws {
+    func testPreFilledCellsCannotBeEdited() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -93,7 +93,7 @@ final class NumberPadViewTests: XCTestCase {
     // MARK: - Conflict Detection Tests
 
     /// Test that conflict count updates when placing invalid numbers
-    func testConflictCountForInvalidPlacement() throws {
+    func testConflictCountForInvalidPlacement() {
         // Given - Use a puzzle where we can create a conflict
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -126,7 +126,7 @@ final class NumberPadViewTests: XCTestCase {
     }
 
     /// Test that conflict count is zero in notes mode
-    func testConflictCountIgnoredInNotesMode() throws {
+    func testConflictCountIgnoredInNotesMode() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -147,7 +147,7 @@ final class NumberPadViewTests: XCTestCase {
     // MARK: - Selection and Disabled State Tests
 
     /// Test that invalid numbers are disabled
-    func testInvalidNumbersDisabled() throws {
+    func testInvalidNumbersDisabled() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -170,7 +170,7 @@ final class NumberPadViewTests: XCTestCase {
     }
 
     /// Test that number pad shows no selection when no cell is selected
-    func testNumberPadWithNoSelection() throws {
+    func testNumberPadWithNoSelection() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -202,11 +202,14 @@ final class NumberPadViewTests: XCTestCase {
 
         // Then - Final value should be one of the sequence or nil
         let value = viewModel.value(at: position)
-        XCTAssertTrue(value == nil || sequence.contains(value!), "Cell should contain a valid number or be empty")
+        XCTAssertTrue(
+            try value == nil || sequence.contains(XCTUnwrap(value)),
+            "Cell should contain a valid number or be empty"
+        )
     }
 
     /// Test entering zero
-    func testEnteringZero() throws {
+    func testEnteringZero() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -224,7 +227,7 @@ final class NumberPadViewTests: XCTestCase {
     // MARK: - View Creation Tests
 
     /// Test NumberPadView creates successfully
-    func testNumberPadViewCreation() throws {
+    func testNumberPadViewCreation() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -237,7 +240,7 @@ final class NumberPadViewTests: XCTestCase {
     }
 
     /// Test NumberPadView with different difficulty puzzles
-    func testNumberPadViewWithDifferentDifficulties() throws {
+    func testNumberPadViewWithDifferentDifficulties() {
         let puzzles = [
             TestFixtures.easyPuzzle,
             TestFixtures.mediumPuzzle,
@@ -254,7 +257,7 @@ final class NumberPadViewTests: XCTestCase {
     // MARK: - Layout Adaptation Tests
 
     /// Test NumberPadView layout on compact device
-    func testNumberPadLayoutCompactDevice() throws {
+    func testNumberPadLayoutCompactDevice() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -266,7 +269,7 @@ final class NumberPadViewTests: XCTestCase {
     }
 
     /// Test NumberPadView layout on regular device
-    func testNumberPadLayoutRegularDevice() throws {
+    func testNumberPadLayoutRegularDevice() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -280,7 +283,7 @@ final class NumberPadViewTests: XCTestCase {
     // MARK: - Integration Tests
 
     /// Test complete user flow: select cell -> enter number -> select different cell -> enter number
-    func testCompleteUserFlow() throws {
+    func testCompleteUserFlow() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)
@@ -308,7 +311,7 @@ final class NumberPadViewTests: XCTestCase {
     }
 
     /// Test that number pad works correctly with clearing
-    func testNumberPadWithClearing() throws {
+    func testNumberPadWithClearing() {
         // Given
         let puzzle = TestFixtures.easyPuzzle
         let viewModel = GameViewModel(puzzle: puzzle)

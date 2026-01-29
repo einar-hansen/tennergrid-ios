@@ -328,9 +328,7 @@ final class PersistenceManager {
             }
 
             // Decode JSON
-            let data = try decoder.decode(T.self, from: jsonData)
-
-            return data
+            return try decoder.decode(T.self, from: jsonData)
         } catch let error as DecodingError {
             // Decoding failures indicate corrupted or incompatible data
             throw PersistenceError.decodingFailed(error)

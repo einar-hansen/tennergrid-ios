@@ -26,7 +26,9 @@ struct TabBarView: View {
         case dailyChallenges
         case profile
 
-        var id: Int { rawValue }
+        var id: Int {
+            rawValue
+        }
 
         /// Display title for each tab
         var title: String {

@@ -277,7 +277,7 @@ final class PersistenceSchemaTests: XCTestCase {
 
         let size = PersistenceSchema.fileSize(at: testFile)
         XCTAssertNotNil(size)
-        XCTAssertGreaterThan(size!, 0)
+        XCTAssertGreaterThan(try XCTUnwrap(size), 0)
     }
 
     func testModificationDateReturnsNilForNonexistentFile() {

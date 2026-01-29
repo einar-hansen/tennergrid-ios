@@ -1,5 +1,4 @@
 import XCTest
-
 @testable import TennerGrid
 
 // swiftlint:disable type_body_length implicitly_unwrapped_optional
