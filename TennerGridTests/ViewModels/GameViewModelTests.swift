@@ -1337,11 +1337,14 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.undoCount, 3)
         XCTAssertEqual(viewModel.redoCount, 3)
 
-        // Perform new action in middle of sequence
-        viewModel.addPencilMark(5)
+        // Perform new action in middle of sequence (add a mark that's NOT already there)
+        viewModel.addPencilMark(2) // 2 is not in [1,5,6], so this will create a new action
+        XCTAssertTrue(viewModel.marks(at: position).contains(2))
+        XCTAssertTrue(viewModel.marks(at: position).contains(1))
         XCTAssertTrue(viewModel.marks(at: position).contains(5))
+        XCTAssertTrue(viewModel.marks(at: position).contains(6))
 
-        // Redo stack should be cleared
+        // Redo stack should be cleared and undo count incremented
         XCTAssertEqual(viewModel.redoCount, 0)
         XCTAssertEqual(viewModel.undoCount, 4)
 
@@ -1377,15 +1380,19 @@ final class GameViewModelTests: XCTestCase {
 
         // Perform many operations on position1 only
         // Valid values for position (0,1) with (0,2)=5: 4, 6 (NOT 5 - adjacent conflict!)
-        let validValues = [4, 6, 4, 6, 4, 6, 4, 6, 4, 6]
+        // Start with 6 (different from current value 4) to ensure first action is recorded
+        let validValues = [6, 4, 6, 4, 6, 4, 6, 4, 6, 4]
         for value in validValues {
             viewModel.selectCell(at: position1)
             viewModel.enterNumber(value)
             viewModel.clearSelectedCell()
         }
 
-        // Undo all 20 actions (10 enter + 10 clear) to return to the saved state
-        for _ in 0 ..< 20 {
+        // Calculate how many actions were added by the loop
+        let actionsFromLoop = viewModel.undoCount - initialUndoCount
+
+        // Undo all actions from the loop to return to the saved state
+        for _ in 0 ..< actionsFromLoop {
             viewModel.undo()
         }
 
