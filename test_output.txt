@@ -1,7 +1,4 @@
-/Users/einar/Sites/utvikler-einar-hansen/TennerGrid/TennerGridTests/TestFixtures.swift:16:50: warning: main actor-isolated conformance of 'PuzzleResponse' to 'Decodable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
-               let response = try? JSONDecoder().decode(PuzzleResponse.self, from: data)
-                                                 ^
-2026-01-29 00:04:57.639 xcodebuild[30267:31549150]  iOSSimulator: 7D1C8176-DC1D-450F-B726-5BE53C6B3F14: Failed to launch app with identifier: com.tennergrid.TennerGridUITests.xctrunner and options: {
+2026-01-29 02:54:05.177 xcodebuild[39257:31701491]  iOSSimulator: C7F1765E-28F1-4A07-8982-B7851201953D: Failed to launch app with identifier: com.tennergrid.TennerGridUITests.xctrunner and options: {
     "activate_suspended" = 1;
     arguments =     (
     );
@@ -12,7 +9,7 @@
         "DYLD_FRAMEWORK_PATH" = "/Users/einar/Library/Developer/Xcode/DerivedData/TennerGrid-aimlkqfbjtqasngddjpdfhoorkje/Build/Products/Debug-iphonesimulator:/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/Library/Frameworks";
         "DYLD_INSERT_LIBRARIES" = "/usr/lib/libRPAC.dylib:/Library/Developer/CoreSimulator/Volumes/iOS_23C54/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.2.simruntime/Contents/Resources/RuntimeRoot/usr/lib/libMainThreadChecker.dylib:/usr/lib/libRPAC.dylib";
         "DYLD_LIBRARY_PATH" = "/Users/einar/Library/Developer/Xcode/DerivedData/TennerGrid-aimlkqfbjtqasngddjpdfhoorkje/Build/Products/Debug-iphonesimulator:/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/lib";
-        "LLVM_PROFILE_FILE" = "/var/folders/wq/g_h3kyfd3yn7ht6jvt7lnrgh0000gn/T/com.tennergrid.TennerGridUITests.xctrunner/7FA59644-D79D-4EE3-B94F-DA640DC756ED-30267-000011D0F976A839/1DD43F0B-51C7-48EA-9D24-6C1CC9DE85D9-%p%c.profraw";
+        "LLVM_PROFILE_FILE" = "/var/folders/wq/g_h3kyfd3yn7ht6jvt7lnrgh0000gn/T/com.tennergrid.TennerGridUITests.xctrunner/1B5A9B33-7392-466E-8E94-F33CEC23C6B6-39257-000011D92FDE1748/82C9AA28-00DE-430D-AAF4-3AA3B3F51991-%p%c.profraw";
         NSApplicationQuitWithoutSuddenTermination = YES;
         NSUnbufferedIO = YES;
         "OS_ACTIVITY_DT_MODE" = YES;
@@ -22,7 +19,7 @@
         "PERFC_SUPPRESS_SYSTEM_REPORTS" = 1;
         "RUN_DESTINATION_DEVICE_NAME" = "Clone 2 of iPhone 17";
         "RUN_DESTINATION_DEVICE_PLATFORM_IDENTIFIER" = "com.apple.platform.iphonesimulator";
-        "RUN_DESTINATION_DEVICE_UDID" = "7D1C8176-DC1D-450F-B726-5BE53C6B3F14";
+        "RUN_DESTINATION_DEVICE_UDID" = "C7F1765E-28F1-4A07-8982-B7851201953D";
         "SQLITE_ENABLE_THREAD_ASSERTIONS" = 1;
         TERM = dumb;
         "XCODE_SCHEME_NAME" = TennerGrid;
@@ -30,31 +27,31 @@
         XCTestBundleInjectPath = "/usr/lib/libRPAC.dylib:/Library/Developer/CoreSimulator/Volumes/iOS_23C54/Library/Developer/CoreSimulator/Profiles/Runtimes/iOS 26.2.simruntime/Contents/Resources/RuntimeRoot/usr/lib/libMainThreadChecker.dylib:/usr/lib/libRPAC.dylib";
         XCTestBundlePath = "PlugIns/TennerGridUITests.xctest";
         XCTestConfigurationFilePath = "";
-        XCTestSessionIdentifier = "E973ECF9-6FBC-4F4A-8819-06F737629C16";
+        XCTestSessionIdentifier = "CDFE3AC8-17EC-4475-A5EC-C2B852F36FC3";
         "__XCODE_BUILT_PRODUCTS_DIR_PATHS" = "/Users/einar/Library/Developer/Xcode/DerivedData/TennerGrid-aimlkqfbjtqasngddjpdfhoorkje/Build/Products/Debug-iphonesimulator";
         "__XPC_DYLD_FRAMEWORK_PATH" = "/Users/einar/Library/Developer/Xcode/DerivedData/TennerGrid-aimlkqfbjtqasngddjpdfhoorkje/Build/Products/Debug-iphonesimulator";
         "__XPC_DYLD_LIBRARY_PATH" = "/Users/einar/Library/Developer/Xcode/DerivedData/TennerGrid-aimlkqfbjtqasngddjpdfhoorkje/Build/Products/Debug-iphonesimulator";
-        "__XPC_LLVM_PROFILE_FILE" = "/var/folders/wq/g_h3kyfd3yn7ht6jvt7lnrgh0000gn/T/com.tennergrid.TennerGridUITests.xctrunner/7FA59644-D79D-4EE3-B94F-DA640DC756ED-30267-000011D0F976A839/1DD43F0B-51C7-48EA-9D24-6C1CC9DE85D9-%p%c.profraw";
+        "__XPC_LLVM_PROFILE_FILE" = "/var/folders/wq/g_h3kyfd3yn7ht6jvt7lnrgh0000gn/T/com.tennergrid.TennerGridUITests.xctrunner/1B5A9B33-7392-466E-8E94-F33CEC23C6B6-39257-000011D92FDE1748/82C9AA28-00DE-430D-AAF4-3AA3B3F51991-%p%c.profraw";
     };
     stderr = "/dev/ttys011";
     stdout = "/dev/ttys011";
     "terminate_running_process" = 1;
     "wait_for_debugger" = 1;
-} (error = Error Domain=FBSOpenApplicationServiceErrorDomain Code=1 "Simulator device failed to launch com.tennergrid.TennerGridUITests.xctrunner." UserInfo={NSLocalizedDescription=Simulator device failed to launch com.tennergrid.TennerGridUITests.xctrunner., NSUnderlyingError=0x84f53fea0 {Error Domain=FBSOpenApplicationServiceErrorDomain Code=1 "The request to open "com.tennergrid.TennerGridUITests.xctrunner" failed." UserInfo={BSErrorCodeDescription=RequestDenied, NSLocalizedDescription=The request to open "com.tennergrid.TennerGridUITests.xctrunner" failed., NSUnderlyingError=0x84f53fe10 {Error Domain=FBProcessExit Code=64 "The process failed to launch." UserInfo={NSUnderlyingError=0x84f53fd80 {Error Domain=RBSRequestErrorDomain Code=5 "Launch failed." UserInfo=0x851681b00 (not displayed)}, BSErrorCodeDescription=launch-failed, NSLocalizedFailureReason=The process failed to launch.}}, FBSOpenApplicationRequestID=0xb449, NSLocalizedFailureReason=The request was denied by service delegate (SBMainWorkspace).}}, NSLocalizedFailureReason=The request was denied by service delegate (SBMainWorkspace)., FBSOpenApplicationRequestID=0xb449, SimCallingSelector=launchApplicationWithID:options:pid:error:, BSErrorCodeDescription=RequestDenied})
-2026-01-29 00:05:08.020 xcodebuild[30267:31548302] [MT] IDETestOperationsObserverDebug: 182.899 elapsed -- Testing started completed.
-2026-01-29 00:05:08.020 xcodebuild[30267:31548302] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
-2026-01-29 00:05:08.020 xcodebuild[30267:31548302] [MT] IDETestOperationsObserverDebug: 182.899 sec, +182.899 sec -- end
+} (error = Error Domain=FBSOpenApplicationServiceErrorDomain Code=1 "Simulator device failed to launch com.tennergrid.TennerGridUITests.xctrunner." UserInfo={NSLocalizedDescription=Simulator device failed to launch com.tennergrid.TennerGridUITests.xctrunner., NSUnderlyingError=0xa3a73e070 {Error Domain=FBSOpenApplicationServiceErrorDomain Code=1 "The request to open "com.tennergrid.TennerGridUITests.xctrunner" failed." UserInfo={BSErrorCodeDescription=RequestDenied, NSLocalizedDescription=The request to open "com.tennergrid.TennerGridUITests.xctrunner" failed., NSUnderlyingError=0xa3a73e0a0 {Error Domain=FBProcessExit Code=64 "The process failed to launch." UserInfo={NSUnderlyingError=0xa3a73e0d0 {Error Domain=RBSRequestErrorDomain Code=5 "Launch failed." UserInfo=0xa3641cb40 (not displayed)}, BSErrorCodeDescription=launch-failed, NSLocalizedFailureReason=The process failed to launch.}}, FBSOpenApplicationRequestID=0x4378, NSLocalizedFailureReason=The request was denied by service delegate (SBMainWorkspace).}}, NSLocalizedFailureReason=The request was denied by service delegate (SBMainWorkspace)., FBSOpenApplicationRequestID=0x4378, SimCallingSelector=launchApplicationWithID:options:pid:error:, BSErrorCodeDescription=RequestDenied})
+2026-01-29 02:54:26.855 xcodebuild[39257:31701482] [MT] IDETestOperationsObserverDebug: 164.153 elapsed -- Testing started completed.
+2026-01-29 02:54:26.855 xcodebuild[39257:31701482] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-01-29 02:54:26.855 xcodebuild[39257:31701482] [MT] IDETestOperationsObserverDebug: 164.153 sec, +164.153 sec -- end
 ** TEST FAILED **
 
 Testing started
-Test suite 'TennerGridUITests' started on 'Clone 1 of iPhone 17 - TennerGridUITests-Runner (30691)'
-Test case 'TennerGridUITests.testExample()' passed on 'Clone 1 of iPhone 17 - TennerGridUITests-Runner (30691)' (2.720 seconds)
-Test case 'TennerGridUITests.testThemePersistence()' passed on 'Clone 1 of iPhone 17 - TennerGridUITests-Runner (30691)' (26.079 seconds)
-Test case 'TennerGridUITests.testCompleteGameFlowWithVoiceOver()' passed on 'Clone 1 of iPhone 17 - TennerGridUITests-Runner (30691)' (15.584 seconds)
-Test suite 'TennerGridUITestsLaunchTests' started on 'Clone 3 of iPhone 17 - TennerGridUITests-Runner (31320)'
-Test case 'TennerGridUITestsLaunchTests.testLaunch()' passed on 'Clone 3 of iPhone 17 - TennerGridUITests-Runner (31320)' (3.957 seconds)
-Test case 'TennerGridUITestsLaunchTests.testLaunch()' passed on 'Clone 3 of iPhone 17 - TennerGridUITests-Runner (31320)' (5.817 seconds)
-Test case 'TennerGridUITests.testThemeSwitchingWhileNavigating()' passed on 'Clone 1 of iPhone 17 - TennerGridUITests-Runner (30691)' (38.403 seconds)
-Test case 'TennerGridUITestsLaunchTests.testLaunch()' passed on 'Clone 3 of iPhone 17 - TennerGridUITests-Runner (31320)' (5.206 seconds)
-Test case 'TennerGridUITestsLaunchTests.testLaunch()' passed on 'Clone 3 of iPhone 17 - TennerGridUITests-Runner (31320)' (5.809 seconds)
-Test case 'TennerGridUITests.testDynamicThemeSwitching()' passed on 'Clone 1 of iPhone 17 - TennerGridUITests-Runner (30691)' (29.440 seconds)
+Test suite 'TennerGridUITests' started on 'Clone 1 of iPhone 17 - TennerGridUITests-Runner (39649)'
+Test case 'TennerGridUITests.testDynamicThemeSwitching()' passed on 'Clone 1 of iPhone 17 - TennerGridUITests-Runner (39649)' (28.450 seconds)
+Test case 'TennerGridUITests.testThemePersistence()' passed on 'Clone 1 of iPhone 17 - TennerGridUITests-Runner (39649)' (27.429 seconds)
+Test suite 'TennerGridUITestsLaunchTests' started on 'Clone 3 of iPhone 17 - TennerGridUITests-Runner (40241)'
+Test case 'TennerGridUITests.testCompleteGameFlowWithVoiceOver()' passed on 'Clone 1 of iPhone 17 - TennerGridUITests-Runner (39649)' (5.266 seconds)
+Test case 'TennerGridUITestsLaunchTests.testLaunch()' passed on 'Clone 3 of iPhone 17 - TennerGridUITests-Runner (40241)' (5.453 seconds)
+Test case 'TennerGridUITests.testExample()' passed on 'Clone 1 of iPhone 17 - TennerGridUITests-Runner (39649)' (3.669 seconds)
+Test case 'TennerGridUITestsLaunchTests.testLaunch()' passed on 'Clone 3 of iPhone 17 - TennerGridUITests-Runner (40241)' (5.891 seconds)
+Test case 'TennerGridUITestsLaunchTests.testLaunch()' passed on 'Clone 3 of iPhone 17 - TennerGridUITests-Runner (40241)' (6.889 seconds)
+Test case 'TennerGridUITestsLaunchTests.testLaunch()' passed on 'Clone 3 of iPhone 17 - TennerGridUITests-Runner (40241)' (5.803 seconds)
+Test case 'TennerGridUITests.testThemeSwitchingWhileNavigating()' passed on 'Clone 1 of iPhone 17 - TennerGridUITests-Runner (39649)' (36.497 seconds)
