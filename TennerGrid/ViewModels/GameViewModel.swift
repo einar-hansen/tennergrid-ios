@@ -326,6 +326,9 @@ final class GameViewModel: ObservableObject {
                 // Place the number
                 gameState.setValue(value, at: position)
 
+                // Clear pencil marks from the cell when placing a value
+                gameState.setPencilMarks([], at: position)
+
                 // Auto-update notes in affected cells (same row and neighbors)
                 updateNotesAfterValueEntry(value: value, at: position)
 
@@ -1039,9 +1042,13 @@ final class GameViewModel: ObservableObject {
         case .setValue:
             // Restore value (may be nil)
             gameState.setValue(targetValue, at: action.position)
-            // Restore pencil marks if we're undoing
-            if isUndo, !action.oldPencilMarks.isEmpty {
+            // Restore or clear pencil marks based on direction
+            if isUndo {
+                // Restore old pencil marks when undoing
                 gameState.setPencilMarks(action.oldPencilMarks, at: action.position)
+            } else {
+                // Clear pencil marks when redoing (placing a value clears marks)
+                gameState.setPencilMarks([], at: action.position)
             }
 
         case .clearValue:

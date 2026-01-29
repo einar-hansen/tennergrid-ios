@@ -448,9 +448,11 @@ final class TennerGridUITests: XCTestCase {
         settingsButton.tap()
 
         // Wait for settings view to appear
-        let appearanceSection = app.staticTexts["Appearance"]
+        // iOS may uppercase section headers, so check both variants
+        let appearanceExists = app.staticTexts["Appearance"].waitForExistence(timeout: 2) ||
+                               app.staticTexts["APPEARANCE"].waitForExistence(timeout: 2)
         XCTAssertTrue(
-            appearanceSection.waitForExistence(timeout: 2) || app.staticTexts["APPEARANCE"].exists,
+            appearanceExists,
             "Appearance section should exist in Settings"
         )
     }
